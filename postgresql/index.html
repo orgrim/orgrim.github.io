@@ -1,0 +1,18 @@
+---
+layout: default
+title: PostgreSQL
+---
+
+<section>
+<h2>Blog : PostgreSQL</h2>
+<ul>
+{% for post in site.categories.postgresql %}
+<li>{{ post.date | date: "%F" }} <a href="{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>
+</section>
+<!--
+<section>
+<h2>Pages</h2>
+</section>
+-->
