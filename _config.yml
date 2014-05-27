@@ -2,5 +2,6 @@ name: code. grind. sleep.
 markdown: redcarpet
 pygments: true
 baseurl: /
+url: http://www.orgrim.net
 timezone: Europe/Paris
 paginate: 5
