@@ -9,7 +9,7 @@ title: Blog
   {% if post.categories %}
   <ul class="tags list-inline">
     {% for c in post.categories %}
-    <li><span class="glyphicon glyphicon-tag"></span> <a href="{{ site.url }}/{{ c}}/">{{ c }}</a></li>
+    <li><span class="glyphicon glyphicon-tag"></span> <a href="{{ site.baseurl }}{{ c }}/">{{ c }}</a></li>
     {% endfor %}
   </ul>
   {% endif %}
@@ -26,9 +26,9 @@ title: Blog
     {% if paginator.previous_page %}
     <li class="previous">
       {% if paginator.previous_page == 1 %}
-      <a href="/index.html">&larr; Previous</a>
+      <a href="{{ site.baseurl }}index.html">&larr; Previous</a>
       {% else %}
-      <a href="/page{{ paginator.previous_page }}">&larr; Previous</a>
+      <a href="{{ site.baseurl }}/page{{ paginator.previous_page }}">&larr; Previous</a>
       {% endif %}
     </li>
     {% else %}
@@ -38,7 +38,7 @@ title: Blog
     <li><span>Page: {{ paginator.page }} of {{ paginator.total_pages }}</span></li>
 
     {% if paginator.next_page %}
-    <li class="next"><a href="/page{{ paginator.next_page }}">Next &rarr;</a></li>
+    <li class="next"><a href="{{ site.baseurl }}/page{{ paginator.next_page }}">Next &rarr;</a></li>
     {% else %}
     <li class="next disabled"><a href="#">Next &rarr;</a></li>
     {% endif %}
