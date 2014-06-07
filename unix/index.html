@@ -1,18 +1,5 @@
 ---
-layout: default
+layout: category_index
 title: Unix
+category: unix
 ---
-
-<section>
-<h2>Blog : Unix</h2>
-<ul>
-{% for post in site.categories.unix %}
-<li>{{ post.date | date: "%F" }} <a href="{{ post.url }}">{{ post.title }}</a></li>
-{% endfor %}
-</ul>
-</section>
-<!--
-<section>
-<h2>Pages</h2>
-</section>
--->

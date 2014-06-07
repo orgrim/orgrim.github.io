@@ -9,7 +9,7 @@ title: Blog
   {% if post.categories %}
   <ul class="tags list-inline">
     {% for c in post.categories %}
-    <li><span class="glyphicon glyphicon-tag"></span> <a href="{{ site.baseurl }}{{ c }}/">{{ c }}</a></li>
+    <li><a href="{{ site.baseurl }}{{ c }}/">{{ c }}</a> <a href="{{ site.baseurl }}{{ c }}/feed.xml"><span class="fa fa-rss"></span></a></li>
     {% endfor %}
   </ul>
   {% endif %}
