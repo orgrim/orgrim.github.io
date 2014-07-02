@@ -1,5 +1,6 @@
 body {
   font: 12px/1.5 Bitstream Vera Sans, Helvetica, Arial, sans-serif;
+  color: #000;
 }
 
 section {
@@ -49,4 +50,20 @@ h6, .h6 {
 
 textarea#query {
   font-family: Menlo,Monaco,Consolas,"Courier New", monospace;
+}
+
+.navbar-default {
+  background-color: transparent;
+}
+
+.navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a {
+  color: #000;
+}
+
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus {
+  color: #5e5e5e;
+}
+
+.navbar-nav .dropdown-menu {
+  font-size: inherit;
 }
