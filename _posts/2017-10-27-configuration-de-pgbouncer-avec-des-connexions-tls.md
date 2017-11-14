@@ -30,8 +30,8 @@ Changer quelques informations :
     set_var EASYRSA_REQ_COUNTRY	"FR"
     set_var EASYRSA_REQ_PROVINCE	"Ile-de-France"
     set_var EASYRSA_REQ_CITY	"Paris"
-    set_var EASYRSA_REQ_ORG		"Dalibo"
-    set_var EASYRSA_REQ_EMAIL	"admin@dalibo.com"
+    set_var EASYRSA_REQ_ORG		"MyOrg"
+    set_var EASYRSA_REQ_EMAIL	"admin@myorg.lo"
     set_var EASYRSA_REQ_OU		"Clients"
 
 Créer l'autorité :
