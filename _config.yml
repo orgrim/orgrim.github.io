@@ -3,4 +3,4 @@ baseurl: /
 url: http://www.orgrim.net
 timezone: Europe/Paris
 paginate: 5
-gems: [jekyll-paginate]
+plugins: [jekyll-paginate]
