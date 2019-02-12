@@ -1,6 +1,6 @@
 name: code. grind. sleep.
 baseurl: /
-url: http://www.orgrim.net
+url: https://www.orgrim.net
 timezone: Europe/Paris
 paginate: 5
 plugins: [jekyll-paginate]
