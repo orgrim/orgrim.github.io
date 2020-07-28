@@ -9,12 +9,12 @@ title: Blog
   {% if post.categories %}
   <ul class="tags list-inline">
     {% for c in post.categories %}
-    <li><a href="{{ site.url }}/{{ c }}/">{{ c }}</a> <a href="{{ site.url }}/{{ c }}/feed.xml"><span class="fa fa-rss"></span></a></li>
+    <li><a href="{{ site.url }}/{{ c | downcase }}/">{{ c }}</a> <a href="{{ site.url }}/{{ c | downcase }}/feed.xml"><span class="fa fa-rss"></span></a></li>
     {% endfor %}
   </ul>
   {% endif %}
 
-  <p><small><em>{{ post.date | date: "%d/%m/%Y, %T" }}</em></small></p>
+  <p><small><em>{{ post.date | date: "%d/%m/%Y, %T %z" }}</em></small></p>
   
   {{ post.content }}
 </section>
