@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>bash on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/bash/</link>
+    <description>code. grind. sleep. (bash)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Wed, 29 Jun 2011 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/bash/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Rediriger stdout/stderr depuis un script avec du pipe</title>
+      <link>https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/</link>
+      <pubDate>Wed, 29 Jun 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/</guid>
+      <description>&lt;p&gt;Pour rediriger stdout/stderr à l&amp;rsquo;interieur vers l&amp;rsquo;entrée standard d&amp;rsquo;un
+commande, il faut utiliser exec et du sous-shell. Cette astuce est un
+bashisme a priori.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;objectif est de renvoyer tous les messages du script dans syslog sans
+mettre de redirection sur la ligne de commande. Le principe général
+est :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;exec FD&amp;gt; &amp;gt;(COMMAND)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;FD est le numéro du file descriptor, 1 pour stdout, 2 pour stderr&lt;/li&gt;
+&lt;li&gt;COMMAND est la commande a exécuter, elle doit bien sûr lire les
+données en entrée.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Un plus gros exemple :&lt;/p&gt;
+&lt;p&gt;{% highlight bash %}
+SYSLOG=&amp;ldquo;no&amp;rdquo;&lt;/p&gt;
+&lt;h1 id=&#34;load-configuration-file&#34;&gt;Load configuration file&lt;/h1&gt;
+&lt;p&gt;CONFIG=/etc/myconfig.conf
+if [ -f &amp;ldquo;$CONFIG&amp;rdquo; ]; then
+. $CONFIG
+fi&lt;/p&gt;
+&lt;h1 id=&#34;redirect-output-to-syslog-if-configured&#34;&gt;Redirect output to syslog if configured&lt;/h1&gt;
+&lt;p&gt;if [ &amp;ldquo;$SYSLOG&amp;rdquo; = &amp;ldquo;yes&amp;rdquo; ]; then
+SYSLOG_FACILITY=${SYSLOG_FACILITY:-local0}
+SYSLOG_IDENT=${SYSLOG_IDENT:-postgres}&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;exec 1&amp;gt; &amp;gt;(logger -t ${SYSLOG_IDENT} -p ${SYSLOG_FACILITY}.info)
+exec 2&amp;gt; &amp;gt;(logger -t ${SYSLOG_IDENT} -p ${SYSLOG_FACILITY}.err)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;fi&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+avec dans la configuration :
+
+-   `SYSLOG` : mettre à yes ou no pour activer
+-   `SYSLOG_FACILITY` : ou envoyer
+-   `SYSLOG_IDENT` : avec quel tag
+
+L&#39;exemple est pris d&#39;un de mes scripts d&#39;archivage pour PostgreSQL, ce
+qui permet de logguer dans syslog sans mettre de pipe dans
+`archive_command` (ce qu&#39;il ne faut pas faire parce que ça casse : le
+code retour donné à PostgreSQL est celui de la dernière commande de la
+chaîne de pipe).
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>Insérer des tabulations dans sa ligne de commande bash</title>
+      <link>https://www.orgrim.net/post/2011-03-24-inserer-des-tabulations-dans-sa-ligne-de-commande-bash/</link>
+      <pubDate>Thu, 24 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-24-inserer-des-tabulations-dans-sa-ligne-de-commande-bash/</guid>
+      <description>&lt;p&gt;Il y a longtemps que je me demandais comment faire ça, sans prendre la
+peine de rechercher ou lire le man. C&amp;rsquo;est chose faite, pour insérer une
+tabulation, il faut contourner la complétion de commandes avec le combo
+suivant :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;C-v TAB
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;C&amp;rsquo;est simple, mais ça ne s&amp;rsquo;invente pas.&lt;/p&gt;
+&lt;p&gt;Pour le coup, c&amp;rsquo;est utile quand on veut voir un fichier de configuration
+sans les commentaires, par exemple&lt;code&gt; postgresql.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;grep -Ev &#39;^(( |        )*#|$)&#39; postgresql.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On doit donc taper une tabulation dans l&amp;rsquo;expression régulière : on
+affiche toutes les lignes qui ne satisfont pas la condition « tout ce
+qui commence par 0 ou plusieurs espaces ou tabulations suivi d&amp;rsquo;un dièse,
+ou une ligne vide ».&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Dual boot Debian/NetBSD - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Dual boot Debian/NetBSD" />
+<meta property="og:description" content="L&rsquo;installation d&rsquo;un dual boot Linux/BSD est somme toute assez simple, on
+coupe le disque en deux et on installe les systèmes l&rsquo;un après l&rsquo;autre.
+La seule difficulté reste sur l&rsquo;installation/configuration des
+bootloaders." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/" />
+<meta property="article:published_time" content="2010-11-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2010-11-29T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Dual boot Debian/NetBSD"/>
+<meta name="twitter:description" content="L&rsquo;installation d&rsquo;un dual boot Linux/BSD est somme toute assez simple, on
+coupe le disque en deux et on installe les systèmes l&rsquo;un après l&rsquo;autre.
+La seule difficulté reste sur l&rsquo;installation/configuration des
+bootloaders."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Dual boot Debian/NetBSD</h1>
+        </header>
+        <div class="content">
+            <p>L&rsquo;installation d&rsquo;un dual boot Linux/BSD est somme toute assez simple, on
+coupe le disque en deux et on installe les systèmes l&rsquo;un après l&rsquo;autre.
+La seule difficulté reste sur l&rsquo;installation/configuration des
+bootloaders.</p>
+<p>Voici comment j&rsquo;ai installé mon laptop en dual boot Debian/NetBSD.
+D&rsquo;abord, quelques principes/astuces:</p>
+<ul>
+<li>Linux s&rsquo;installe dans différentes partitions DOS</li>
+<li>NetBSD installe ses partitions à l&rsquo;intérieur d&rsquo;une partition DOS qui
+lui est dédiée</li>
+<li>On peut partager la swap entre les deux systèmes</li>
+<li>On installe d&rsquo;abord Linux et on utilise du LVM pour éviter de créer
+des partitions étendues</li>
+<li>GRUB sera le boot loader principal et on chainload&rsquo;era le boot
+loader de NetBSD</li>
+</ul>
+<p>Table des partitions DOS:</p>
+<ul>
+<li>Part 1: /boot (100Mb) - type Linux</li>
+<li>Part 2: swap (taille de la RAM) - type Swap</li>
+<li>Part 3: LVM (moitié du reste) - type Linux LVM</li>
+<li>Part 4: NetBSD (le reste) - type NetBSD</li>
+</ul>
+<p>Etapes:</p>
+<ol>
+<li>
+<p>Installer Debian (on prend une squeeze avec grub2)</p>
+</li>
+<li>
+<p>Installer NetBSD</p>
+</li>
+<li>
+<p>Booter NetBSD et lancer:
+<code>installboot -v /dev/rwd0a /usr/mdec/bootxx_ffsv1</code> (wd0a est la
+partition / et commence au début de la partition DOS allouée à
+NetBSD)</p>
+</li>
+<li>
+<p>Rebooter sur le mode Rescue de Debian:</p>
+<ol>
+<li>Choisir son root fs et executer un shell dedans</li>
+<li>Monter tous les FS: <code>mount -t ext3 -a</code></li>
+<li>Editer <code>/etc/grub.d/40_custom</code> (voir plus bas) :</li>
+<li>Lancer: <code>grub-install</code></li>
+</ol>
+</li>
+<li>
+<p>Rebooter et vérifier que tout est bien accessible</p>
+</li>
+</ol>
+<p><code>/etc/grub.d/40_custom</code> :</p>
+<p>{% highlight bash %}
+#!/bin/sh
+exec tail -n +3 $0
+menuentry &ldquo;NetBSD&rdquo; {
+set root=(hd0,4)
+chainloader +1
+}</p>
+<pre><code></code></pre>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2010-11-29</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/debian">#debian</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/dual-boot">#dual-boot</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>PostgreSQL - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="alternate" type="application/rss+xml" href="https://www.orgrim.net/categories/postgresql/index.xml" title="code. grind. sleep." />
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="PostgreSQL" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.orgrim.net/categories/postgresql/" />
+<meta property="og:updated_time" content="2017-10-30T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="PostgreSQL"/>
+<meta name="twitter:description" content=""/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    <h1>Catégorie: PostgreSQL</h1>
+    <div class="post-info">
+        <a href="https://www.orgrim.net/categories">Vers toutes les catégories</a>
+    </div>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/">Gestion des utilisateurs pgBouncer avec auth_query</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Avec pgBouncer 1.6 sont arrivés deux nouveaux paramètres, <code>auth_user</code> et
+<code>auth_query</code>, qui permettent de faciliter la gestion du fichier des
+utilisateurs. Le fichier des utilisateurs contient les couples
+utilisateur / mot de passe hashé pour s&rsquo;authentifier à la place de
+l&rsquo;utilisateur final sur le serveur PostgreSQL. Il y a deux problèmes
+majeurs avec ce fichier utilisateur : son maintien fastidieux et le
+risque de collision entre noms de roles identiques mais avec des mots
+de passe différents si le même pgBoucner accède à plusieurs instances
+PostgreSQL.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2017-10-30</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/pgbouncer">#pgbouncer</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/auth">#auth</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/">Configuration de pgBouncer avec des connexions TLS</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2017-10-27</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/pgbouncer">#pgbouncer</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/auth">#auth</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/">Réflexions sur l&#39;archivage des fichiers WAL</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>PostgreSQL faisant son bonhomme de chemin, on se retrouve désormais
+avec des configurations où il faut archiver plusieurs fois les WAL
+parce qu&rsquo;on a de la sauvegarde PITR et de la réplication.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2015-12-30</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/archiving">#archiving</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/wal">#wal</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/replication">#replication</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/">pg_back le script de base pour sauvegarder PostgreSQL</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Il y a fort longtemps, et c&rsquo;est ma première contribution relative à
+PostgreSQL, j&rsquo;ai écrit un script de backup qui dump tout un serveur
+PostgreSQL avec <code>pg_dump</code> et <code>pg_dumpall</code>. Il s&rsquo;agit de pg_back.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2015-03-12</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_back">#pg_back</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/backup">#backup</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/dump">#dump</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2014-09-22-confiner-postgresql-avec-selinux/">Confiner PostgreSQL avec SELinux</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <style type="text/css">.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:#444;background:#e7f2fa}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:#fff;background:#6ab0de}.notice.warning .notice-title{background:rgba(217,83,79,.9)}.notice.warning{background:#fae2e2}.notice.info .notice-title{background:#f0b37e}.notice.info{background:#fff2db}.notice.note .notice-title{background:#6ab0de}.notice.note{background:#e7f2fA}.notice.tip .notice-title{background:rgba(92,184,92,.8)}.notice.tip{background:#e6f9e6}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:0.125em;position:relative}</style>
+<svg width="0" height="0" display="none" xmlns="http://www.w3.org/2000/svg"><symbol id="tip-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"/></symbol><symbol id="note-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></symbol><symbol id="warning-notice" viewBox="0 0 576 512" preserveAspectRatio="xMidYMid meet"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></symbol><symbol id="info-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></symbol></svg><div class="notice note" >
+<p class="first notice-title"><span class="icon-notice baseline"><svg><use href="#note-notice"></use></svg></span>Remarque</p><p>Ce post est partiellement obsolète, avec le passage à systemd.</p></div>
+
+<p>J&rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
+aller trop loin, parce que j&rsquo;entendais souvent la phrase &ldquo;Si on veut
+de la sécurité, il faut SELinux&rdquo; et surtout à cause de l&rsquo;arrivée de
+l&rsquo;extension <code>sepgsql</code> dans les modules contrib de PostgreSQL. Ça avait
+donné une conf pour le Fosdem où finalement, j&rsquo;ai plus parlé des
+privilèges classiques que de SELinux.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2014-09-22</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/selinux">#selinux</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2013-04-06-oups-des-tablespaces-imbriques/">Oups... des tablespaces imbriqués</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Imbriquer des tablespaces n&rsquo;a pas vraiment de sens dans PostgreSQL
+surtout si on veut se prendre la tête avec des montages dans tous les
+sens&hellip; Mais bon c&rsquo;est permis, car PostgreSQL utilise uniquement les
+liens symboliques dans <code>$PGDATA/pg_tblspc</code> pour accéder au contenu des
+tablespaces.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2013-04-06</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2012-01-25-got-guc/">Got GUC?</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&rsquo;un paramètre au niveau d&rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2012-01-25</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/configuration">#configuration</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/">Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&rsquo;expérimentation est nécessaire pour se rassurer&hellip;
+On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
+L&rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est pourquoi on a besoin de plusieurs tablespaces.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-10-14</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-04-could-not-open-relation-with-oid-n/">Could not open relation with oid N</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        On peut parfois trouver cet étrange message d&rsquo;erreur dans les traces de PostgreSQL (N étant un nombre) ou lors de l&rsquo;exécution d&rsquo;une requête :
+ERROR: could not open relation with OID N  Si on recherche ce message dans les mailing-lists du projet, on peut facilement conclure que la base de données est corrompue, qu&rsquo;il y a des problèmes matériels et que la sécurité des données est en péril. Et bien, ce n&rsquo;est pas forcément le cas : obtenir ce message peut être tout à fait normal.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-04</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/lock">#lock</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/">Retrouver un trigger à partir du nom de la fonction associée</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Ici encore, tout est dans le catalogue système de PostgreSQL, il suffit
+de regarder dans la table <code>pg_trigger</code>.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-04-07</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+    
+    
+        
+    <div class="pagination">
+        <div class="left pagination-item disabled">
+            
+        </div>
+        <div class="right pagination-item ">
+            
+                <a href="/categories/postgresql/page/2/">articles &#43; anciens</a>
+            
+        </div>
+    </div>
+
+
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

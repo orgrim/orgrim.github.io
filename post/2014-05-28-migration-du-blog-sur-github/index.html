@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Migration du blog sur github - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Migration du blog sur github" />
+<meta property="og:description" content="Finalement le temps ne me permettant plus d&rsquo;administrer mon serveur
+dédié comme il faut, j&rsquo;ai décidé de l&rsquo;abondonner et transférer mes
+services ailleurs. Pour le blog et le wiki, j&rsquo;ai choisi de faire un
+site/blog github avec jekyll, vu que c&rsquo;est tout prémaché." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2014-05-28-migration-du-blog-sur-github/" />
+<meta property="article:published_time" content="2014-05-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2014-05-28T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Migration du blog sur github"/>
+<meta name="twitter:description" content="Finalement le temps ne me permettant plus d&rsquo;administrer mon serveur
+dédié comme il faut, j&rsquo;ai décidé de l&rsquo;abondonner et transférer mes
+services ailleurs. Pour le blog et le wiki, j&rsquo;ai choisi de faire un
+site/blog github avec jekyll, vu que c&rsquo;est tout prémaché."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Migration du blog sur github</h1>
+        </header>
+        <div class="content">
+            <p>Finalement le temps ne me permettant plus d&rsquo;administrer mon serveur
+dédié comme il faut, j&rsquo;ai décidé de l&rsquo;abondonner et transférer mes
+services ailleurs. Pour le blog et le wiki, j&rsquo;ai choisi de faire un
+site/blog github avec jekyll, vu que c&rsquo;est tout prémaché.</p>
+<p>Sur github, l&rsquo;hébergement c&rsquo;est du fichier html, donc statique, on a
+plusieurs possibilités pour créer un site :</p>
+<ul>
+<li><a href="http://jekyllrb.com">jekyll</a> dont github est capable de compiler le résultat à chaque
+push du dépôt, mais avec certaines limitations, comme aucun plugin
+et la nécessité de créer pas mal de pages pour que ça ressemble à un
+blog</li>
+<li><a href="http://octopress.org">octopress</a> qui est une surcouche à jekyll, il faut rtfm et tout de
+même faire ses templates, voir un peu de ruby</li>
+<li><a href="http://getpelican.com">pelican</a> qui fait comme octopress à peu prêt mais en python</li>
+<li>plein d&rsquo;autres générateurs de site statiques que j&rsquo;ai surement raté</li>
+</ul>
+<p>L&rsquo;avantage de pelican est dans sa capacité à importer le contenu d&rsquo;un
+blog dotclear, et transformer la syntaxe en markdown. Le markdown
+semble avoir la cote, beaucoup de générateurs de site l&rsquo;utilisent,
+d&rsquo;ailleurs je m&rsquo;y suis mis.</p>
+<p>Comme j&rsquo;avais déjà fait le site de <a href="http://dalibo.github.io/pitrery/">pitrery</a> avec jekyll sur github,
+la migration fut plus facile, une fois le dotclear migré grâce à
+pelican.</p>
+<p>Au final, j&rsquo;ai maintenant un truc tout simple avec un thème
+<a href="http://getbootstrap.com">bootstrap</a>, et le jekyll de base de github est largement suffisant.</p>
+<p>La bonne découverte fut <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>, un super convertisseur de format de
+document texte, qui va me servir pour la migration du dokuwiki à base
+de :</p>
+<pre><code>pandoc -f html -t markdown http://wiki.orgrim.net/page?do=export_html
+</code></pre>
+<p>Le mot de la fin, ça demande un peu de boulot de nettoyage manuel,
+mais vu le nombre impressionant de posts que j&rsquo;ai pu produire en quatre
+ans, c&rsquo;était pas trop méchant.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2014-05-28</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">Unix</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/blog">#blog</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pandoc">#pandoc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

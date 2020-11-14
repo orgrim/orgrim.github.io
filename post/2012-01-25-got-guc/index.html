@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Got GUC? - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Got GUC?" />
+<meta property="og:description" content="Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&rsquo;un paramètre au niveau d&rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2012-01-25-got-guc/" />
+<meta property="article:published_time" content="2012-01-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2012-01-25T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Got GUC?"/>
+<meta name="twitter:description" content="Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&rsquo;un paramètre au niveau d&rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Got GUC?</h1>
+        </header>
+        <div class="content">
+            <p>Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui
+signifie Grand Unified Configuration, c&rsquo;est le nom de la partie du code
+qui gère les paramètres de configuration. En gros, ce sont tous les
+paramètres du fichier <code>postgresql.conf</code>.</p>
+<p>Ce qui est moins connu et utilisé, c&rsquo;est la possibilité de configurer
+ces paramètres à différents niveaux :</p>
+<ol>
+<li>Fichier <code>postgresql.conf</code></li>
+<li>Ligne de commande du postmaster, le processus principal du serveur</li>
+<li>Base de données</li>
+<li>Rôle</li>
+<li>Rôle sur une base de données</li>
+<li>Session</li>
+<li>Transaction</li>
+</ol>
+<p>La précédence des valeurs va en descendant dans la liste, par exemple la
+valeur d&rsquo;un paramètre au niveau d&rsquo;un rôle écrase celle positionnée au
+niveau de la base de donnée ou la ligne de commande. Ce comportement est
+très intéressant pour définir une valeur d&rsquo;un paramètre dépendante du
+contexte d&rsquo;exécution d&rsquo;un traitement. Par exemple on peut placer un
+timeout des requêtes au niveau de la base pour éviter qu&rsquo;une application
+ne jette l&rsquo;éponge avant PostgreSQL, et configurer l&rsquo;absence de timeout
+pour un rôle dédié aux opérations de VACUUM et ANALYSE, on limite ainsi
+l&rsquo;effet de bord du timeout :</p>
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="c1">-- timeout à 30 secondes sur la base de données
+</span><span class="c1"></span><span class="k">ALTER</span> <span class="k">DATABASE</span> <span class="n">mabase</span> <span class="k">SET</span> <span class="n">statement_timeout</span> <span class="k">TO</span> <span class="mi">30000</span><span class="p">;</span>
+
+<span class="c1">-- pas de timeout pour le role maintenance chargé du vacuum
+</span><span class="c1"></span><span class="k">ALTER</span> <span class="k">ROLE</span> <span class="n">maintenance</span> <span class="k">SET</span> <span class="n">statement_timeout</span> <span class="k">TO</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></div><p>Selon l&rsquo;endroit où doit être positionné la valeur on utilise :</p>
+<ul>
+<li><code>postgresql.conf</code> : directement dans le fichier</li>
+<li>ligne de commande : dans le script d&rsquo;init avec l&rsquo;option <code>-c</code> et à
+l&rsquo;exécution de <code>pg_ctl</code> avec l&rsquo;option <code>-o</code></li>
+<li>base de données : <code>ALTER DATABASE nom_base SET param TO valeur;</code></li>
+<li>rôle : <code>ALTER ROLE nom_role SET param TO valeur;</code></li>
+<li>rôle dans une base de données : <code>ALTER ROLE nom_role IN DATABASE nom_base SET param TO valeur;</code></li>
+<li>session : <code>SET [ SESSION ] param TO valeur;</code></li>
+<li>transaction : <code>SET LOCAL param TO valeur;</code></li>
+</ul>
+<p>Pour le passage des valeurs au niveau SQL, on peut utiliser
+<code>RESET param</code> à la place de <code>SET param TO</code> pour réinitialiser la
+valeur à son défaut pour le contexte choisi.</p>
+<p>Pour les paramètres au niveau des bases de données et des rôle, ces
+informations sont stockées dans la table du catalogue système
+<code>pg_catalog.pg_db_role_setting</code>. La commande psql <code>\drds</code>permet de
+facilement afficher son contenu.</p>
+<p>On peut également définir des paramètres personnalisés, comme le font
+certaines extensions. Pour cela il faut définir une classe de variables
+personnalisée, en déclarant un préfixe (on en sépare plusieurs par des
+virgules) dans le paramètre de configuration <code>custom_variable_classes</code> :</p>
+<pre><code>custom_variable_classes = 'nico'
+</code></pre>
+<p>Ensuite, on peut directement ajouter nos variables personnalisées en les
+préfixant par <code>nico.</code> :</p>
+<pre><code>nico.test_guc = 1000
+</code></pre>
+<p>On peut alors manipuler ces variables comme ceci :</p>
+<h2 id="nicotest_guc">{% highlight psql %}
+mydb=# SHOW nico.test_guc;
+nico.test_guc</h2>
+<p>1000
+(1 row)</p>
+<h2 id="nicotest_guc-1">mydb=# SHOW nico.test_guc;
+nico.test_guc</h2>
+<p>1000
+(1 row)</p>
+<h2 id="nicotest_guc-2">mydb=# SET nico.test_guc = 3;
+SET
+mydb=# SHOW nico.test_guc;
+nico.test_guc</h2>
+<p>3
+(1 row)</p>
+<h2 id="nicoreguc">mydb=# SET nico.reguc = on;
+SET
+mydb=# SHOW nico.reguc;
+nico.reguc</h2>
+<p>on
+(1 row)</p>
+<pre><code>
+Enfin, on peut utiliser les fonctions `current_setting()` et
+`set_config()` pour manipuler ces variables dans des fonctions :
+
+{% highlight psql %}
+mydb=# SELECT set_config('nico.test_guc', '100', false);
+ set_config 
+------------
+ 100
+(1 row)
+
+mydb=# SELECT current_setting('nico.test_guc');
+ current_setting 
+-----------------
+ 100
+(1 row)
+</code></pre><p>PS: merci à <a href="http://momjian.us/main/blogs/pgblog/2011.html#December_1_2011">ce post</a> pour l&rsquo;idée de creuser le sujet.</p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2012-01-25</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/configuration">#configuration</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

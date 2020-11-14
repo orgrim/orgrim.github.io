@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip" />
+<meta property="og:description" content="Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
+pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
+pour pkgsrc : http://pkgsrc.se/wip/pgbuildfarm." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/" />
+<meta property="article:published_time" content="2011-08-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-08-06T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip"/>
+<meta name="twitter:description" content="Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
+pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
+pour pkgsrc : http://pkgsrc.se/wip/pgbuildfarm."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</h1>
+        </header>
+        <div class="content">
+            <p>Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
+pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
+pour pkgsrc : <a href="http://pkgsrc.se/wip/pgbuildfarm">http://pkgsrc.se/wip/pgbuildfarm</a>.</p>
+<p>En espérant qu&rsquo;il soit ajouté à l&rsquo;arbre officiel&hellip;</p>
+<p>Voici la configuration pour lancer des builds sur NetBSD, dans
+<code>/usr/pkg/etc/pgbuildfarm/build-farm.conf</code>, en commençant par le chemin
+du miroir du dépôt Git :</p>
+<pre><code># Modifier dans %conf
+scmrepo =&gt; '/usr/pgbuildfarm/pgsql-base.git',
+</code></pre>
+<p>Le client est destiné à être lancé par cron, connu pour son
+environnement light, c&rsquo;est pourquoi les paramètres d&rsquo;environnement
+doivent être adaptés :</p>
+<ul>
+<li>
+<p>Le make GNU s&rsquo;appelle gmake chez nous</p>
+</li>
+<li>
+<p>Pas mal de programmes proviennent de pkgsrc, il faut donc que le
+client ait <code>/usr/pkg/bin</code> dans son PATH, et puisse trouver les
+bibliothèques issues des packages.</p>
+<p>make =&gt; &lsquo;gmake&rsquo;,
+aux_path =&gt; &ldquo;/usr/pkg/bin&rdquo;,</p>
+<p>build_env =&gt;
+{
+PATH =&gt; &ldquo;/usr/pkg/bin:$ENV{PATH}&rdquo;,
+LD_LIBRARY_PATH =&gt; &ldquo;/usr/pkg/lib&rdquo;,
+},</p>
+<p>config_env =&gt;
+{
+CC =&gt; &lsquo;gcc&rsquo;,
+PATH =&gt; &ldquo;/usr/pkg/bin:$ENV{PATH}&rdquo;,
+LD_LIBRARY_PATH =&gt; &ldquo;/usr/pkg/lib&rdquo;,
+},</p>
+</li>
+</ul>
+<p>Enfin le plus important, les options du <code>configure</code>, la plupart
+nécessitent des packages supplémentaires comme <code>python</code> ou la <code>libxml</code>.
+Ce qui est primordial ici est d&rsquo;utiliser le « template » NetBSD :</p>
+<pre><code>config_opts =&gt;
+[qw(
+    --enable-cassert
+    --enable-debug
+    --enable-nls
+    --enable-integer-datetimes
+    --with-perl
+    --with-python
+    --with-tcl
+    --with-krb5
+    --with-includes=/usr/include/krb5:/usr/pkg/include
+    --with-libraries=/usr/pkg/lib
+    --with-openssl
+    --with-template=netbsd
+    --enable-thread-safety
+)],
+</code></pre>
+<p>Pour toutes ces options, les packages suivants ont été installés :</p>
+<ul>
+<li><code>devel/bison</code></li>
+<li><code>devel/flex</code></li>
+<li><code>lang/python26</code> (et <code>pkgtools/pkg_alternatives</code> pour avoir le lien
+python)</li>
+<li><code>lang/perl5</code></li>
+<li><code>lang/tcl</code></li>
+<li><code>textproc/libxml2</code></li>
+<li><code>textproc/libxslt</code></li>
+<li><code>devel/readline</code></li>
+</ul>
+<p>P.S. : Il n&rsquo;y a que les particularités de NetBSD décrites ici, en
+complément du <a href="http://wiki.postgresql.org/wiki/PostgreSQL_Buildfarm_Howto">wiki de PostgreSQL</a>.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-06</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

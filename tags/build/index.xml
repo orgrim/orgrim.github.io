@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>build on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/build/</link>
+    <description>code. grind. sleep. (build)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Tue, 24 Jan 2012 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/build/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Compiler dans l&#39;arbre des sources</title>
+      <link>https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/</link>
+      <pubDate>Tue, 24 Jan 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/</guid>
+      <description>&lt;p&gt;Je m&amp;rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&amp;rsquo;avère qu&amp;rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&amp;rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&amp;rsquo;agit de NetBSD 5.1.1, la version 6 n&amp;rsquo;aura pas
+ce manque.&lt;/p&gt;
+&lt;p&gt;Il faut donc recompiler un noyau pour ajouter cette fonctionnalité, pour
+faire vite on ne passe pas par &lt;code&gt;build.sh&lt;/code&gt;, les tools etc, on compile
+directement dans l&amp;rsquo;arbre des sources, montrer comment faire ça est le
+but de post.&lt;/p&gt;
+&lt;p&gt;On commence par récupérer les sources sur un serveur CVS près de chez
+soi :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# export CVS_RSH=ssh
+# export CVSROOT=&amp;quot;anoncvs@anoncvs.NetBSD.org:/cvsroot&amp;quot;
+# cd /usr
+# cvs -q -z3 co -P -rnetbsd-5-1-1-RELEASE src
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite, on n&amp;rsquo;a pas besoin d&amp;rsquo;avoir une conf particulière dans son
+&lt;code&gt;/etc/mk.conf&lt;/code&gt;, on n&amp;rsquo;a juste à ajouter les options dans le fichier de
+conf du kernel et compiler directement par l&amp;rsquo;intermédiaire de &lt;code&gt;make&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;On édite le fichier &lt;code&gt;/usr/src/sys/arch/i386/conf/GENERIC.local&lt;/code&gt;, pour y
+ajouter les lignes suivantes, il est inclus par le fichier &lt;code&gt;GENERIC&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# DRI driver    
+i915drm*        at vga?         # Intel i915, i945 DRM driver
+mach64drm*      at vga?         # mach64 (3D Rage Pro, Rage) DRM driver
+mgadrm*         at vga?         # Matrox G[24]00, G[45]50 DRM driver
+r128drm*        at vga?         # ATI Rage 128 DRM driver
+radeondrm*      at vga?         # ATI Radeon DRM driver
+savagedrm*      at vga?         # S3 Savage DRM driver
+sisdrm*         at vga?         # SiS DRM driver
+tdfxdrm*        at vga?         # 3dfx (voodoo) DRM driver
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On compile le kernel à la main :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# config GENERIC
+# cd ../compile/GENERIC
+# make depend
+# make
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On installe le kernel à la main :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mv /netbsd /netbsd.old
+# cp netbsd /
+# chmod 444 /netbsd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour revenir facilement en arrière en cas de souci, on peut ajouter la
+ligne suivante dans &lt;code&gt;/boot.cfg&lt;/code&gt;, en deuxième position :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;menu=Boot old kernel:boot netbsd.old
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Il ne reste plus qu&amp;rsquo;à rebooter sur le nouveau kernel.&lt;/p&gt;
+&lt;p&gt;Référence : &lt;a href=&#34;http://www.netbsd.org/docs/guide/en/chap-kernel.html#chap-kernel-building-manually&#34;&gt;Le guide&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;On peut faire la même manip pour mettre à jour une partie du système
+seulement, par exemple lorsqu&amp;rsquo;une faille de sécurité doit être corrigée.
+La méthode de compilation dans l&amp;rsquo;arbre des sources est indiquée dans
+l&amp;rsquo;avis.&lt;/p&gt;
+&lt;p&gt;Plus généralement, la méthode est la suivante, avec l&amp;rsquo;exemple de &lt;code&gt;ls&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/src/bin/ls
+# make USETOOLS=no cleandir
+# make USETOOLS=no dependall
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le binaire résultant et sa doc sont prêts dans le répertoire courant, il
+ne reste qu&amp;rsquo;à installer :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# make USETOOLS=no install
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

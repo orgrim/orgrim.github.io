@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>X11 on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/x11/</link>
+    <description>code. grind. sleep. (X11)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Fri, 23 Aug 2013 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/x11/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>modular-xorg, radeon et pas de KMS</title>
+      <link>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</link>
+      <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</guid>
+      <description>&lt;p&gt;Il y avait un moment que je n&amp;rsquo;avais pas touché à NetBSD et donc mis à
+jour mon lappy avec du pkg frais. Entre temps, la version de X.org
+modular, donc issue de pkgsrc, est revenue en 2012, avec son lot de
+drivers mis à jour. Le drivers xf86-video-ati, est passé en version
+7.1.0, sauf qu&amp;rsquo;il fonctionne uniquement en KMS (Kernel Mode Setting),
+chose qu&amp;rsquo;on n&amp;rsquo;a pas encore dans notre kernel.&lt;/p&gt;
+&lt;p&gt;Il faut donc la dernière version de la branche 6 du driver, qui contient
+encore le support UMS, disponible dans le paquet &lt;code&gt;x11/xf86-video-ati6&lt;/code&gt;,
+qui porte le même nom de package, bizarrement. Tout ça est suivi dans le
+&lt;a href=&#34;http://gnats.netbsd.org/cgi-bin/query-pr-single.pl?number=47935&#34;&gt;PR 47935&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Pour que le serveur X trouve le device avec ce driver, j&amp;rsquo;ai du virer la
+ligne &lt;code&gt;BusID&lt;/code&gt; dans la section Device du &lt;code&gt;xorg.conf&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>X11 forwarding request failed on channel 0</title>
+      <link>https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/</link>
+      <pubDate>Fri, 21 Oct 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/</guid>
+      <description>&lt;p&gt;Quand j&amp;rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en
+X.org modular, j&amp;rsquo;ai ça :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;orgrim@serfouette ~ $ ssh rateau 
+X11 forwarding request failed on channel 0
+Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;WTF? ça tombe en marche SSH normalement.&lt;/p&gt;
+&lt;p&gt;Et bien le souci vient de l&amp;rsquo;échange des magic cookies pour
+l&amp;rsquo;authentification entre serveurs X à travers SSH, c&amp;rsquo;est utilisé par le
+X11 forwarding et on a besoin de plusieurs choses pour ça :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;le chemin complet vers &lt;code&gt;xauth&lt;/code&gt; sur le client&lt;/li&gt;
+&lt;li&gt;le chemin complet vers &lt;code&gt;xauth&lt;/code&gt; sur le serveur&lt;/li&gt;
+&lt;li&gt;Avoir &lt;code&gt;X11Forward yes&lt;/code&gt; sur le serveur quand on le demande sur le
+client (il vaut &lt;code&gt;yes&lt;/code&gt; dans le &lt;code&gt;/etc/ssh/ssh_config&lt;/code&gt; du client par
+flemme de taper &lt;code&gt;-X&lt;/code&gt; sur la ligne de commande)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le client est sous Linux, donc pas de soucis le chemin en dur
+&lt;code&gt;/usr/bin/xauth&lt;/code&gt; dans le binaire &lt;code&gt;sshd&lt;/code&gt; marche. Par contre pour NetBSD
+avec du X.org modular, il faut décommenter l&amp;rsquo;option &lt;code&gt;XAuthLocation&lt;/code&gt; dans
+&lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; et &lt;code&gt;/etc/ssh/ssh_config&lt;/code&gt; pour donner le bon
+chemin vers &lt;code&gt;xauth&lt;/code&gt;, comme indiqué en commentaire dans ces deux
+fichiers :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# If you use xorg from pkgsrc then uncomment the following line.
+#  XAuthLocation /usr/pkg/bin/xauth
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, comme le &lt;code&gt;X11Forward&lt;/code&gt; est à &lt;code&gt;no&lt;/code&gt; par défaut sur NetBSD, je l&amp;rsquo;ai
+activé. La &lt;strong&gt;vrai solution&lt;/strong&gt; est de faire ça côté client en utilisant
+explicitement l&amp;rsquo;option &lt;code&gt;-X&lt;/code&gt; quand on veut ouvrir des fenêtres sur le
+serveur.&lt;/p&gt;
+&lt;p&gt;Le pire c&amp;rsquo;est que Google ne sort rien sur le message &amp;ldquo;X11 forwarding
+request failed on channel 0&amp;rdquo;, à part une question sans réponse sur un
+stackoverflow-like en Russe !&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

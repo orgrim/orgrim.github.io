@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Configuration de pgBouncer avec des connexions TLS - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Configuration de pgBouncer avec des connexions TLS" />
+<meta property="og:description" content="Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/" />
+<meta property="article:published_time" content="2017-10-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-10-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Configuration de pgBouncer avec des connexions TLS"/>
+<meta name="twitter:description" content="Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Configuration de pgBouncer avec des connexions TLS</h1>
+        </header>
+        <div class="content">
+            <p>Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.</p>
+<h2 id="autorité-de-certification-avec-easyrsa">Autorité de certification avec EasyRSA</h2>
+<h3 id="installation">Installation</h3>
+<p>Télécharger et installer la dernière version de EasyRSA. La version 3
+est différente de la version 2, fournie dans Debain Stretch.</p>
+<pre><code>wget https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.3/EasyRSA-3.0.3.tgz
+tar xzf EasyRSA-3.0.3.tgz
+cd EasyRSA-3.0.3
+</code></pre>
+<h3 id="création-de-lautorité-de-certification">Création de l&rsquo;autorité de certification</h3>
+<p>Créer un fichier de configuration :</p>
+<pre><code>cp vars.example vars
+vi vars
+</code></pre>
+<p>Changer quelques informations :</p>
+<pre><code>set_var EASYRSA_REQ_COUNTRY	&quot;FR&quot;
+set_var EASYRSA_REQ_PROVINCE	&quot;Ile-de-France&quot;
+set_var EASYRSA_REQ_CITY	&quot;Paris&quot;
+set_var EASYRSA_REQ_ORG		&quot;MyOrg&quot;
+set_var EASYRSA_REQ_EMAIL	&quot;admin@myorg.lo&quot;
+set_var EASYRSA_REQ_OU		&quot;Clients&quot;
+</code></pre>
+<p>Créer l&rsquo;autorité :</p>
+<pre><code>./easyrsa init-pki
+./easyrsa build-ca
+</code></pre>
+<p>Il faut lui donner un nom, par exemple CA Clients ou PostgreSQL ou un
+truc significatif. Il faut aussi saisir un mot de passe pour la clé du
+certificat racine, celui qui permet de signer tout le reste.</p>
+<h3 id="création-des-certificats">Création des certificats</h3>
+<p>Pour créer un bi-clé pour un serveur :</p>
+<pre><code>./easyrsa build-server-full postgresql nopass
+</code></pre>
+<p>Si la clé et le certificat du serveur doivent être transmis pas un moyen
+peu sécurisé, comme le mail, créer un fichier PKCS#12 plutot qu&rsquo;un tar :</p>
+<pre><code>./easyrsa export-p12 postgresql
+</code></pre>
+<p>On peut mettre un mot de passe au fichier.</p>
+<pre><code>./easyrsa build-server-full pgbouncer nopass
+</code></pre>
+<p>Générer aussi la liste de révocation, qui permet rendre des
+certificats invalides.</p>
+<pre><code>./easyrsa gen-crl
+</code></pre>
+<h3 id="extraction-des-éléments-du-p12">Extraction des éléments du p12</h3>
+<p>La clé privée :</p>
+<pre><code>openssl pkcs12 -in postgresql.p12 -nocerts -nodes -out postgresql.key
+chmod 600 postgresql.key
+</code></pre>
+<p>Le certificat :</p>
+<pre><code>openssl pkcs12 -in postgresql.p12 -clcerts -out postgresql.crt
+</code></pre>
+<p>Le certificat de l&rsquo;AC :</p>
+<pre><code>openssl pkcs12 -in postgresql.p12 -cacerts -out ca.crt
+</code></pre>
+<h2 id="configurer-postgresql-pour-le-tls">Configurer PostgreSQL pour le TLS</h2>
+<p>il faut les fichiers suivants :</p>
+<pre><code>pki/ca.crt
+pki/crl.pem
+pki/issued/postgresql.crt
+pki/private/postgresql.key
+</code></pre>
+<p>ou</p>
+<pre><code>pki/crl.pem
+pki/private/postgresql.p12
+</code></pre>
+<p>et extraire le contenu du fichier PKCS#12 (voir plus haut).</p>
+<p>Le plus simple est de placer ces fichiers dans le répertoire $PGDATA,
+les chemins dans la configuration sont relatifs à ce répertoire.</p>
+<p>Dans $PGDATA/postgresql.conf, configurer au minimum :</p>
+<pre><code>ssl = on
+ssl_cert_file = 'postgresql.crt'
+ssl_key_file = 'postgresql.key'
+ssl_ca_file = 'ca.crt'
+ssl_crl_file = 'crl.pem'
+</code></pre>
+<p>Un reload de la configuration suffit pour prendre en compte les
+modifications. Ce paramétrage permet à l&rsquo;instance de chiffrer les
+connexions. On définit si la connexion TLS est imposé au clients et
+l&rsquo;authentification par certificat dans le fichier pg_hba.conf</p>
+<p>Le TLS ne concerne pas les connections locales par socket unix, géré
+par le type &lsquo;local&rsquo;.</p>
+<p>Le type &lsquo;host&rsquo;, concerne les connexions en clair ou TLS, utiliser
+&lsquo;hostssl&rsquo; ou &lsquo;hostnossl&rsquo; pour distinguer le TLS dans les
+autorisations.</p>
+<p>On peut interdire les connexions en clair avec ces deux lignes :</p>
+<pre><code>hostnossl   all   all   0.0.0.0/0   reject
+hostnossl   all   all   ::/0        reject
+</code></pre>
+<p>Toutes les lignes &lsquo;host&rsquo; suivantes ne concerneront que les connexions
+TLS, du fait de l&rsquo;interdiction précédente.</p>
+<h2 id="configurer-pgbouncer-pour-le-tls">Configurer pgBouncer pour le TLS</h2>
+<h3 id="clients">Clients</h3>
+<p>il faut les fichiers suivants :</p>
+<pre><code>pki/ca.crt
+pki/crl.pem
+pki/issued/postgresql.crt
+pki/private/postgresql.key
+</code></pre>
+<p>ou</p>
+<pre><code>pki/crl.pem
+pki/private/postgresql.p12
+</code></pre>
+<p>et extraire le contenu du fichier PKCS#12 (voir plus haut).</p>
+<p>Dans /etc/pgbouncer/pgbouncer.ini, il faut configurer &lsquo;client_tls_sslmode&rsquo; :</p>
+<ul>
+<li>disable : n&rsquo;accepte pas les connexions TLS, le paramétrage par défaut</li>
+<li>allow : accepte les connexions TLS et les connexions en clair</li>
+<li>require : n&rsquo;accepte que les connexions TLS</li>
+<li>verify-ca, verify-full : n&rsquo;accepte que les connexions TLS, et demande un certificat au client issue de la même AC</li>
+</ul>
+<p>Pour les chemins vers les fichiers :</p>
+<pre><code>client_tls_ca_file = /etc/pgbouncer/ca.crt
+client_tls_key_file = /etc/pgbouncer/pgbouncer.key
+client_tls_cert_file = /etc/pgbouncer/pgbouncer.crt
+</code></pre>
+<p>Pour authentifier les clients avec un certificat, il faut :</p>
+<pre><code>auth_type = cert
+</code></pre>
+<p>Le CN du certificat doit alors être identique au nom d&rsquo;utilisateur de
+connexion.</p>
+<p>Cela ne dispense pas de la configuration de l&rsquo;authenfication entre
+pgBouncer et PostgreSQL, avec &lsquo;auth_file&rsquo;, voire &lsquo;auth_user&rsquo; et &lsquo;auth_query&rsquo;.</p>
+<h3 id="backends-postgresql">Backends PostgreSQL</h3>
+<p>Pour que pgBouncer se connecte aux serveurs PostgreSQL en TLS, dans
+/etc/pgbouncer/pgbouncer.ini, il faut configurer :</p>
+<pre><code>server_tls_sslmode = require
+</code></pre>
+<p>Si on souhaite que pgBouncer vérifie le certificat de l&rsquo;AC du serveur
+PostgreSQL :</p>
+<pre><code>server_tls_sslmode = verify-ca
+server_tls_ca_file = /etc/pgbouncer/ca.crt
+</code></pre>
+<p>On peut enfin configurer pgBouncer et PostgreSQL pour que pgBouncer
+s&rsquo;authentifie avec un certificat client, dans /etc/pgbouncer.ini :</p>
+<pre><code>server_tls_sslmode = verify-ca
+server_tls_ca_file = /etc/pgbouncer/ca.crt
+server_tls_key_file = /etc/pgbouncer/pgbouncer_back.key
+server_tls_cert_file = /etc/pgbouncer/pgbouncer_back.crt
+</code></pre>
+<p>Le fichier pg_hba.conf devra alors demander un certificat avec
+l&rsquo;option clientcert=1 :</p>
+<pre><code>hostssl all all ip_pgbouncer/32 md5 clientcert=1
+</code></pre>
+<p>On ne peut utiliser la méthode cert uniquement si le CN du certificat
+client de pgBouncer est identique au nom de l&rsquo;utilisateur qui se
+connecte. Ainsi, on ne peut plus utiliser qu&rsquo;un seul nom d&rsquo;utilisateur
+pour les accès à PostgreSQL, dans ce cas là il vaut mieux forcer le
+nom d&rsquo;utilisateur dans la section [database].</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2017-10-27</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/pgbouncer">#pgbouncer</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/auth">#auth</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>pdf on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/pdf/</link>
+    <description>code. grind. sleep. (pdf)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Tue, 21 Jun 2011 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/pdf/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Combiner des PDF en un seul</title>
+      <link>https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/</link>
+      <pubDate>Tue, 21 Jun 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/</guid>
+      <description>&lt;p&gt;Pour combiner des pdf en un seul, on peut essayer &lt;code&gt;pdfjoin&lt;/code&gt; fournit par
+le projet &lt;a href=&#34;http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam/&#34; title=&#34;pdfjam&#34;&gt;pdfjam&lt;/a&gt;. En attendant que les 250 Mo de dépendances (Latex
+principalement) s&amp;rsquo;installent, on peut utiliser ghostscript :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=../combined_doc.pdf *.pdf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Merci à &lt;a href=&#34;http://www.perlmonks.org/?node_id=470323&#34;&gt;perlmonks.org&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

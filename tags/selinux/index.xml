@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>selinux on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/selinux/</link>
+    <description>code. grind. sleep. (selinux)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Mon, 22 Sep 2014 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/selinux/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Confiner PostgreSQL avec SELinux</title>
+      <link>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</link>
+      <pubDate>Mon, 22 Sep 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</guid>
+      <description>&lt;style type=&#34;text/css&#34;&gt;.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:#444;background:#e7f2fa}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:#fff;background:#6ab0de}.notice.warning .notice-title{background:rgba(217,83,79,.9)}.notice.warning{background:#fae2e2}.notice.info .notice-title{background:#f0b37e}.notice.info{background:#fff2db}.notice.note .notice-title{background:#6ab0de}.notice.note{background:#e7f2fA}.notice.tip .notice-title{background:rgba(92,184,92,.8)}.notice.tip{background:#e6f9e6}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:0.125em;position:relative}&lt;/style&gt;
+&lt;svg width=&#34;0&#34; height=&#34;0&#34; display=&#34;none&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;&lt;symbol id=&#34;tip-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;note-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;warning-notice&#34; viewBox=&#34;0 0 576 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;info-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z&#34;/&gt;&lt;/symbol&gt;&lt;/svg&gt;&lt;div class=&#34;notice note&#34; &gt;
+&lt;p class=&#34;first notice-title&#34;&gt;&lt;span class=&#34;icon-notice baseline&#34;&gt;&lt;svg&gt;&lt;use href=&#34;#note-notice&#34;&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/span&gt;Remarque&lt;/p&gt;&lt;p&gt;Ce post est partiellement obsolète, avec le passage à systemd.&lt;/p&gt;&lt;/div&gt;
+
+&lt;p&gt;J&amp;rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
+aller trop loin, parce que j&amp;rsquo;entendais souvent la phrase &amp;ldquo;Si on veut
+de la sécurité, il faut SELinux&amp;rdquo; et surtout à cause de l&amp;rsquo;arrivée de
+l&amp;rsquo;extension &lt;code&gt;sepgsql&lt;/code&gt; dans les modules contrib de PostgreSQL. Ça avait
+donné une conf pour le Fosdem où finalement, j&amp;rsquo;ai plus parlé des
+privilèges classiques que de SELinux.&lt;/p&gt;
+&lt;p&gt;Suite à une demande au ${BOULOT}, je me suis replongé dedans, et les
+choses ont peu évolué. Dans la majorité des recherches que j&amp;rsquo;ai pu
+faire, SELinux reste tout de même un truc qui se met en travers la
+route, c&amp;rsquo;est-à-dire, qu&amp;rsquo;il y a toujours plus de résultats sur comment
+le désactiver plutôt que configurer les choses correctement. Ensuite,
+certains proposent de faire aveuglement confiance à &lt;code&gt;setroubleshoot&lt;/code&gt;
+et &lt;code&gt;audit2allow&lt;/code&gt; pour faire taire la bête. Enfin, j&amp;rsquo;ai dû trouver une
+page ou deux après en deux semaines à temps plein sur le sujet qui
+parlent de comment confiner un utilisateur dans le but d&amp;rsquo;implémenter ce
+que promet SELinux et que toutes les entreprises demandent : le RBAC,
+Role Based Access Control, ou comment donner le moins de droits
+possibles aux sous-traitants qui hébergent les serveurs.&lt;/p&gt;
+&lt;p&gt;Cette fois ci, je suis allé plus loin. Déjà, je suis parti sur une
+installation de CentOS 6, la famille de distribution
+RHEL/CentOS/Fedora semble être la plus en avance par rapport à
+SELinux : à peu près tous les services/daemons fournis dans l&amp;rsquo;install
+sont confinés par SELinux. Les utilisateurs ne le sont pas au login,
+il n&amp;rsquo;y a donc aucune configuration de RBAC. On verra peut-être ça plus
+tard, j&amp;rsquo;ai pas encore obtenu de résultat satisfaisant sur ce sujet, et
+il vaut mieux expliquer comment confiner correctement PostgreSQL avant
+de passer aux roles. Tout simplement, parce qu&amp;rsquo;il est très simple de
+casser ce confinement avec la configuration par défaut de RHEL, grâce
+à &lt;code&gt;pg_ctl&lt;/code&gt;. Enfin, l&amp;rsquo;installation des paquets du PGDG n&amp;rsquo;est pas
+confinée par défaut, il manque les file contexts adaptés aux chemins
+particuliers de ces paquets, prévu pour faire cohabiter plusieurs
+versions majeures ; ce qui ne correspond pas ce qu&amp;rsquo;à prévu Red Hat
+pour PostgreSQL.&lt;/p&gt;
+&lt;p&gt;Après cette longue introduction, mais avant de commencer, il faut
+savoir administrer un minumum SELinux : si vous ne savez pas qu&amp;rsquo;il
+existe des options &lt;code&gt;-Z&lt;/code&gt;, ce que sont les contexts, les types et les
+domaines, mieux vaut d&amp;rsquo;abord se documenter, par exemple &lt;a href=&#34;https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security-Enhanced_Linux/index.html&#34;&gt;chez Red
+Hat&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Voici donc les file contexts à ajouter dans un fichier &lt;em&gt;module.te&lt;/em&gt; pour
+confiner l&amp;rsquo;installation PostgreSQL du PGDG :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/etc/rc\.d/init\.d/(se)?postgresql(-.*)?    --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb        --  gen_context(system_u:object_r:postgresql_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl        --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres      --  gen_context(system_u:object_r:postgresql_exec_t,s0)
+/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?	    gen_context(system_u:object_r:locale_t,s0)
+/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?        gen_context(system_u:object_r:man_t,s0)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Tout d&amp;rsquo;abord, pour l&amp;rsquo;init script et &lt;code&gt;pg_ctl&lt;/code&gt;, on utilise le type
+&lt;code&gt;postgresql_initrc_exec_t&lt;/code&gt;, c&amp;rsquo;est ce qui permet de lancer PostgreSQL
+dans le domaine confiné &lt;code&gt;postgresql_t&lt;/code&gt; au boot, via l&amp;rsquo;init script, et
+manuellement. La méthode la plus propre est de toujours utiliser
+l&amp;rsquo;init script, idéalement par l&amp;rsquo;intermédiaire de &lt;code&gt;run_init&lt;/code&gt; pour
+démarrer, arrêter ou redémarrer le postmaster. On évite alors de
+laisser trainer des choses dans &lt;code&gt;/var/{run,lock}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Les programmes &lt;code&gt;postgres&lt;/code&gt; et &lt;code&gt;initdb&lt;/code&gt; doivent avoir le type
+&lt;code&gt;postgresql_exec_t&lt;/code&gt; car ils exécutent le serveur PostgreSQL ; cela
+doit se faire dans le domaine &lt;code&gt;postgresql_t&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Enfin, on a placé les labels corrects sur les fichiers de traduction
+et les pages de man, pour faire plus propre. Ce code source de module
+SELinux alors doit être compilé et chargé.&lt;/p&gt;
+&lt;p&gt;Cette configuration est reprise dans le module SELinux disponible sur
+&lt;a href=&#34;http://github.com/dalibo/selinux-pgsql-pgdg&#34;&gt;github&lt;/a&gt;. On peut aussi l&amp;rsquo;ajouter manuellement avec &lt;code&gt;semanage&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;semanage fcontext -a -t postgresql_initrc_exec_t &#39;/etc/rc\.d/init\.d/(se)?postgresql(-.*)?&#39;
+semanage fcontext -a -t postgresql_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb&#39;
+semanage fcontext -a -t postgresql_initrc_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl&#39;
+semanage fcontext -a -t postgresql_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres&#39;
+semanage fcontext -a -t locale_t &#39;/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?&#39;
+semanage fcontext -a -t man_t &#39;/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Il existe un certain nombre de booleans pour la configuration des
+droits SELinux de PostgreSQL, le plus important concerne &lt;code&gt;rsync&lt;/code&gt;,
+souvent nécessaire pour faire des base backups. Il s&amp;rsquo;agit de
+&lt;code&gt;postgresql_can_rsync&lt;/code&gt;, pour l&amp;rsquo;activer :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;semanage boolean -m --on postgresql_can_rsync
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Si on lance l&amp;rsquo;instance sur un port TCP différent de 5432, il faut
+l&amp;rsquo;autoriser dans la configuration locale de SELinux :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;semanage port -a -t postgresql_port_t -p tcp &amp;lt;port&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, il ne faut pas oublier d&amp;rsquo;appliquer les contexts aux fichiers
+soit avec &lt;code&gt;restorecon&lt;/code&gt;, un relabel complet au reboot ou &lt;code&gt;chcon&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

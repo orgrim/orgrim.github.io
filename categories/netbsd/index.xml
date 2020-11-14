@@ -1,0 +1,1136 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NetBSD on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/categories/netbsd/</link>
+    <description>code. grind. sleep. (NetBSD)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Fri, 23 Aug 2013 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/categories/netbsd/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>modular-xorg, radeon et pas de KMS</title>
+      <link>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</link>
+      <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</guid>
+      <description>&lt;p&gt;Il y avait un moment que je n&amp;rsquo;avais pas touché à NetBSD et donc mis à
+jour mon lappy avec du pkg frais. Entre temps, la version de X.org
+modular, donc issue de pkgsrc, est revenue en 2012, avec son lot de
+drivers mis à jour. Le drivers xf86-video-ati, est passé en version
+7.1.0, sauf qu&amp;rsquo;il fonctionne uniquement en KMS (Kernel Mode Setting),
+chose qu&amp;rsquo;on n&amp;rsquo;a pas encore dans notre kernel.&lt;/p&gt;
+&lt;p&gt;Il faut donc la dernière version de la branche 6 du driver, qui contient
+encore le support UMS, disponible dans le paquet &lt;code&gt;x11/xf86-video-ati6&lt;/code&gt;,
+qui porte le même nom de package, bizarrement. Tout ça est suivi dans le
+&lt;a href=&#34;http://gnats.netbsd.org/cgi-bin/query-pr-single.pl?number=47935&#34;&gt;PR 47935&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Pour que le serveur X trouve le device avec ce driver, j&amp;rsquo;ai du virer la
+ligne &lt;code&gt;BusID&lt;/code&gt; dans la section Device du &lt;code&gt;xorg.conf&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Un bulk build par jour dans un screen</title>
+      <link>https://www.orgrim.net/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/</link>
+      <pubDate>Fri, 10 May 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/</guid>
+      <description>&lt;p&gt;Mes packages NetBSD sont préparés par pbulk, qui tourne en continu grâce
+au script &lt;a href=&#34;https://github.com/orgrim/nb-utils/blob/master/pkgsrc/pbulk-builder&#34;&gt;pbulk-builder&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;avais prévu avec l&amp;rsquo;option &lt;code&gt;-1&lt;/code&gt; de lui éviter d&amp;rsquo;entrer dans une boucle
+infinie, et j&amp;rsquo;ai pas eu tort. En effet, la majorité des tours ne fait
+que mettre à jour l&amp;rsquo;arbre &lt;a href=&#34;http://pkgsrc.org&#34;&gt;pkgsrc&lt;/a&gt;, résoudre les dépendances, sans
+rien compiler de nouveau. La première solution que j&amp;rsquo;ai trouvé a été de
+créer une règle sieve pour ne pas recevoir des dizaines de mails de
+rapport de bulk inutiles, en les plaçant dans un répertoire séparé&amp;hellip;&lt;/p&gt;
+&lt;p&gt;N&amp;rsquo;ayant jamais pris le temps d&amp;rsquo;utiliser cette fameuse option one-shot,
+j&amp;rsquo;ai décidé de mettre le lancement du bulk dans la crontab, sauf que
+c&amp;rsquo;est long et qu&amp;rsquo;il vaut mieux suivre ça avec screen. C&amp;rsquo;est possible
+grâce aux options &lt;code&gt;-d&lt;/code&gt; et &lt;code&gt;-m&lt;/code&gt; (avec &lt;code&gt;-S&lt;/code&gt; pour mettre un titre) :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;0 23 * * * /usr/pkg/bin/screen -dmS bulk -c /root/.screenrc /usr/pkg/bin/bash ~orgrim/nb-utils/pkgsrc/pbulk-builder -c -1 /data/pbulk
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On peut alors attacher le screen quand le bulk tourne.&lt;/p&gt;
+&lt;p&gt;PS: merci au fans de tmux de passer sur le chan #netbsdfr sur Freenode
+pour me dire comment faire pareil avec tmux :)&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>pbulk-builder et pkgtools/mksandbox</title>
+      <link>https://www.orgrim.net/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/</link>
+      <pubDate>Sat, 26 Jan 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/</guid>
+      <description>&lt;p&gt;Après la réinstall d&amp;rsquo;une de mes machines de build en 6.0.1, j&amp;rsquo;ai eu la
+bonne surprise de voir que le script de build &lt;code&gt;pbulk-builder&lt;/code&gt;
+(&lt;a href=&#34;https://github.com/orgrim/nb-utils&#34;&gt;https://github.com/orgrim/nb-utils&lt;/a&gt;) ne trouvait plus &lt;code&gt;mksandbox&lt;/code&gt;
+dans l&amp;rsquo;arbre de pkgsrc. Il est désormais dans son paquet :
+&lt;code&gt;pkgtools/mksandbox&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Le script est à jour. le script de montage de la sandbox se prend un
+&lt;code&gt;sed&lt;/code&gt; dans la foulée pour éviter qu&amp;rsquo;il force le montage de l&amp;rsquo;arbre
+pkgsrc dans &lt;code&gt;/tree/pkgsrc&lt;/code&gt;&amp;hellip;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Compiler dans l&#39;arbre des sources</title>
+      <link>https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/</link>
+      <pubDate>Tue, 24 Jan 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/</guid>
+      <description>&lt;p&gt;Je m&amp;rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&amp;rsquo;avère qu&amp;rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&amp;rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&amp;rsquo;agit de NetBSD 5.1.1, la version 6 n&amp;rsquo;aura pas
+ce manque.&lt;/p&gt;
+&lt;p&gt;Il faut donc recompiler un noyau pour ajouter cette fonctionnalité, pour
+faire vite on ne passe pas par &lt;code&gt;build.sh&lt;/code&gt;, les tools etc, on compile
+directement dans l&amp;rsquo;arbre des sources, montrer comment faire ça est le
+but de post.&lt;/p&gt;
+&lt;p&gt;On commence par récupérer les sources sur un serveur CVS près de chez
+soi :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# export CVS_RSH=ssh
+# export CVSROOT=&amp;quot;anoncvs@anoncvs.NetBSD.org:/cvsroot&amp;quot;
+# cd /usr
+# cvs -q -z3 co -P -rnetbsd-5-1-1-RELEASE src
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite, on n&amp;rsquo;a pas besoin d&amp;rsquo;avoir une conf particulière dans son
+&lt;code&gt;/etc/mk.conf&lt;/code&gt;, on n&amp;rsquo;a juste à ajouter les options dans le fichier de
+conf du kernel et compiler directement par l&amp;rsquo;intermédiaire de &lt;code&gt;make&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;On édite le fichier &lt;code&gt;/usr/src/sys/arch/i386/conf/GENERIC.local&lt;/code&gt;, pour y
+ajouter les lignes suivantes, il est inclus par le fichier &lt;code&gt;GENERIC&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# DRI driver    
+i915drm*        at vga?         # Intel i915, i945 DRM driver
+mach64drm*      at vga?         # mach64 (3D Rage Pro, Rage) DRM driver
+mgadrm*         at vga?         # Matrox G[24]00, G[45]50 DRM driver
+r128drm*        at vga?         # ATI Rage 128 DRM driver
+radeondrm*      at vga?         # ATI Radeon DRM driver
+savagedrm*      at vga?         # S3 Savage DRM driver
+sisdrm*         at vga?         # SiS DRM driver
+tdfxdrm*        at vga?         # 3dfx (voodoo) DRM driver
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On compile le kernel à la main :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# config GENERIC
+# cd ../compile/GENERIC
+# make depend
+# make
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On installe le kernel à la main :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mv /netbsd /netbsd.old
+# cp netbsd /
+# chmod 444 /netbsd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour revenir facilement en arrière en cas de souci, on peut ajouter la
+ligne suivante dans &lt;code&gt;/boot.cfg&lt;/code&gt;, en deuxième position :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;menu=Boot old kernel:boot netbsd.old
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Il ne reste plus qu&amp;rsquo;à rebooter sur le nouveau kernel.&lt;/p&gt;
+&lt;p&gt;Référence : &lt;a href=&#34;http://www.netbsd.org/docs/guide/en/chap-kernel.html#chap-kernel-building-manually&#34;&gt;Le guide&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;On peut faire la même manip pour mettre à jour une partie du système
+seulement, par exemple lorsqu&amp;rsquo;une faille de sécurité doit être corrigée.
+La méthode de compilation dans l&amp;rsquo;arbre des sources est indiquée dans
+l&amp;rsquo;avis.&lt;/p&gt;
+&lt;p&gt;Plus généralement, la méthode est la suivante, avec l&amp;rsquo;exemple de &lt;code&gt;ls&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/src/bin/ls
+# make USETOOLS=no cleandir
+# make USETOOLS=no dependall
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le binaire résultant et sa doc sont prêts dans le répertoire courant, il
+ne reste qu&amp;rsquo;à installer :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# make USETOOLS=no install
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>X11 forwarding request failed on channel 0</title>
+      <link>https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/</link>
+      <pubDate>Fri, 21 Oct 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/</guid>
+      <description>&lt;p&gt;Quand j&amp;rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en
+X.org modular, j&amp;rsquo;ai ça :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;orgrim@serfouette ~ $ ssh rateau 
+X11 forwarding request failed on channel 0
+Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;WTF? ça tombe en marche SSH normalement.&lt;/p&gt;
+&lt;p&gt;Et bien le souci vient de l&amp;rsquo;échange des magic cookies pour
+l&amp;rsquo;authentification entre serveurs X à travers SSH, c&amp;rsquo;est utilisé par le
+X11 forwarding et on a besoin de plusieurs choses pour ça :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;le chemin complet vers &lt;code&gt;xauth&lt;/code&gt; sur le client&lt;/li&gt;
+&lt;li&gt;le chemin complet vers &lt;code&gt;xauth&lt;/code&gt; sur le serveur&lt;/li&gt;
+&lt;li&gt;Avoir &lt;code&gt;X11Forward yes&lt;/code&gt; sur le serveur quand on le demande sur le
+client (il vaut &lt;code&gt;yes&lt;/code&gt; dans le &lt;code&gt;/etc/ssh/ssh_config&lt;/code&gt; du client par
+flemme de taper &lt;code&gt;-X&lt;/code&gt; sur la ligne de commande)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le client est sous Linux, donc pas de soucis le chemin en dur
+&lt;code&gt;/usr/bin/xauth&lt;/code&gt; dans le binaire &lt;code&gt;sshd&lt;/code&gt; marche. Par contre pour NetBSD
+avec du X.org modular, il faut décommenter l&amp;rsquo;option &lt;code&gt;XAuthLocation&lt;/code&gt; dans
+&lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; et &lt;code&gt;/etc/ssh/ssh_config&lt;/code&gt; pour donner le bon
+chemin vers &lt;code&gt;xauth&lt;/code&gt;, comme indiqué en commentaire dans ces deux
+fichiers :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# If you use xorg from pkgsrc then uncomment the following line.
+#  XAuthLocation /usr/pkg/bin/xauth
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, comme le &lt;code&gt;X11Forward&lt;/code&gt; est à &lt;code&gt;no&lt;/code&gt; par défaut sur NetBSD, je l&amp;rsquo;ai
+activé. La &lt;strong&gt;vrai solution&lt;/strong&gt; est de faire ça côté client en utilisant
+explicitement l&amp;rsquo;option &lt;code&gt;-X&lt;/code&gt; quand on veut ouvrir des fenêtres sur le
+serveur.&lt;/p&gt;
+&lt;p&gt;Le pire c&amp;rsquo;est que Google ne sort rien sur le message &amp;ldquo;X11 forwarding
+request failed on channel 0&amp;rdquo;, à part une question sans réponse sur un
+stackoverflow-like en Russe !&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Passer de X.org natif à modular</title>
+      <link>https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/</link>
+      <pubDate>Mon, 19 Sep 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/</guid>
+      <description>&lt;p&gt;X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
+« native » et le second « modular » selon la valeur de la variable
+&lt;code&gt;X11_TYPE&lt;/code&gt; que l&amp;rsquo;on positionne dans son &lt;code&gt;/etc/mk.conf&lt;/code&gt; pour signifier à
+pkgsrc sur lequel linker.&lt;/p&gt;
+&lt;p&gt;Il s&amp;rsquo;agit des mêmes versions à peu de choses prêt, et X.org native n&amp;rsquo;est
+pas vieux ou non maintenu comme la rumeur voudrait le faire croire. Il
+est juste en retard parce qu&amp;rsquo;il suit le cycle de release du basesys
+alors que modular suit celui de pkgsrc et est tiré vers l&amp;rsquo;avant par les
+packages qui en dépendent. Cela peut poser problème lorsqu&amp;rsquo;on suit la
+cible mouvante qu&amp;rsquo;est pkgsrc-current.&lt;/p&gt;
+&lt;p&gt;La première chose à faire pour passer de native à modular est d&amp;rsquo;éditer
+&lt;code&gt;/etc/mk.conf&lt;/code&gt; pour changer &lt;code&gt;X11_TYPE&lt;/code&gt;, on en profite pour ne plus
+compiler le native :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;MKX11=no 
+X11_TYPE=modular
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite, il faut modifier la liste de packages à compiler pour y ajouter
+soit tout modular en installant &lt;code&gt;meta-pkgs/modular-xorg&lt;/code&gt;, soit en
+n&amp;rsquo;installant que le nécessaire, ça fait plus cool, dans
+&lt;code&gt;/usr/pkgsrc/pkgchk.conf&lt;/code&gt; (si vous avez suivi les docs ici ou dans le
+wiki) :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;meta-pkgs/modular-xorg-apps
+meta-pkgs/modular-xorg-libs
+meta-pkgs/modular-xorg-fonts
+x11/xf86-input-keyboard
+x11/xf86-input-mouse
+x11/xf86-input-void
+x11/xf86-video-nv
+x11/xf86-video-vesa
+x11/xf86-video-vga
+x11/xf86-video-wsfb
+x11/modular-xorg-server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite on donne ça à manger à &lt;code&gt;pkg_comp&lt;/code&gt; ou à son bulk. L&amp;rsquo;important ici
+est de tout recompiler pour bien transférer les dépendances de native
+vers modular : en gros on pète la sandbox, que ça soit de &lt;code&gt;mk/bulk&lt;/code&gt; ou
+&lt;code&gt;pkg_comp&lt;/code&gt; et on recommence. Etant passé en mode bulk partiel comme
+indiqué dans un précédent &lt;a href=&#34;https://www.orgrim.net/post/2011/08/19/Bulk-build-partiel-de-pkgsrc&#34;&gt;post&lt;/a&gt;, voici comment faire :&lt;/p&gt;
+&lt;p&gt;​1. On vérifie avec &lt;code&gt;mount&lt;/code&gt; que la standbox n&amp;rsquo;est pas montée ni qu&amp;rsquo;un
+build tourne (dans ce cas faut le killer), sinon :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /usr/sandbox/sandbox umount
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​2. On vérifie que le contenu des mk.conf du système et de la sandbox
+sont en phase, c&amp;rsquo;est le seul fichier de la sandbox à sauver&lt;/p&gt;
+&lt;p&gt;​3. On recrée la sandbox :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# rm -rf /usr/sandbox
+# cd /usr/pkgsrc/mk/bulk
+# sh mksandbox --without-x /usr/sandbox
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​4. On nettoie les packages déjà compilés, pour forcer leur
+recompilation, et les fichiers cachés du bulk build :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/
+# mv CVS .CVS
+# rm -rf *
+# mv .CVS CVS
+# cd /usr/pkgsrc
+# rm .broken.html .bulk_build_id .bulk_db .bulklock .depends .dependstree .index  .order .start .supports
+# pkgclean
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​5. On lance le bulk build et on attend, il faut prévoir entre 150 et
+200 packages supplémentaires à compiler.&lt;/p&gt;
+&lt;p&gt;Les étapes suivantes sont simples, on sauvegarde tout ce qu&amp;rsquo;il faut dans
+&lt;code&gt;/usr/pkg&lt;/code&gt;, puis on supprime tous les packages installés :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr
+# mv pkg pkg.old
+# cd /var/db
+# mkdir old_pkgdb
+# mv pkg pkg.refcount old_pkgdb
+# rm -rf pkgin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A partir d&amp;rsquo;ici, on n&amp;rsquo;a plus de programmes issus de pkgsrc, en gros pas
+de sudo, vim et autres&amp;hellip;&lt;/p&gt;
+&lt;p&gt;Puis, il faut supprimer les fichiers des sets de X.org, on se base pour
+cela sur le contenu de &lt;code&gt;/etc/mtree/set.x*&lt;/code&gt;. On en arrive donc à un stade
+où on est dans la même situation qu&amp;rsquo;après une installation du système
+sans les sets de X.org natif.&lt;/p&gt;
+&lt;p&gt;Enfin, on réinstalle tout les packages avec &lt;a href=&#34;http://www.pkgin.net&#34;&gt;pkgin&lt;/a&gt;, qui dans sa
+version 0.5.0 (du CVS) peut importer une liste de packages au format de
+&lt;code&gt;pkg_chk&lt;/code&gt;, qui se trouve être le même utilisé par le bulk-build, comme de
+par hasard :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_add http://pkgsrc.orgrim.net/NetBSD/5.1/amd64/All/pkg_install-20110805.tgz
+# mkdir -p /usr/pkg/etc
+# cp -r /usr/pkg.old/etc/pkgin /usr/pkg/etc
+# ./pkgin up
+# ./pkgin im pkgchk.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; si le &lt;code&gt;pkg_add&lt;/code&gt; de pkg_install ne passe pas, essayer avec
+&lt;code&gt;-f&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;et hop, reste plus qu&amp;rsquo;à reconfigurer les chemins dans
+&lt;code&gt;/etc/X11/xorg.conf&lt;/code&gt; et c&amp;rsquo;est bon.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Bulk build partiel de pkgsrc</title>
+      <link>https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/</link>
+      <pubDate>Fri, 19 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/</guid>
+      <description>&lt;p&gt;En suivant l&#39;&lt;a href=&#34;http://www.guigui2.net/index.php?post/2011/07/30/sudo-sh-/usr/pkgsrc/mk/bulk/do-sandbox-build-s&#34;&gt;excellent tip de Mr GuiGui2&lt;/a&gt;, j&amp;rsquo;ai pu monter ma petite
+archi de bulk build personnelle pour fournir du package tout frais à
+&lt;a href=&#34;http://pkgin.net&#34;&gt;pkgin&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai donc ajouté le bloc magique suivant à mon &lt;code&gt;/etc/mk.conf&lt;/code&gt;, qui
+permet de gérer la présence de commentaires dans &lt;code&gt;pkgchk.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# bulk build config
+DEPENDS_TARGET= bulk-install
+BATCH=          yes
+
+BULK_PREREQ+=   pkgtools/lintpkgsrc
+.if defined(SPECIFIC_PKGS)
+PKGLIST!=               awk &#39;$$1 !~ /^\\#/ {print $$1}&#39; ${PKGCHK_CONF}
+.       for _pkg_ in ${PKGLIST}
+HOST_SPECIFIC_PKGS+=    ${_pkg_}
+.       endfor
+.endif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour aller plus loin, j&amp;rsquo;ai automatisé le process au maximum pour lancer
+des bulk build réguliers par cron, grâce au script [bulk-builder][]. Ce
+script remplace &lt;code&gt;do-sandbox-build&lt;/code&gt; et &lt;code&gt;do-sandbox-upload&lt;/code&gt;, il est
+également capable de gérer des chemins alternatifs, mettre à jour
+&lt;code&gt;pkgsrc&lt;/code&gt; avant de lancer le bulk.&lt;/p&gt;
+&lt;p&gt;La procédure pour mettre ça en place est donc :&lt;/p&gt;
+&lt;p&gt;​1. Ajouter le bloc montré plus haut à &lt;code&gt;/etc/mk.conf&lt;/code&gt; et y définir
+&lt;code&gt;PKGCHK_CONF&lt;/code&gt;, il s&amp;rsquo;agit du chemin vers une liste de packages au format
+\&amp;ldquo;catetgorie/package\&amp;rdquo;, un par ligne, qu&amp;rsquo;on peut automatiquement créer
+avec &lt;code&gt;pkg_chk -g&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;​2. Créer la sandbox :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/mk/bulk
+# sh mksandbox --without-x /usr/sandbox
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​3. Créer et configurer &lt;code&gt;/usr/pkgsrc/mk/bulk/build.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/mk/bulk
+# cp build.conf-example build.conf
+# vi build.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​4. Lancer le bulk build :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sh bulk-builder -u -R
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-u&lt;/code&gt; demande de &lt;code&gt;cvs up&lt;/code&gt; le répertoire &lt;code&gt;/usr/pkgsrc&lt;/code&gt; avant de
+commencer&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-R&lt;/code&gt; demande de ne pas uploader le résultat (les packages)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Enfin, il suffit d&amp;rsquo;utiliser la ligne suivante pour utiliser les packages
+avec &lt;code&gt;pkgin&lt;/code&gt;, dans &lt;code&gt;/usr/pkg/etc/pkgin/repositories.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;file:///usr/pkgsrc/packages/All
+&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- raw HTML omitted --&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Montrer les dépendances avec make dans pkgsrc</title>
+      <link>https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/</link>
+      <pubDate>Thu, 18 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/</guid>
+      <description>&lt;p&gt;Généralement, on peut savoir quelles sont les dépendances d&amp;rsquo;un package
+en utilisant &lt;code&gt;make show-depends&lt;/code&gt;, mais cela ne montre que les
+dépendances pour l&amp;rsquo;installation, les dépendances pour la compilation ne
+sont pas montrées.&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;pre&gt;&lt;code&gt;$ cd /usr/pkgsrc/databases/postgresql90-server/
+$ make show-depends
+postgresql90-client&amp;gt;=9.0.4:../../databases/postgresql90-client
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour connaître les dépendances selon leur type (installation ou
+compilation), on peut utiliser la cible &lt;code&gt;show-depends-pkgpaths&lt;/code&gt; alliée à
+la variable &lt;code&gt;DEPENDS_TYPE&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Pour avoir seulement les dépendances de compilation :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=build show-depends-pkgpaths
+devel/bison
+devel/gmake
+pkgtools/digest
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour avoir seulement celles d&amp;rsquo;installation :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=install show-depends-pkgpaths
+databases/postgresql90-client
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Et enfin pour montrer les deux types, qui est aussi le comportement par
+défaut :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=all show-depends-pkgpaths
+databases/postgresql90-client
+devel/bison
+devel/gmake
+pkgtools/digest
+
+$ make show-depends-pkgpaths
+databases/postgresql90-client
+devel/bison
+devel/gmake
+pkgtools/digest
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour plus d&amp;rsquo;information, le Makefile qui contrôle cette cible est
+&lt;code&gt;mk/bsd.utils.mk&lt;/code&gt;.&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</title>
+      <link>https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/</link>
+      <pubDate>Sat, 06 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/</guid>
+      <description>&lt;p&gt;Comme j&amp;rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&amp;rsquo;après la configuration du client (écrit en Perl). Il n&amp;rsquo;est d&amp;rsquo;ailleurs
+pas forcément très convi à installer, c&amp;rsquo;est pourquoi je l&amp;rsquo;ai packagé
+pour pkgsrc : &lt;a href=&#34;http://pkgsrc.se/wip/pgbuildfarm&#34;&gt;http://pkgsrc.se/wip/pgbuildfarm&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;En espérant qu&amp;rsquo;il soit ajouté à l&amp;rsquo;arbre officiel&amp;hellip;&lt;/p&gt;
+&lt;p&gt;Voici la configuration pour lancer des builds sur NetBSD, dans
+&lt;code&gt;/usr/pkg/etc/pgbuildfarm/build-farm.conf&lt;/code&gt;, en commençant par le chemin
+du miroir du dépôt Git :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Modifier dans %conf
+scmrepo =&amp;gt; &#39;/usr/pgbuildfarm/pgsql-base.git&#39;,
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le client est destiné à être lancé par cron, connu pour son
+environnement light, c&amp;rsquo;est pourquoi les paramètres d&amp;rsquo;environnement
+doivent être adaptés :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Le make GNU s&amp;rsquo;appelle gmake chez nous&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Pas mal de programmes proviennent de pkgsrc, il faut donc que le
+client ait &lt;code&gt;/usr/pkg/bin&lt;/code&gt; dans son PATH, et puisse trouver les
+bibliothèques issues des packages.&lt;/p&gt;
+&lt;p&gt;make =&amp;gt; &amp;lsquo;gmake&amp;rsquo;,
+aux_path =&amp;gt; &amp;ldquo;/usr/pkg/bin&amp;rdquo;,&lt;/p&gt;
+&lt;p&gt;build_env =&amp;gt;
+{
+PATH =&amp;gt; &amp;ldquo;/usr/pkg/bin:$ENV{PATH}&amp;rdquo;,
+LD_LIBRARY_PATH =&amp;gt; &amp;ldquo;/usr/pkg/lib&amp;rdquo;,
+},&lt;/p&gt;
+&lt;p&gt;config_env =&amp;gt;
+{
+CC =&amp;gt; &amp;lsquo;gcc&amp;rsquo;,
+PATH =&amp;gt; &amp;ldquo;/usr/pkg/bin:$ENV{PATH}&amp;rdquo;,
+LD_LIBRARY_PATH =&amp;gt; &amp;ldquo;/usr/pkg/lib&amp;rdquo;,
+},&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Enfin le plus important, les options du &lt;code&gt;configure&lt;/code&gt;, la plupart
+nécessitent des packages supplémentaires comme &lt;code&gt;python&lt;/code&gt; ou la &lt;code&gt;libxml&lt;/code&gt;.
+Ce qui est primordial ici est d&amp;rsquo;utiliser le « template » NetBSD :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;config_opts =&amp;gt;
+[qw(
+    --enable-cassert
+    --enable-debug
+    --enable-nls
+    --enable-integer-datetimes
+    --with-perl
+    --with-python
+    --with-tcl
+    --with-krb5
+    --with-includes=/usr/include/krb5:/usr/pkg/include
+    --with-libraries=/usr/pkg/lib
+    --with-openssl
+    --with-template=netbsd
+    --enable-thread-safety
+)],
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour toutes ces options, les packages suivants ont été installés :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;devel/bison&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;devel/flex&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lang/python26&lt;/code&gt; (et &lt;code&gt;pkgtools/pkg_alternatives&lt;/code&gt; pour avoir le lien
+python)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lang/perl5&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lang/tcl&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;textproc/libxml2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;textproc/libxslt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;devel/readline&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;P.S. : Il n&amp;rsquo;y a que les particularités de NetBSD décrites ici, en
+complément du &lt;a href=&#34;http://wiki.postgresql.org/wiki/PostgreSQL_Buildfarm_Howto&#34;&gt;wiki de PostgreSQL&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>NetBSD en KVM</title>
+      <link>https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/</link>
+      <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/</guid>
+      <description>&lt;p&gt;Comme je viens d&amp;rsquo;investir dans un &lt;a href=&#34;http://www.kimsufi.com/fr/&#34;&gt;serveur kimsufi&lt;/a&gt; (le 16G), je me suis dis qu&amp;rsquo;avoir
+quelques machines NetBSD pour servir la bonne cause ça serait bien cool.&lt;/p&gt;
+&lt;p&gt;En fait, j&amp;rsquo;ai deux besoins :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Avoir un dépôt de paquet et de quoi fait des bulk build réduits de
+pkgsrc pour me permettre de n&amp;rsquo;utiliser uniquement l&amp;rsquo;excellent pkgin&lt;/li&gt;
+&lt;li&gt;Fournir des machines à la Build Farm de PostgreSQL, parce qu&amp;rsquo;il n&amp;rsquo;y
+a même pas de machine NetBSD en i386 et en amd64 (seulement powerpc
+et mips)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;J&amp;rsquo;ai donc décidé de monter 2 machines NetBSD en KVM sur ma grosse box
+Debian, qui fait tourner ça grâce à KVM.&lt;/p&gt;
+&lt;p&gt;Pour l&amp;rsquo;installation, il y a 2 possibilités, soit on fait du VNC, soit on
+redirige la sortie VGA dans du curses. Pour le disque j&amp;rsquo;ai choisi de
+poser directement les données sur des volumes logiques, dans ce cas, il
+faut désactiver le cache ce qui permet une infime perte de puissance en
+I/O.&lt;/p&gt;
+&lt;p&gt;Il faut commencer par récupérer l&amp;rsquo;ISO d&amp;rsquo;installation :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;wget ftp://ftp.fr.netbsd.org/pub/NetBSD/iso/5.1/amd64cd-5.1.iso
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite, créer le volume logique (on a choisi de donner 50 Go) et lancer
+l&amp;rsquo;installation, en curses ça passe nickel, il faut choisir d&amp;rsquo;utiliser la
+console serie :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kvm -drive file=/dev/system/kvm-nb64-d1,cache=none \\
+    -m 1024 \\
+    -net nic,model=e1000 -net tap \\
+    -name nb64 \\
+    -curses \\
+    -cdrom /home/orgrim/netbsd/amd64cd-5.1.iso \\
+    -boot d \\
+    -k fr
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Une fois installé, on lance la commande suivante dans un screen, on
+demande à KVM de fournir l&amp;rsquo;accès console en série dans un fichier, ce
+qui permet d&amp;rsquo;avoir la console QEMU disponible directement dans le
+screen :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kvm -nographic \\
+    -drive file=/dev/system/kvm-nb64-d1,cache=none \\
+    -m 1024 \\
+    -net nic,model=e1000,macaddr=DE:AD:BE:EF:37:D1 -net tap \\
+    -name nb64 \\
+    -boot c \\
+    -serial unix:/tmp/nb64.sock,server,nowait
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note: merci de changer la MAC de l&amp;rsquo;interface réseau, c&amp;rsquo;est utilisé en
+prod chez moi :)&lt;/p&gt;
+&lt;p&gt;Enfin, il est important de démarrer le noyau NetBSD sans ACPI ni SMP (en
+mettant le defaut à 4 dans &lt;code&gt;/boot.cfg&lt;/code&gt;)&lt;/p&gt;
+&lt;p&gt;Pour accéder à la machine en console série :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;minicom -D unix#/tmp/nd64.sock
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Si on a oublié de choisir la console série, on peut l&amp;rsquo;activer de cette
+façon :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Booter avec &lt;code&gt;-curses -k fr&lt;/code&gt; à la place de &lt;code&gt;-nographic&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Lancer la commande suivante pour activer la console série :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; # installboot -v -o console=com0,speed=19200 /dev/rwd0a /usr/mdec/bootxx_ffsv1
+ File system:         /dev/rwd0a
+ Primary bootstrap:   /usr/mdec/bootxx_ffsv1
+ Boot options:        timeout 5, flags 0, speed 19200, ioaddr 0, console com0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
+    
+    <item>
+      <title>pkgin adventures - bien générer son pkg_summary</title>
+      <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/</link>
+      <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/</guid>
+      <description>&lt;p&gt;Comme indiqué dans d&amp;rsquo;autres posts, j&amp;rsquo;abuse des chroots &lt;code&gt;pkg_comp&lt;/code&gt; pour
+tenir mes paquets à jour. Je suis récemment passé à l&amp;rsquo;utilisation de
+&lt;code&gt;pkgin&lt;/code&gt; pour la gestion de mes paquets une fois préparés dans le chroot.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;pkgin&lt;/code&gt; se base sur &lt;code&gt;pkg_summary&lt;/code&gt; pour connaître toutes les informations
+des paquets, nécessaires à sa popotte. Il y a plusieurs façons de créer
+un fichier &lt;code&gt;pkg_summary&lt;/code&gt; à donner à &lt;code&gt;pkgin&lt;/code&gt;, mais seule une façon
+fonctionne correctement :&lt;/p&gt;
+&lt;p&gt;​1. On génère le fichier à partir des paquets déjà installés :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_info -a -X | bzip2 &amp;gt; pkg_summary.bz2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​2. On génère le fichier à partir des tarballs présentes dans
+&lt;code&gt;/usr/pkgsrc/packages/All&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;La méthode 1 n&amp;rsquo;est pas valable car l&amp;rsquo;information sur les tarballs
+manque. Ainsi, &lt;code&gt;pkgin&lt;/code&gt; considère les tailles de tarball à 0 comme
+valables, ce qui arrive lorsqu&amp;rsquo;un dépôt est injoignable : le fetch
+laisse un fichier vide dans le cache que &lt;code&gt;pkgin&lt;/code&gt; considère comme
+correct.&lt;/p&gt;
+&lt;p&gt;Il faut donc utiliser la méthode 2 pour fournir l&amp;rsquo;information correcte à
+&lt;code&gt;pkgin&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Pour conclure, l&amp;rsquo;investigation autour de ce souci, a permis aux
+développeurs du projet d&amp;rsquo;ajouter :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Un mode verbose pour avoir plein d&amp;rsquo;informations utiles&lt;/li&gt;
+&lt;li&gt;Un message d&amp;rsquo;avertissement lorsque &lt;code&gt;pkgin&lt;/code&gt; rencontre un paquet à
+avec une taille à 0&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+    <item>
+      <title>pkgin adventures - conflit résolu</title>
+      <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-conflit-resolu/</link>
+      <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-conflit-resolu/</guid>
+      <description>&lt;p&gt;Il y a quelques jours, il a été décidé de remplacer &lt;code&gt;libungif&lt;/code&gt; par
+&lt;code&gt;giflib&lt;/code&gt; dans pkgsrc. Pour éviter de mixer les deux et donc avoir des
+problèmes, les deux paquets se déclarent mutuellement en conflit. A
+partir de maintenant la dépendance par défaut est sur &lt;code&gt;giflib&lt;/code&gt;, ce qui a
+donc fait que ma mise à jour (&lt;code&gt;pkg_chk&lt;/code&gt; dans un &lt;code&gt;pkg_comp&lt;/code&gt;) a tellement
+buté dessus que j&amp;rsquo;ai décidé qu&amp;rsquo;il serait plus simple de repartir d&amp;rsquo;un
+chroot &lt;code&gt;pkg_comp&lt;/code&gt; tout neuf&amp;hellip;&lt;/p&gt;
+&lt;p&gt;Même si j&amp;rsquo;avais oublié de retirer &lt;code&gt;libungif&lt;/code&gt; de mon
+&lt;code&gt;/usr/pkgsrc/pkgchk.conf&lt;/code&gt; au début, j&amp;rsquo;ai bien obtenu un dépôt tout neuf
+pour &lt;code&gt;pkgin&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Et là, la magie de &lt;code&gt;pkgin&lt;/code&gt; a opéré :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkgin up
+processing local summary...
+updating database: 100%
+downloading pkg_summary.bz2:    0Bbps 100%
+processing remote summary (file:///usr/pkgsrc/packages/amd64/All)...
+updating database: 100%
+
+# pkgin fug
+calculating dependencies... done.
+giflib-4.1.6 (to be installed) conflicts with installed package libungif-4.1.4nb1.
+proceed ? [y/N] n
+
+# pkgin srd libungif
+local reverse dependency tree for libungif
+        feh-1.3.4nb8
+        giblib-1.2.4nb9
+        python-mode-1.0nb1
+        php-mode-1.4.0nb1
+        mplayer-1.0rc20100913nb5
+        emacs-23.2nb4
+        imlib2-1.4.2nb6
+
+# pkgin rm libungif
+8 packages to delete: mplayer-1.0rc20100913nb5 php-mode-1.4.0nb1 python-mode-1.0nb1
+ feh-1.3.4nb8 emacs-23.2nb4 giblib-1.2.4nb9 imlib2-1.4.2nb6 libungif-4.1.4nb1
+proceed ? [y/N] y
+....
+
+# pkgin in feh emacs php-mode python-mode mplayer
+...
+
+# pkgin fug
+calculating dependencies... done.
+
+21 packages to be upgraded: epdfview-0.1.7nb10 mercurial-1.8 scmgit-base-1.7.3.5
+scmgit-docs-1.7.3.5 poppler-glib-0.16.2 libgnome-2.32.0nb2 libgnomeui-2.24.4nb2
+poppler-glib-0.16.2 poppler-utils-0.16.2 t1lib-5.1.2nb1 gtk2+-2.22.1nb1
+tex-dvipdfm-0.13.2dnb3 curl-7.21.3 glib2-2.26.1nb2 gnutls-2.10.4 libksba-1.1.0
+dialog-1.1.20110118 libidn-1.19 luatex-0.65.0nb1 web2c-2010nb6 poppler-0.16.2
+
+21 packages to be installed: poppler-0.16.3 dialog-1.1.20110302 libidn-1.20
+luatex-0.65.0nb2 web2c-2010nb7 curl-7.21.4 glib2-2.28.2 gnutls-2.10.5nb1 libksba-1.2.0
+gtk2+-2.24.1 tex-dvipdfm-0.13.2dnb4 poppler-glib-0.16.3 libgnome-2.32.1
+libgnomeui-2.24.5 poppler-glib-0.16.3 poppler-utils-0.16.3 t1lib-5.1.2nb2
+epdfview-0.1.7nb11 mercurial-1.8.1 scmgit-base-1.7.4.1 scmgit-docs-1.7.4.1
+(40M to download, 292M to install)
+
+proceed ? [y/N] y
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Et hop, résolution du conflit à la main, certes, mais &lt;!-- raw HTML omitted --&gt;très
+facilement&lt;!-- raw HTML omitted --&gt; et avec &lt;!-- raw HTML omitted --&gt;un seul outil&lt;!-- raw HTML omitted --&gt;. Sans &lt;code&gt;pkgin&lt;/code&gt;,
+j&amp;rsquo;aurais du itérer à coup de &lt;code&gt;pkg_info -R&lt;/code&gt;, &lt;code&gt;pkg_delete&lt;/code&gt; et
+&lt;code&gt;pkg_chk -ub&lt;/code&gt;&amp;hellip; Parce &lt;code&gt;pkgin&lt;/code&gt; ressort tout l&amp;rsquo;arbre des dépendances :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; # pkg_info -R giflib
+Information for giflib-4.1.6:
+
+Required by:
+imlib2-1.4.2nb7
+emacs-23.2nb5
+mplayer-1.0rc20100913nb6
+
+
+# pkgin srd giflib
+local reverse dependency tree for giflib
+        feh-1.3.4nb8
+        giblib-1.2.4nb9
+        python-mode-1.0nb1
+        php-mode-1.4.0nb1
+        mplayer-1.0rc20100913nb6
+        emacs-23.2nb5
+        imlib2-1.4.2nb7
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>pkgin adventures - utiliser pkgin avec pkgsrc-current</title>
+      <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/</link>
+      <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;pkgin&lt;/strong&gt; est un outil de gestion de paquets binaires pour pkgsrc, le
+système de paquets de NetBSD. Pour pouvoir l&amp;rsquo;utiliser il faut donc des
+paquets binaires, sauf que les binaires ne sont officiellement
+disponibles que pour les releases trimestrielles de pkgsrc. Quand on
+suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
+dépôt.&lt;/p&gt;
+&lt;p&gt;La solution consiste donc à utiliser l&amp;rsquo;équipe habituelle pour compiler
+les paquets sans gêner le système : &lt;code&gt;pkg_comp&lt;/code&gt; et &lt;code&gt;pkg_chk&lt;/code&gt;. Pour le
+dépôt on a simplement besoin d&amp;rsquo;un serveur web pour les mettre à
+disposition.&lt;/p&gt;
+&lt;p&gt;Voici un petit résumé de la procédure :&lt;/p&gt;
+&lt;p&gt;​1. A partir d&amp;rsquo;une machine ayant l&amp;rsquo;ensemble de ses paquets déjà
+installés, on met en place un chroot &lt;code&gt;pkg_comp&lt;/code&gt; comme indiqué &lt;a href=&#34;http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp&#34;&gt;sur le
+wiki&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;​2. On génère la liste des paquets à construire à partir des paquets
+installé avec &lt;code&gt;pkg_chk&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_chk -g
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​3. On les compile dans le chroot :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_comp build pkgtools/pkg_chk
+# pkg_comp chroot pkg_chk -ua
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​4. On génère le fichier &lt;code&gt;pkg_summary&lt;/code&gt; qui va bien :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​5. On ajoute le définition du dépôt local dans la configuration de
+&lt;code&gt;pkgin&lt;/code&gt;, en éditant &lt;code&gt;/usr/pkg/etc/pkgin/repositories.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;file:///usr/pkgsrc/packages/All
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On peut enfin utiliser &lt;code&gt;pkgin&lt;/code&gt; pour ajouter et supprimer des paquets. Il
+suffit de regénérer le &lt;code&gt;pkg_summary&lt;/code&gt; à chaque nouvelle compilation de
+paquet dans le chroot.&lt;/p&gt;
+&lt;p&gt;Pour l&amp;rsquo;upgrade, il faut pouvoir ne garder que les paquets les plus à
+jour dans le dépôt, pour cela l&amp;rsquo;outil &lt;code&gt;pkg_tarup&lt;/code&gt; entre en jeu, il
+permet de générer les paquets binaires à partir de l&amp;rsquo;installation
+courante.&lt;/p&gt;
+&lt;p&gt;Après une upgrade avec &lt;code&gt;pkg_chk&lt;/code&gt; dans le chroot, on peut mettre à jour
+le dépôt :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_comp build pkgtools/pkg_tarup
+# rm /usr/pkgsrc/packages/All/*
+# pkg_comp chroot pkg_tarup -a -d /usr/pkgsrc/packages/All \\&#39;*\\&#39;
+# cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, pour mettre à jour avec &lt;code&gt;pkgin&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkgin up
+# pkgin fug
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>pkgsrc, pkg_comp et ccache</title>
+      <link>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</link>
+      <pubDate>Fri, 04 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</guid>
+      <description>&lt;p&gt;Pour utiliser ccache dans un chroot &lt;code&gt;pkg_comp&lt;/code&gt;, on commence par installer
+ccache :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pkg_comp build devel/ccache
+# pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;En utilisant la cible &lt;code&gt;package-install&lt;/code&gt; dans le chroot, ccache s&amp;rsquo;y
+trouve installé. On l&amp;rsquo;installe aussi sur le système pour surveiller les
+statistiques plus tard.&lt;/p&gt;
+&lt;p&gt;Ensuite, on édite le &lt;code&gt;etc/mk.conf&lt;/code&gt; du chroot, par exemple
+&lt;code&gt;/local/pkg_comp/default/etc/mk.conf&lt;/code&gt;, pour y définir les variables
+suivantes :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ...
+# fin de la conf speciale pkg_comp
+
+CCACHE_DIR=${WRKOBJDIR}/.ccache
+PKGSRC_COMPILER = ccache gcc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On créé ensuite le répertoire du cache, si le chemin du chroot est
+&lt;code&gt;/local/pkg_comp/default&lt;/code&gt;, avec la variable &lt;code&gt;WRKOBJDIR&lt;/code&gt; laissée par
+défaut :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ensuite, il suffit de compiler ses packages comme d&amp;rsquo;habitude.&lt;/p&gt;
+&lt;p&gt;Enfin, on peut suivre les statistiques du cache avec la commande
+suivante :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# CCACHE_DIR=/local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache ccache -s
+cache directory                     /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
+cache hit                            133
+cache miss                          3053
+called for link                      383
+compile failed                        43
+preprocessor error                    34
+autoconf compile/link                388
+unsupported compiler option          216
+no input file                         55
+files in cache                      6201
+cache size                          58.7 Mbytes
+max cache size                    1024.0 Mbytes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;P.S. : Une doc pour mettre en place un chroot &lt;code&gt;pkg_comp&lt;/code&gt; est disponible
+&lt;a href=&#34;http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp&#34;&gt;sur le wiki&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>DNSSEC et Bind sur NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/</link>
+      <pubDate>Thu, 03 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/</guid>
+      <description>&lt;p&gt;En reconfigurant ma gateway sur NetBSD, le serveur Bind fournit dans
+« basesys » refusait de fonctionner à cause de l&amp;rsquo;activation de DNSSEC
+par défaut.&lt;/p&gt;
+&lt;p&gt;Pour le désactiver, il suffit de modifier les paramètres
+suivants dans &lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options {
+        # ...
+
+        dnssec-enable no;
+        dnssec-validation no;
+#        dnssec-lookaside auto;
+
+        # ...
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Mais ce n&amp;rsquo;est pas la solution idéale, sachant que DNSSEC est activé sur
+la zone root depuis juin 2010, autant l&amp;rsquo;utiliser. Pour avoir DNSSEC dans
+le Bind du basesys, il manque juste la configuration des clés. On
+récupère la DNSKEY de la zone root avec la commande qui va bien :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dig +dnssec +multiline . dnskey &amp;gt; /chemin/vers/root_dnskey
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On obtient la clé qu&amp;rsquo;il faut vérifier, on génère donc l&amp;rsquo;enregistrement
+DS correspondant :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dnssec-dsfromkey -2 -f /chemin/vers/root_dnskey .
+. IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32 F24E8FB5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Attention :&lt;/strong&gt; le dernier espace doit être ignoré.&lt;/p&gt;
+&lt;p&gt;On compare donc à ce que fournit l&amp;rsquo;IANA
+(&lt;a href=&#34;http://data.iana.org/root-anchors/root-anchors.xml&#34;&gt;http://data.iana.org/root-anchors/root-anchors.xml&lt;/a&gt;) et d&amp;rsquo;autres
+comme Kirei (&lt;a href=&#34;http://www.kirei.se/en/2010/06/20/root-ksk/&#34;&gt;http://www.kirei.se/en/2010/06/20/root-ksk/&lt;/a&gt;) qui
+fournissent également les signatures PGP à vérifier.&lt;/p&gt;
+&lt;p&gt;Quand c&amp;rsquo;est bon (GPG dit OK), on ajoute un bloc &lt;code&gt;managed-keys&lt;/code&gt; avec le
+contenu de l&amp;rsquo;enregistrement DNSKEY de la zone root dans
+&lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options {
+        # ...
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+        managed-keys-directory &amp;quot;keys&amp;quot;;
+
+        # ...
+};
+
+managed-keys {
+        &amp;quot;.&amp;quot; initial-key 257 3 8 &amp;quot;AwEAAagAIKlVZrp...&amp;quot;;
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour bénéficier du « look aside », c&amp;rsquo;est à dire une autre source de
+vérification des données du DNS, il faut ajouter la clé sur service DLV
+de ISC (l&amp;rsquo;organisation qui code Bind), en récupérant la clé là :
+&lt;a href=&#34;https://www.isc.org/solutions/dlv&#34;&gt;https://www.isc.org/solutions/dlv&lt;/a&gt; et après vérification des
+signatures PGP, on peut ajouter un bloc &lt;code&gt;trusted-keys&lt;/code&gt; à
+&lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;trusted-keys {
+        dlv.isc.org. 257 3 5 &amp;quot;BEAAAAP...&amp;quot;;
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Avant de relancer le service, on peut configurer des logs (voir le
+&lt;a href=&#34;http://wiki.orgrim.net/netbsd/named#configurer-les-logs&#34;&gt;wiki&lt;/a&gt; pour les logs dans le chroot) pour mettre du debug sur la
+partie DNSSEC :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;logging {
+        # ...
+        channel dnssec_log_file {
+                file &amp;quot;/var/log/dnssec.log&amp;quot; versions 3 size 20m;
+                severity debug 3;
+                print-category yes;
+                print-severity yes;
+                print-time yes;
+        };
+
+        category dnssec { dnssec_log_file; };
+        # ...
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Et corriger quelques permissions :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /etc/namedb/keys
+# chown named:named /etc/namedb/keys
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, on peut redémarrer le service et surveiller les logs :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /etc/rc.d/named restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour tester, on utilise &lt;code&gt;dig&lt;/code&gt; sur zone signée :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dig +dnssec +multiline net
+
+; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.7.2-P3 &amp;lt;&amp;lt;&amp;gt;&amp;gt; +dnssec +multiline net
+;; global options: +cmd
+;; Got answer:
+;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 5595
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 0, AUTHORITY: 4, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags: do; udp: 4096
+;; QUESTION SECTION:
+;net.                   IN A
+
+;; AUTHORITY SECTION:
+net.                    518 IN SOA a.gtld-servers.net. nstld.verisign-grs.com. (
+                                1299183189 ; serial
+                                1800       ; refresh (30 minutes)
+                                900        ; retry (15 minutes)
+                                604800     ; expire (1 week)
+                                86400      ; minimum (1 day)
+                                )
+net.                    518 IN RRSIG SOA 8 1 900 20110310201309 (
+                                20110303200309 3980 net.
+                                TUwUOfzcgGN/lXERU2Y+l3xMr8h6cg/t7ODOiGh8wSNq
+                                8zOEvaTYeR+aKY76mY9X1d+odTcHv52ewLs0nQLlvzFb
+                                iz48fxJrWoNKz5D1HxYDJGNqAsxh3usX0xxnNQoM0cIm
+                                vvw5uFWxFK8cJ0Xha1s4Rpd2z2gVse3yZB3kU78= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN RRSIG NSEC3 8 2 86400 20110310193846 (
+                                20110303192846 3980 net.
+                                IhkKHupik3uQMq94xJQqaLmTeXPCeROIdcicFRh5ocsP
+                                Mzfm/sO+9MpPdPpffCeCg3TtPxHhln6N0ffUa5jNoNnK
+                                kmxZTqF6OUPnW7+pUm2kIysZxjOR5wK4n40IyTj8QNWZ
+                                DspTJTVV7v/4RHgqnoHo2vHcZvLR744Y8PDEBH4= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN NSEC3 1 1 0 - A25R64HGRKT76GSK0JS1PNJ44MEELOJ6 NS SOA RRSIG DNSKEY NSEC3PARAM
+
+;; Query time: 12 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Thu Mar  3 21:20:00 2011
+;; MSG SIZE  rcvd: 511
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le flag &lt;strong&gt;ad&lt;/strong&gt; indique que la réponse est valide selon DNSSEC.&lt;/p&gt;
+&lt;p&gt;On voit des trucs du genre dans les logs :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;03-Mar-2011 18:22:12.734 dnssec: debug 3: validating @0xba5c7000: net DS: starting
+03-Mar-2011 18:22:12.735 dnssec: debug 3: validating @0xba5c7000: net DS: attempting positive response validation
+03-Mar-2011 18:22:12.738 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: attempting insecurity proof
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: insecurity proof failed
+03-Mar-2011 18:22:12.740 dnssec: info: validating @0xba5ca000: . NS: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.740 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.778 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: starting
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: attempting insecurity proof
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: insecurity proof failed
+03-Mar-2011 18:22:12.779 dnssec: info: validating @0xba5ca000: . DNSKEY: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.791 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.792 dnssec: debug 3: validating @0xba5ca000: . NS: attempting positive response validation
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: starting
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: attempting positive response validation
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: verify rdataset (keyid=19036): success
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: signed by trusted key; marking as secure
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validator @0xba5c4000: dns_validator_destroy
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: in fetch_callback_validator
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: keyset with trust 8
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: resuming validate
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: in fetch_callback_validator
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: keyset with trust 8
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: resuming validate
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validator @0xba5c7000: dns_validator_destroy
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On voit bien, que lors de la vérification de la signature de &lt;em&gt;net&lt;/em&gt;, Bind
+commence par vérifier &lt;em&gt;.&lt;/em&gt; (la zone root) et que ça marche.&lt;/p&gt;
+&lt;p&gt;PS : ne pas oublier de (re)mettre la verbosité des logs à &lt;em&gt;info&lt;/em&gt; après
+coup.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Accès SSH externe sur une gateway NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/</link>
+      <pubDate>Sat, 26 Feb 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/</guid>
+      <description>&lt;p&gt;Pour permettre l&amp;rsquo;accès à la gateway depuis Internet avec un maximum de
+sécurité, j&amp;rsquo;ai configuré le serveur OpenSSH (fournit dans basesys) et PF
+pour :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;N&amp;rsquo;autoriser l&amp;rsquo;accès que par clé publique&lt;/li&gt;
+&lt;li&gt;Empêcher les attaques par force brute sur le serveur&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;La configuration d&amp;rsquo;OpenSSH peut se faire de deux façon :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;On désactive l&amp;rsquo;authentification par mot de passe et l&amp;rsquo;utilisation de
+PAM pour que la méthode keyboard-ineractive ne laisse rien passer&lt;/li&gt;
+&lt;li&gt;On désactive l&amp;rsquo;authentification par mot de passe et le
+challenge/respone pour garder l&amp;rsquo;utilisation de PAM&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;J&amp;rsquo;ai choisi la 2ème méthode qui permet de garder la fonctionnalité de
+pam_nologin (seul root peut se logguer si &lt;code&gt;/etc/nologin&lt;/code&gt; existe, en
+modifiant &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePam yes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ainsi, l&amp;rsquo;authentification par mot de passe est totalement désactivée.&lt;/p&gt;
+&lt;p&gt;Pour empêcher les attaques par force brute sur le serveur, on configure
+PF de cette façon :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Il faut une table pour enregistrer les IP à bannir&lt;/li&gt;
+&lt;li&gt;On utilise l&amp;rsquo;option &lt;code&gt;max-src-conn-rate&lt;/code&gt; sur la règle qui ouvre le
+port de SSH : pas plus de deux connexions dans un intervalle de dix
+secondes par IP.&lt;/li&gt;
+&lt;li&gt;On ajoute une règle pour bloquer les IP présentes de la table&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Les règles PF, à placer dans &lt;code&gt;/etc/pf.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;table &amp;lt;ssh_bans&amp;gt; persist
+
+# allow ssh on the external interface, limit to connections in ten seconds
+pass in on $ext_if inet proto tcp to ($ext_if) port ssh \\
+    keep state (max-src-conn-rate 2/10, overload &amp;lt;ssh_bans&amp;gt; flush)
+
+# reject banned ip from connectiong to ssh port
+block return in on $ext_if inet proto tcp from &amp;lt;ssh_bans&amp;gt; to ($ext_if) port ssh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour surveiller, on utilise les options de manipulation des tables de
+&lt;code&gt;pfctl&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pfctl -t ssh_bans -T show
+# pfctl -t ssh_bans -T add X.Y.Z.T
+# pfctl -t ssh_bans -T delete X.Y.Z.T
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, un petit thread qui explique à quoi sert le challenge/response et la méthode keyboard-interactive : &lt;a href=&#34;http://groups.google.com/group/comp.security.ssh/browse_thread/thread/c483316ac6abcb74&#34;&gt;http://groups.google.com/group/comp.security.ssh/browse_thread/thread/c483316ac6abcb74&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Choisir des sources d&#39;entropie pour /dev/[u]random</title>
+      <link>https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/</link>
+      <pubDate>Thu, 30 Dec 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/</guid>
+      <description>&lt;p&gt;Pour monter un service DNS on a besoin de &lt;code&gt;/dev/random&lt;/code&gt; pour générer la
+clé rndc. Sans collecte d&amp;rsquo;entropie, &lt;code&gt;/dev/random&lt;/code&gt; ne crache rien.&lt;/p&gt;
+&lt;p&gt;La preuve sur un domU Xen en NetBSD 5.1 (le dom0 suit 5-stable), donnée par
+&lt;code&gt;ktruss&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fourche ~ # ktruss rndc-confgen -a -t /var/chroot/named
+[...]
+   519      1 rndc-confgen open(&amp;quot;/dev/random&amp;quot;, 0x4, 0) = 3
+[...]
+   519      1 rndc-confgen read(0x3, 0xbf7fe4a8, 0x10) Err#35 EAGAIN
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le &lt;code&gt;read()&lt;/code&gt; attend gentiment que &lt;code&gt;/dev/random&lt;/code&gt; lui fournisse du nombre
+aléatoire pendant que celui-ci dit de revenir plus tard. La raison est
+simple, aucune source d&amp;rsquo;entropie n&amp;rsquo;est configurée pour la collecte sur
+le domU, comme l&amp;rsquo;indique &lt;code&gt;rndctl&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -l
+Source                 Bits Type      Flags
+xennet1                   0 net  
+xennet0                   0 net  
+xbd0                      0 disk
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Et les stats ne sont pas glorieuses :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -s    
+               51 bits mixed into pool
+                0 bits currently stored in pool (max 4096)
+                0 bits of entropy discarded due to full pool
+               51 hard-random bits generated
+            16749 pseudo-random bits generated
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Après une lecture du man de rndctl, on active tout :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -ce -d xennet1
+fourche ~ # rndctl -ce -d xennet0
+fourche ~ # rndctl -ce -d xbd0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ça va tout de suite mieux, &lt;code&gt;rndc-confgen&lt;/code&gt; termine, et on a des « bits »
+qui commencent à remplir le « pool » :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -ls
+Source                 Bits Type      Flags
+xennet1                   0 net  estimate, collect
+xennet0                  80 net  estimate, collect
+xbd0                      0 disk estimate, collect
+              133 bits mixed into pool
+               80 bits currently stored in pool (max 4096)
+                0 bits of entropy discarded due to full pool
+               53 hard-random bits generated
+            17003 pseudo-random bits generated
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour avoir ça activé au boot, dans &lt;code&gt;/etc/rc.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rndctl=YES
+rndctl_flags=&amp;quot;xbd0; -c -t net&amp;quot; # Voir les commentaires dans /etc/rc.d/rndctl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Reste à découvrir pourquoi ce n&amp;rsquo;est pas activé par défaut en domU&amp;hellip;&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;</description>
+    </item>
+    
+    <item>
+      <title>Dual boot Debian/NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/</link>
+      <pubDate>Mon, 29 Nov 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/</guid>
+      <description>&lt;p&gt;L&amp;rsquo;installation d&amp;rsquo;un dual boot Linux/BSD est somme toute assez simple, on
+coupe le disque en deux et on installe les systèmes l&amp;rsquo;un après l&amp;rsquo;autre.
+La seule difficulté reste sur l&amp;rsquo;installation/configuration des
+bootloaders.&lt;/p&gt;
+&lt;p&gt;Voici comment j&amp;rsquo;ai installé mon laptop en dual boot Debian/NetBSD.
+D&amp;rsquo;abord, quelques principes/astuces:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux s&amp;rsquo;installe dans différentes partitions DOS&lt;/li&gt;
+&lt;li&gt;NetBSD installe ses partitions à l&amp;rsquo;intérieur d&amp;rsquo;une partition DOS qui
+lui est dédiée&lt;/li&gt;
+&lt;li&gt;On peut partager la swap entre les deux systèmes&lt;/li&gt;
+&lt;li&gt;On installe d&amp;rsquo;abord Linux et on utilise du LVM pour éviter de créer
+des partitions étendues&lt;/li&gt;
+&lt;li&gt;GRUB sera le boot loader principal et on chainload&amp;rsquo;era le boot
+loader de NetBSD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Table des partitions DOS:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Part 1: /boot (100Mb) - type Linux&lt;/li&gt;
+&lt;li&gt;Part 2: swap (taille de la RAM) - type Swap&lt;/li&gt;
+&lt;li&gt;Part 3: LVM (moitié du reste) - type Linux LVM&lt;/li&gt;
+&lt;li&gt;Part 4: NetBSD (le reste) - type NetBSD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Etapes:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Installer Debian (on prend une squeeze avec grub2)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Installer NetBSD&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Booter NetBSD et lancer:
+&lt;code&gt;installboot -v /dev/rwd0a /usr/mdec/bootxx_ffsv1&lt;/code&gt; (wd0a est la
+partition / et commence au début de la partition DOS allouée à
+NetBSD)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebooter sur le mode Rescue de Debian:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Choisir son root fs et executer un shell dedans&lt;/li&gt;
+&lt;li&gt;Monter tous les FS: &lt;code&gt;mount -t ext3 -a&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Editer &lt;code&gt;/etc/grub.d/40_custom&lt;/code&gt; (voir plus bas) :&lt;/li&gt;
+&lt;li&gt;Lancer: &lt;code&gt;grub-install&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebooter et vérifier que tout est bien accessible&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;/etc/grub.d/40_custom&lt;/code&gt; :&lt;/p&gt;
+&lt;p&gt;{% highlight bash %}
+#!/bin/sh
+exec tail -n +3 $0
+menuentry &amp;ldquo;NetBSD&amp;rdquo; {
+set root=(hd0,4)
+chainloader +1
+}&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

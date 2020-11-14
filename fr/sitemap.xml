@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://www.orgrim.net/categories/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/categories/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/categories/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/cloud-init/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/libvirt/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/categories/unix/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/unix/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/auth/</loc>
+    <lastmod>2017-10-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/</loc>
+    <lastmod>2017-10-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pgbouncer/</loc>
+    <lastmod>2017-10-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/categories/postgresql/</loc>
+    <lastmod>2017-10-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/</loc>
+    <lastmod>2017-10-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/archiving/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/replication/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/wal/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/backup/</loc>
+    <lastmod>2015-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/dump/</loc>
+    <lastmod>2015-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pg_back/</loc>
+    <lastmod>2015-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/</loc>
+    <lastmod>2015-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</loc>
+    <lastmod>2014-09-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/postgresql/</loc>
+    <lastmod>2014-09-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/selinux/</loc>
+    <lastmod>2014-09-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/blog/</loc>
+    <lastmod>2014-05-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2014-05-28-migration-du-blog-sur-github/</loc>
+    <lastmod>2014-05-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pandoc/</loc>
+    <lastmod>2014-05-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</loc>
+    <lastmod>2013-08-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/categories/netbsd/</loc>
+    <lastmod>2013-08-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/netbsd/</loc>
+    <lastmod>2013-08-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pkgsrc/</loc>
+    <lastmod>2013-08-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/x11/</loc>
+    <lastmod>2013-08-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/</loc>
+    <lastmod>2013-05-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2013-04-06-oups-des-tablespaces-imbriques/</loc>
+    <lastmod>2013-04-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pg_catalog/</loc>
+    <lastmod>2013-04-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/</loc>
+    <lastmod>2013-01-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/configuration/</loc>
+    <lastmod>2012-01-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2012-01-25-got-guc/</loc>
+    <lastmod>2012-01-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/build/</loc>
+    <lastmod>2012-01-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/</loc>
+    <lastmod>2012-01-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/ssh/</loc>
+    <lastmod>2011-10-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/</loc>
+    <lastmod>2011-10-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/</loc>
+    <lastmod>2011-10-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/</loc>
+    <lastmod>2011-09-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/</loc>
+    <lastmod>2011-08-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/</loc>
+    <lastmod>2011-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/</loc>
+    <lastmod>2011-08-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-08-04-could-not-open-relation-with-oid-n/</loc>
+    <lastmod>2011-08-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/lock/</loc>
+    <lastmod>2011-08-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-07-04-configuration-reseau-pour-virtualiser-chez-ovh/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/debian/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/ipv6/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/kvm/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/lxc/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/</loc>
+    <lastmod>2011-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/bash/</loc>
+    <lastmod>2011-06-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/</loc>
+    <lastmod>2011-06-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/</loc>
+    <lastmod>2011-06-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/ghostscript/</loc>
+    <lastmod>2011-06-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pdf/</loc>
+    <lastmod>2011-06-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/</loc>
+    <lastmod>2011-04-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-24-inserer-des-tabulations-dans-sa-ligne-de-commande-bash/</loc>
+    <lastmod>2011-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-14-pg_classreltuples-nest-quune-approximation-du-nombre-de-lignes/</loc>
+    <lastmod>2011-03-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pkgin/</loc>
+    <lastmod>2011-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/</loc>
+    <lastmod>2011-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-conflit-resolu/</loc>
+    <lastmod>2011-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/</loc>
+    <lastmod>2011-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/ccache/</loc>
+    <lastmod>2011-03-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pkg_comp/</loc>
+    <lastmod>2011-03-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</loc>
+    <lastmod>2011-03-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/bind/</loc>
+    <lastmod>2011-03-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/dnssec/</loc>
+    <lastmod>2011-03-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/</loc>
+    <lastmod>2011-03-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/</loc>
+    <lastmod>2011-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/pf/</loc>
+    <lastmod>2011-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-02-25-voir-tous-les-champs-dune-table/</loc>
+    <lastmod>2011-02-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-02-22-recreer-une-sequence/</loc>
+    <lastmod>2011-02-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/sequence/</loc>
+    <lastmod>2011-02-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/</loc>
+    <lastmod>2010-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/random/</loc>
+    <lastmod>2010-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/rndctl/</loc>
+    <lastmod>2010-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/</loc>
+    <lastmod>2010-11-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/dual-boot/</loc>
+    <lastmod>2010-11-29T00:00:00+00:00</lastmod>
+  </url>
+  
+</urlset>

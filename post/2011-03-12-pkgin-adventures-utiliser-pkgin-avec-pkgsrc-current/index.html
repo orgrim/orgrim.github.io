@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>pkgin adventures - utiliser pkgin avec pkgsrc-current - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="pkgin adventures - utiliser pkgin avec pkgsrc-current" />
+<meta property="og:description" content="pkgin est un outil de gestion de paquets binaires pour pkgsrc, le
+système de paquets de NetBSD. Pour pouvoir l&rsquo;utiliser il faut donc des
+paquets binaires, sauf que les binaires ne sont officiellement
+disponibles que pour les releases trimestrielles de pkgsrc. Quand on
+suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
+dépôt." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/" />
+<meta property="article:published_time" content="2011-03-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-03-12T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="pkgin adventures - utiliser pkgin avec pkgsrc-current"/>
+<meta name="twitter:description" content="pkgin est un outil de gestion de paquets binaires pour pkgsrc, le
+système de paquets de NetBSD. Pour pouvoir l&rsquo;utiliser il faut donc des
+paquets binaires, sauf que les binaires ne sont officiellement
+disponibles que pour les releases trimestrielles de pkgsrc. Quand on
+suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
+dépôt."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">pkgin adventures - utiliser pkgin avec pkgsrc-current</h1>
+        </header>
+        <div class="content">
+            <p><strong>pkgin</strong> est un outil de gestion de paquets binaires pour pkgsrc, le
+système de paquets de NetBSD. Pour pouvoir l&rsquo;utiliser il faut donc des
+paquets binaires, sauf que les binaires ne sont officiellement
+disponibles que pour les releases trimestrielles de pkgsrc. Quand on
+suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
+dépôt.</p>
+<p>La solution consiste donc à utiliser l&rsquo;équipe habituelle pour compiler
+les paquets sans gêner le système : <code>pkg_comp</code> et <code>pkg_chk</code>. Pour le
+dépôt on a simplement besoin d&rsquo;un serveur web pour les mettre à
+disposition.</p>
+<p>Voici un petit résumé de la procédure :</p>
+<p>​1. A partir d&rsquo;une machine ayant l&rsquo;ensemble de ses paquets déjà
+installés, on met en place un chroot <code>pkg_comp</code> comme indiqué <a href="http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp">sur le
+wiki</a>.</p>
+<p>​2. On génère la liste des paquets à construire à partir des paquets
+installé avec <code>pkg_chk</code> :</p>
+<pre><code># pkg_chk -g
+</code></pre>
+<p>​3. On les compile dans le chroot :</p>
+<pre><code># pkg_comp build pkgtools/pkg_chk
+# pkg_comp chroot pkg_chk -ua
+</code></pre>
+<p>​4. On génère le fichier <code>pkg_summary</code> qui va bien :</p>
+<pre><code># cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &gt; pkg_summary.bz2
+</code></pre>
+<p>​5. On ajoute le définition du dépôt local dans la configuration de
+<code>pkgin</code>, en éditant <code>/usr/pkg/etc/pkgin/repositories.conf</code> :</p>
+<pre><code>file:///usr/pkgsrc/packages/All
+</code></pre>
+<p>On peut enfin utiliser <code>pkgin</code> pour ajouter et supprimer des paquets. Il
+suffit de regénérer le <code>pkg_summary</code> à chaque nouvelle compilation de
+paquet dans le chroot.</p>
+<p>Pour l&rsquo;upgrade, il faut pouvoir ne garder que les paquets les plus à
+jour dans le dépôt, pour cela l&rsquo;outil <code>pkg_tarup</code> entre en jeu, il
+permet de générer les paquets binaires à partir de l&rsquo;installation
+courante.</p>
+<p>Après une upgrade avec <code>pkg_chk</code> dans le chroot, on peut mettre à jour
+le dépôt :</p>
+<pre><code># pkg_comp build pkgtools/pkg_tarup
+# rm /usr/pkgsrc/packages/All/*
+# pkg_comp chroot pkg_tarup -a -d /usr/pkgsrc/packages/All \\'*\\'
+# cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &gt; pkg_summary.bz2
+</code></pre>
+<p>Enfin, pour mettre à jour avec <code>pkgin</code> :</p>
+<pre><code># pkgin up
+# pkgin fug
+</code></pre>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-03-12</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

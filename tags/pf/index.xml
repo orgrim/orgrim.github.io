@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>pf on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/pf/</link>
+    <description>code. grind. sleep. (pf)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Sat, 26 Feb 2011 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/pf/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Accès SSH externe sur une gateway NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/</link>
+      <pubDate>Sat, 26 Feb 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/</guid>
+      <description>&lt;p&gt;Pour permettre l&amp;rsquo;accès à la gateway depuis Internet avec un maximum de
+sécurité, j&amp;rsquo;ai configuré le serveur OpenSSH (fournit dans basesys) et PF
+pour :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;N&amp;rsquo;autoriser l&amp;rsquo;accès que par clé publique&lt;/li&gt;
+&lt;li&gt;Empêcher les attaques par force brute sur le serveur&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;La configuration d&amp;rsquo;OpenSSH peut se faire de deux façon :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;On désactive l&amp;rsquo;authentification par mot de passe et l&amp;rsquo;utilisation de
+PAM pour que la méthode keyboard-ineractive ne laisse rien passer&lt;/li&gt;
+&lt;li&gt;On désactive l&amp;rsquo;authentification par mot de passe et le
+challenge/respone pour garder l&amp;rsquo;utilisation de PAM&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;J&amp;rsquo;ai choisi la 2ème méthode qui permet de garder la fonctionnalité de
+pam_nologin (seul root peut se logguer si &lt;code&gt;/etc/nologin&lt;/code&gt; existe, en
+modifiant &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePam yes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ainsi, l&amp;rsquo;authentification par mot de passe est totalement désactivée.&lt;/p&gt;
+&lt;p&gt;Pour empêcher les attaques par force brute sur le serveur, on configure
+PF de cette façon :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Il faut une table pour enregistrer les IP à bannir&lt;/li&gt;
+&lt;li&gt;On utilise l&amp;rsquo;option &lt;code&gt;max-src-conn-rate&lt;/code&gt; sur la règle qui ouvre le
+port de SSH : pas plus de deux connexions dans un intervalle de dix
+secondes par IP.&lt;/li&gt;
+&lt;li&gt;On ajoute une règle pour bloquer les IP présentes de la table&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Les règles PF, à placer dans &lt;code&gt;/etc/pf.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;table &amp;lt;ssh_bans&amp;gt; persist
+
+# allow ssh on the external interface, limit to connections in ten seconds
+pass in on $ext_if inet proto tcp to ($ext_if) port ssh \\
+    keep state (max-src-conn-rate 2/10, overload &amp;lt;ssh_bans&amp;gt; flush)
+
+# reject banned ip from connectiong to ssh port
+block return in on $ext_if inet proto tcp from &amp;lt;ssh_bans&amp;gt; to ($ext_if) port ssh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour surveiller, on utilise les options de manipulation des tables de
+&lt;code&gt;pfctl&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# pfctl -t ssh_bans -T show
+# pfctl -t ssh_bans -T add X.Y.Z.T
+# pfctl -t ssh_bans -T delete X.Y.Z.T
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, un petit thread qui explique à quoi sert le challenge/response et la méthode keyboard-interactive : &lt;a href=&#34;http://groups.google.com/group/comp.security.ssh/browse_thread/thread/c483316ac6abcb74&#34;&gt;http://groups.google.com/group/comp.security.ssh/browse_thread/thread/c483316ac6abcb74&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

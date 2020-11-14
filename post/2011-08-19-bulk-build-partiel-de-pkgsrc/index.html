@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Bulk build partiel de pkgsrc - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Bulk build partiel de pkgsrc" />
+<meta property="og:description" content="En suivant l&#39;excellent tip de Mr GuiGui2, j&rsquo;ai pu monter ma petite archi de bulk build personnelle pour fournir du package tout frais à pkgin.
+J&rsquo;ai donc ajouté le bloc magique suivant à mon /etc/mk.conf, qui permet de gérer la présence de commentaires dans pkgchk.conf :
+# bulk build config DEPENDS_TARGET= bulk-install BATCH= yes BULK_PREREQ&#43;= pkgtools/lintpkgsrc .if defined(SPECIFIC_PKGS) PKGLIST!= awk &#39;$$1 !~ /^\\#/ {print $$1}&#39; ${PKGCHK_CONF} . for _pkg_ in ${PKGLIST} HOST_SPECIFIC_PKGS&#43;= ${_pkg_} ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/" />
+<meta property="article:published_time" content="2011-08-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-08-19T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Bulk build partiel de pkgsrc"/>
+<meta name="twitter:description" content="En suivant l&#39;excellent tip de Mr GuiGui2, j&rsquo;ai pu monter ma petite archi de bulk build personnelle pour fournir du package tout frais à pkgin.
+J&rsquo;ai donc ajouté le bloc magique suivant à mon /etc/mk.conf, qui permet de gérer la présence de commentaires dans pkgchk.conf :
+# bulk build config DEPENDS_TARGET= bulk-install BATCH= yes BULK_PREREQ&#43;= pkgtools/lintpkgsrc .if defined(SPECIFIC_PKGS) PKGLIST!= awk &#39;$$1 !~ /^\\#/ {print $$1}&#39; ${PKGCHK_CONF} . for _pkg_ in ${PKGLIST} HOST_SPECIFIC_PKGS&#43;= ${_pkg_} ."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Bulk build partiel de pkgsrc</h1>
+        </header>
+        <div class="content">
+            <p>En suivant l'<a href="http://www.guigui2.net/index.php?post/2011/07/30/sudo-sh-/usr/pkgsrc/mk/bulk/do-sandbox-build-s">excellent tip de Mr GuiGui2</a>, j&rsquo;ai pu monter ma petite
+archi de bulk build personnelle pour fournir du package tout frais à
+<a href="http://pkgin.net">pkgin</a>.</p>
+<p>J&rsquo;ai donc ajouté le bloc magique suivant à mon <code>/etc/mk.conf</code>, qui
+permet de gérer la présence de commentaires dans <code>pkgchk.conf</code> :</p>
+<pre><code># bulk build config
+DEPENDS_TARGET= bulk-install
+BATCH=          yes
+
+BULK_PREREQ+=   pkgtools/lintpkgsrc
+.if defined(SPECIFIC_PKGS)
+PKGLIST!=               awk '$$1 !~ /^\\#/ {print $$1}' ${PKGCHK_CONF}
+.       for _pkg_ in ${PKGLIST}
+HOST_SPECIFIC_PKGS+=    ${_pkg_}
+.       endfor
+.endif
+</code></pre>
+<p>Pour aller plus loin, j&rsquo;ai automatisé le process au maximum pour lancer
+des bulk build réguliers par cron, grâce au script [bulk-builder][]. Ce
+script remplace <code>do-sandbox-build</code> et <code>do-sandbox-upload</code>, il est
+également capable de gérer des chemins alternatifs, mettre à jour
+<code>pkgsrc</code> avant de lancer le bulk.</p>
+<p>La procédure pour mettre ça en place est donc :</p>
+<p>​1. Ajouter le bloc montré plus haut à <code>/etc/mk.conf</code> et y définir
+<code>PKGCHK_CONF</code>, il s&rsquo;agit du chemin vers une liste de packages au format
+\&ldquo;catetgorie/package\&rdquo;, un par ligne, qu&rsquo;on peut automatiquement créer
+avec <code>pkg_chk -g</code>.</p>
+<p>​2. Créer la sandbox :</p>
+<pre><code># cd /usr/pkgsrc/mk/bulk
+# sh mksandbox --without-x /usr/sandbox
+</code></pre>
+<p>​3. Créer et configurer <code>/usr/pkgsrc/mk/bulk/build.conf</code> :</p>
+<pre><code># cd /usr/pkgsrc/mk/bulk
+# cp build.conf-example build.conf
+# vi build.conf
+</code></pre>
+<p>​4. Lancer le bulk build :</p>
+<pre><code># sh bulk-builder -u -R
+</code></pre>
+<ul>
+<li><code>-u</code> demande de <code>cvs up</code> le répertoire <code>/usr/pkgsrc</code> avant de
+commencer</li>
+<li><code>-R</code> demande de ne pas uploader le résultat (les packages)</li>
+</ul>
+<p>Enfin, il suffit d&rsquo;utiliser la ligne suivante pour utiliser les packages
+avec <code>pkgin</code>, dans <code>/usr/pkg/etc/pkgin/repositories.conf</code> :</p>
+<pre><code>file:///usr/pkgsrc/packages/All
+</code></pre>
+<!-- raw HTML omitted -->
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

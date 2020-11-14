@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>sequence on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/sequence/</link>
+    <description>code. grind. sleep. (sequence)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Tue, 22 Feb 2011 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/sequence/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Recréer une séquence</title>
+      <link>https://www.orgrim.net/post/2011-02-22-recreer-une-sequence/</link>
+      <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-22-recreer-une-sequence/</guid>
+      <description>&lt;p&gt;On peut faire ça dans 2 cas :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;On a fait n&amp;rsquo;importe quoi, et la séquence a disparu :-(&lt;/li&gt;
+&lt;li&gt;On veut transformer une colonne en « SERIAL »&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;owner_de_la_table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--  ?column?
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;-- ----------
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;--       155
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;-- (1 row)
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;-- On prend donc « max(id)+1 » comme valeur de départ de la séquence
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEQUENCE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable_id_seq&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;START&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;155&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OWNED&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;COMMIT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Pour lier la séquence à la table (et ainsi l&amp;rsquo;utiliser lors d&amp;rsquo;INSERT par
+exemple) :&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TABLE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;COLUMN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;id&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DEFAULT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NEXTVAL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;latable_id_seq&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;regclass&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;COMMIT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

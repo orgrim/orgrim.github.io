@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>blog on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/blog/</link>
+    <description>code. grind. sleep. (blog)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Wed, 28 May 2014 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Migration du blog sur github</title>
+      <link>https://www.orgrim.net/post/2014-05-28-migration-du-blog-sur-github/</link>
+      <pubDate>Wed, 28 May 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2014-05-28-migration-du-blog-sur-github/</guid>
+      <description>&lt;p&gt;Finalement le temps ne me permettant plus d&amp;rsquo;administrer mon serveur
+dédié comme il faut, j&amp;rsquo;ai décidé de l&amp;rsquo;abondonner et transférer mes
+services ailleurs. Pour le blog et le wiki, j&amp;rsquo;ai choisi de faire un
+site/blog github avec jekyll, vu que c&amp;rsquo;est tout prémaché.&lt;/p&gt;
+&lt;p&gt;Sur github, l&amp;rsquo;hébergement c&amp;rsquo;est du fichier html, donc statique, on a
+plusieurs possibilités pour créer un site :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://jekyllrb.com&#34;&gt;jekyll&lt;/a&gt; dont github est capable de compiler le résultat à chaque
+push du dépôt, mais avec certaines limitations, comme aucun plugin
+et la nécessité de créer pas mal de pages pour que ça ressemble à un
+blog&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://octopress.org&#34;&gt;octopress&lt;/a&gt; qui est une surcouche à jekyll, il faut rtfm et tout de
+même faire ses templates, voir un peu de ruby&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://getpelican.com&#34;&gt;pelican&lt;/a&gt; qui fait comme octopress à peu prêt mais en python&lt;/li&gt;
+&lt;li&gt;plein d&amp;rsquo;autres générateurs de site statiques que j&amp;rsquo;ai surement raté&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;L&amp;rsquo;avantage de pelican est dans sa capacité à importer le contenu d&amp;rsquo;un
+blog dotclear, et transformer la syntaxe en markdown. Le markdown
+semble avoir la cote, beaucoup de générateurs de site l&amp;rsquo;utilisent,
+d&amp;rsquo;ailleurs je m&amp;rsquo;y suis mis.&lt;/p&gt;
+&lt;p&gt;Comme j&amp;rsquo;avais déjà fait le site de &lt;a href=&#34;http://dalibo.github.io/pitrery/&#34;&gt;pitrery&lt;/a&gt; avec jekyll sur github,
+la migration fut plus facile, une fois le dotclear migré grâce à
+pelican.&lt;/p&gt;
+&lt;p&gt;Au final, j&amp;rsquo;ai maintenant un truc tout simple avec un thème
+&lt;a href=&#34;http://getbootstrap.com&#34;&gt;bootstrap&lt;/a&gt;, et le jekyll de base de github est largement suffisant.&lt;/p&gt;
+&lt;p&gt;La bonne découverte fut &lt;a href=&#34;http://johnmacfarlane.net/pandoc/&#34;&gt;pandoc&lt;/a&gt;, un super convertisseur de format de
+document texte, qui va me servir pour la migration du dokuwiki à base
+de :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pandoc -f html -t markdown http://wiki.orgrim.net/page?do=export_html
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le mot de la fin, ça demande un peu de boulot de nettoyage manuel,
+mais vu le nombre impressionant de posts que j&amp;rsquo;ai pu produire en quatre
+ans, c&amp;rsquo;était pas trop méchant.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

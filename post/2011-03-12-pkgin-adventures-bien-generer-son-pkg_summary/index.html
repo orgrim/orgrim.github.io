@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>pkgin adventures - bien générer son pkg_summary - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="pkgin adventures - bien générer son pkg_summary" />
+<meta property="og:description" content="Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots pkg_comp pour
+tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
+pkgin pour la gestion de mes paquets une fois préparés dans le chroot." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/" />
+<meta property="article:published_time" content="2011-03-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-03-12T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="pkgin adventures - bien générer son pkg_summary"/>
+<meta name="twitter:description" content="Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots pkg_comp pour
+tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
+pkgin pour la gestion de mes paquets une fois préparés dans le chroot."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">pkgin adventures - bien générer son pkg_summary</h1>
+        </header>
+        <div class="content">
+            <p>Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots <code>pkg_comp</code> pour
+tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
+<code>pkgin</code> pour la gestion de mes paquets une fois préparés dans le chroot.</p>
+<p><code>pkgin</code> se base sur <code>pkg_summary</code> pour connaître toutes les informations
+des paquets, nécessaires à sa popotte. Il y a plusieurs façons de créer
+un fichier <code>pkg_summary</code> à donner à <code>pkgin</code>, mais seule une façon
+fonctionne correctement :</p>
+<p>​1. On génère le fichier à partir des paquets déjà installés :</p>
+<pre><code># pkg_info -a -X | bzip2 &gt; pkg_summary.bz2
+</code></pre>
+<p>​2. On génère le fichier à partir des tarballs présentes dans
+<code>/usr/pkgsrc/packages/All</code> :</p>
+<pre><code># cd /usr/pkgsrc/packages/All
+# pkg_info -X *.tgz | bzip2 &gt; pkg_summary.bz2
+</code></pre>
+<p>La méthode 1 n&rsquo;est pas valable car l&rsquo;information sur les tarballs
+manque. Ainsi, <code>pkgin</code> considère les tailles de tarball à 0 comme
+valables, ce qui arrive lorsqu&rsquo;un dépôt est injoignable : le fetch
+laisse un fichier vide dans le cache que <code>pkgin</code> considère comme
+correct.</p>
+<p>Il faut donc utiliser la méthode 2 pour fournir l&rsquo;information correcte à
+<code>pkgin</code>.</p>
+<p>Pour conclure, l&rsquo;investigation autour de ce souci, a permis aux
+développeurs du projet d&rsquo;ajouter :</p>
+<ul>
+<li>Un mode verbose pour avoir plein d&rsquo;informations utiles</li>
+<li>Un message d&rsquo;avertissement lorsque <code>pkgin</code> rencontre un paquet à
+avec une taille à 0</li>
+</ul>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-03-12</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

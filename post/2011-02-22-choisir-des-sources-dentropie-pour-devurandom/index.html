@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Choisir des sources d&#39;entropie pour /dev/[u]random - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Choisir des sources d&#39;entropie pour /dev/[u]random" />
+<meta property="og:description" content="Pour monter un service DNS on a besoin de /dev/random pour générer la
+clé rndc. Sans collecte d&rsquo;entropie, /dev/random ne crache rien." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/" />
+<meta property="article:published_time" content="2010-12-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2010-12-30T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Choisir des sources d&#39;entropie pour /dev/[u]random"/>
+<meta name="twitter:description" content="Pour monter un service DNS on a besoin de /dev/random pour générer la
+clé rndc. Sans collecte d&rsquo;entropie, /dev/random ne crache rien."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Choisir des sources d&#39;entropie pour /dev/[u]random</h1>
+        </header>
+        <div class="content">
+            <p>Pour monter un service DNS on a besoin de <code>/dev/random</code> pour générer la
+clé rndc. Sans collecte d&rsquo;entropie, <code>/dev/random</code> ne crache rien.</p>
+<p>La preuve sur un domU Xen en NetBSD 5.1 (le dom0 suit 5-stable), donnée par
+<code>ktruss</code> :</p>
+<pre><code>fourche ~ # ktruss rndc-confgen -a -t /var/chroot/named
+[...]
+   519      1 rndc-confgen open(&quot;/dev/random&quot;, 0x4, 0) = 3
+[...]
+   519      1 rndc-confgen read(0x3, 0xbf7fe4a8, 0x10) Err#35 EAGAIN
+</code></pre>
+<p>Le <code>read()</code> attend gentiment que <code>/dev/random</code> lui fournisse du nombre
+aléatoire pendant que celui-ci dit de revenir plus tard. La raison est
+simple, aucune source d&rsquo;entropie n&rsquo;est configurée pour la collecte sur
+le domU, comme l&rsquo;indique <code>rndctl</code> :</p>
+<pre><code>fourche ~ # rndctl -l
+Source                 Bits Type      Flags
+xennet1                   0 net  
+xennet0                   0 net  
+xbd0                      0 disk
+</code></pre>
+<p>Et les stats ne sont pas glorieuses :</p>
+<pre><code>fourche ~ # rndctl -s    
+               51 bits mixed into pool
+                0 bits currently stored in pool (max 4096)
+                0 bits of entropy discarded due to full pool
+               51 hard-random bits generated
+            16749 pseudo-random bits generated
+</code></pre>
+<p>Après une lecture du man de rndctl, on active tout :</p>
+<pre><code>fourche ~ # rndctl -ce -d xennet1
+fourche ~ # rndctl -ce -d xennet0
+fourche ~ # rndctl -ce -d xbd0
+</code></pre>
+<p>Ça va tout de suite mieux, <code>rndc-confgen</code> termine, et on a des « bits »
+qui commencent à remplir le « pool » :</p>
+<pre><code>fourche ~ # rndctl -ls
+Source                 Bits Type      Flags
+xennet1                   0 net  estimate, collect
+xennet0                  80 net  estimate, collect
+xbd0                      0 disk estimate, collect
+              133 bits mixed into pool
+               80 bits currently stored in pool (max 4096)
+                0 bits of entropy discarded due to full pool
+               53 hard-random bits generated
+            17003 pseudo-random bits generated
+</code></pre>
+<p>Pour avoir ça activé au boot, dans <code>/etc/rc.conf</code> :</p>
+<pre><code>rndctl=YES
+rndctl_flags=&quot;xbd0; -c -t net&quot; # Voir les commentaires dans /etc/rc.d/rndctl
+</code></pre>
+<p>Reste à découvrir pourquoi ce n&rsquo;est pas activé par défaut en domU&hellip;</p>
+<!-- raw HTML omitted -->
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2010-12-30</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/random">#random</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/rndctl">#rndctl</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

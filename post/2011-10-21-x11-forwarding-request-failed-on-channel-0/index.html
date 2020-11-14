@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>X11 forwarding request failed on channel 0 - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="X11 forwarding request failed on channel 0" />
+<meta property="og:description" content="Quand j&rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en X.org modular, j&rsquo;ai ça :
+orgrim@serfouette ~ $ ssh rateau X11 forwarding request failed on channel 0 Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net  WTF? ça tombe en marche SSH normalement.
+Et bien le souci vient de l&rsquo;échange des magic cookies pour l&rsquo;authentification entre serveurs X à travers SSH, c&rsquo;est utilisé par le X11 forwarding et on a besoin de plusieurs choses pour ça :" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/" />
+<meta property="article:published_time" content="2011-10-21T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-10-21T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="X11 forwarding request failed on channel 0"/>
+<meta name="twitter:description" content="Quand j&rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en X.org modular, j&rsquo;ai ça :
+orgrim@serfouette ~ $ ssh rateau X11 forwarding request failed on channel 0 Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net  WTF? ça tombe en marche SSH normalement.
+Et bien le souci vient de l&rsquo;échange des magic cookies pour l&rsquo;authentification entre serveurs X à travers SSH, c&rsquo;est utilisé par le X11 forwarding et on a besoin de plusieurs choses pour ça :"/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">X11 forwarding request failed on channel 0</h1>
+        </header>
+        <div class="content">
+            <p>Quand j&rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en
+X.org modular, j&rsquo;ai ça :</p>
+<pre><code>orgrim@serfouette ~ $ ssh rateau 
+X11 forwarding request failed on channel 0
+Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net
+</code></pre>
+<p>WTF? ça tombe en marche SSH normalement.</p>
+<p>Et bien le souci vient de l&rsquo;échange des magic cookies pour
+l&rsquo;authentification entre serveurs X à travers SSH, c&rsquo;est utilisé par le
+X11 forwarding et on a besoin de plusieurs choses pour ça :</p>
+<ul>
+<li>le chemin complet vers <code>xauth</code> sur le client</li>
+<li>le chemin complet vers <code>xauth</code> sur le serveur</li>
+<li>Avoir <code>X11Forward yes</code> sur le serveur quand on le demande sur le
+client (il vaut <code>yes</code> dans le <code>/etc/ssh/ssh_config</code> du client par
+flemme de taper <code>-X</code> sur la ligne de commande)</li>
+</ul>
+<p>Le client est sous Linux, donc pas de soucis le chemin en dur
+<code>/usr/bin/xauth</code> dans le binaire <code>sshd</code> marche. Par contre pour NetBSD
+avec du X.org modular, il faut décommenter l&rsquo;option <code>XAuthLocation</code> dans
+<code>/etc/ssh/sshd_config</code> et <code>/etc/ssh/ssh_config</code> pour donner le bon
+chemin vers <code>xauth</code>, comme indiqué en commentaire dans ces deux
+fichiers :</p>
+<pre><code># If you use xorg from pkgsrc then uncomment the following line.
+#  XAuthLocation /usr/pkg/bin/xauth
+</code></pre>
+<p>Enfin, comme le <code>X11Forward</code> est à <code>no</code> par défaut sur NetBSD, je l&rsquo;ai
+activé. La <strong>vrai solution</strong> est de faire ça côté client en utilisant
+explicitement l&rsquo;option <code>-X</code> quand on veut ouvrir des fenêtres sur le
+serveur.</p>
+<p>Le pire c&rsquo;est que Google ne sort rien sur le message &ldquo;X11 forwarding
+request failed on channel 0&rdquo;, à part une question sans réponse sur un
+stackoverflow-like en Russe !</p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-10-21</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/x11">#X11</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ssh">#ssh</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

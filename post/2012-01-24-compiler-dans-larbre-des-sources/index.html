@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Compiler dans l&#39;arbre des sources - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Compiler dans l&#39;arbre des sources" />
+<meta property="og:description" content="Je m&rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&rsquo;avère qu&rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&rsquo;agit de NetBSD 5.1.1, la version 6 n&rsquo;aura pas
+ce manque." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2012-01-24-compiler-dans-larbre-des-sources/" />
+<meta property="article:published_time" content="2012-01-24T00:00:00+00:00" />
+<meta property="article:modified_time" content="2012-01-24T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Compiler dans l&#39;arbre des sources"/>
+<meta name="twitter:description" content="Je m&rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&rsquo;avère qu&rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&rsquo;agit de NetBSD 5.1.1, la version 6 n&rsquo;aura pas
+ce manque."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Compiler dans l&#39;arbre des sources</h1>
+        </header>
+        <div class="content">
+            <p>Je m&rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&rsquo;avère qu&rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&rsquo;agit de NetBSD 5.1.1, la version 6 n&rsquo;aura pas
+ce manque.</p>
+<p>Il faut donc recompiler un noyau pour ajouter cette fonctionnalité, pour
+faire vite on ne passe pas par <code>build.sh</code>, les tools etc, on compile
+directement dans l&rsquo;arbre des sources, montrer comment faire ça est le
+but de post.</p>
+<p>On commence par récupérer les sources sur un serveur CVS près de chez
+soi :</p>
+<pre><code># export CVS_RSH=ssh
+# export CVSROOT=&quot;anoncvs@anoncvs.NetBSD.org:/cvsroot&quot;
+# cd /usr
+# cvs -q -z3 co -P -rnetbsd-5-1-1-RELEASE src
+</code></pre>
+<p>Ensuite, on n&rsquo;a pas besoin d&rsquo;avoir une conf particulière dans son
+<code>/etc/mk.conf</code>, on n&rsquo;a juste à ajouter les options dans le fichier de
+conf du kernel et compiler directement par l&rsquo;intermédiaire de <code>make</code>.</p>
+<p>On édite le fichier <code>/usr/src/sys/arch/i386/conf/GENERIC.local</code>, pour y
+ajouter les lignes suivantes, il est inclus par le fichier <code>GENERIC</code> :</p>
+<pre><code># DRI driver    
+i915drm*        at vga?         # Intel i915, i945 DRM driver
+mach64drm*      at vga?         # mach64 (3D Rage Pro, Rage) DRM driver
+mgadrm*         at vga?         # Matrox G[24]00, G[45]50 DRM driver
+r128drm*        at vga?         # ATI Rage 128 DRM driver
+radeondrm*      at vga?         # ATI Radeon DRM driver
+savagedrm*      at vga?         # S3 Savage DRM driver
+sisdrm*         at vga?         # SiS DRM driver
+tdfxdrm*        at vga?         # 3dfx (voodoo) DRM driver
+</code></pre>
+<p>On compile le kernel à la main :</p>
+<pre><code># config GENERIC
+# cd ../compile/GENERIC
+# make depend
+# make
+</code></pre>
+<p>On installe le kernel à la main :</p>
+<pre><code># mv /netbsd /netbsd.old
+# cp netbsd /
+# chmod 444 /netbsd
+</code></pre>
+<p>Pour revenir facilement en arrière en cas de souci, on peut ajouter la
+ligne suivante dans <code>/boot.cfg</code>, en deuxième position :</p>
+<pre><code>menu=Boot old kernel:boot netbsd.old
+</code></pre>
+<p>Il ne reste plus qu&rsquo;à rebooter sur le nouveau kernel.</p>
+<p>Référence : <a href="http://www.netbsd.org/docs/guide/en/chap-kernel.html#chap-kernel-building-manually">Le guide</a></p>
+<p>On peut faire la même manip pour mettre à jour une partie du système
+seulement, par exemple lorsqu&rsquo;une faille de sécurité doit être corrigée.
+La méthode de compilation dans l&rsquo;arbre des sources est indiquée dans
+l&rsquo;avis.</p>
+<p>Plus généralement, la méthode est la suivante, avec l&rsquo;exemple de <code>ls</code> :</p>
+<pre><code># cd /usr/src/bin/ls
+# make USETOOLS=no cleandir
+# make USETOOLS=no dependall
+</code></pre>
+<p>Le binaire résultant et sa doc sont prêts dans le répertoire courant, il
+ne reste qu&rsquo;à installer :</p>
+<pre><code># make USETOOLS=no install
+</code></pre>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2012-01-24</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/build">#build</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

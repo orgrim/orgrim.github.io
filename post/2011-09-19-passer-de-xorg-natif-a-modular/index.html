@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Passer de X.org natif à modular - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Passer de X.org natif à modular" />
+<meta property="og:description" content="X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
+« native » et le second « modular » selon la valeur de la variable
+X11_TYPE que l&rsquo;on positionne dans son /etc/mk.conf pour signifier à
+pkgsrc sur lequel linker." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/" />
+<meta property="article:published_time" content="2011-09-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-09-19T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Passer de X.org natif à modular"/>
+<meta name="twitter:description" content="X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
+« native » et le second « modular » selon la valeur de la variable
+X11_TYPE que l&rsquo;on positionne dans son /etc/mk.conf pour signifier à
+pkgsrc sur lequel linker."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Passer de X.org natif à modular</h1>
+        </header>
+        <div class="content">
+            <p>X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
+« native » et le second « modular » selon la valeur de la variable
+<code>X11_TYPE</code> que l&rsquo;on positionne dans son <code>/etc/mk.conf</code> pour signifier à
+pkgsrc sur lequel linker.</p>
+<p>Il s&rsquo;agit des mêmes versions à peu de choses prêt, et X.org native n&rsquo;est
+pas vieux ou non maintenu comme la rumeur voudrait le faire croire. Il
+est juste en retard parce qu&rsquo;il suit le cycle de release du basesys
+alors que modular suit celui de pkgsrc et est tiré vers l&rsquo;avant par les
+packages qui en dépendent. Cela peut poser problème lorsqu&rsquo;on suit la
+cible mouvante qu&rsquo;est pkgsrc-current.</p>
+<p>La première chose à faire pour passer de native à modular est d&rsquo;éditer
+<code>/etc/mk.conf</code> pour changer <code>X11_TYPE</code>, on en profite pour ne plus
+compiler le native :</p>
+<pre><code>MKX11=no 
+X11_TYPE=modular
+</code></pre>
+<p>Ensuite, il faut modifier la liste de packages à compiler pour y ajouter
+soit tout modular en installant <code>meta-pkgs/modular-xorg</code>, soit en
+n&rsquo;installant que le nécessaire, ça fait plus cool, dans
+<code>/usr/pkgsrc/pkgchk.conf</code> (si vous avez suivi les docs ici ou dans le
+wiki) :</p>
+<pre><code>meta-pkgs/modular-xorg-apps
+meta-pkgs/modular-xorg-libs
+meta-pkgs/modular-xorg-fonts
+x11/xf86-input-keyboard
+x11/xf86-input-mouse
+x11/xf86-input-void
+x11/xf86-video-nv
+x11/xf86-video-vesa
+x11/xf86-video-vga
+x11/xf86-video-wsfb
+x11/modular-xorg-server
+</code></pre>
+<p>Ensuite on donne ça à manger à <code>pkg_comp</code> ou à son bulk. L&rsquo;important ici
+est de tout recompiler pour bien transférer les dépendances de native
+vers modular : en gros on pète la sandbox, que ça soit de <code>mk/bulk</code> ou
+<code>pkg_comp</code> et on recommence. Etant passé en mode bulk partiel comme
+indiqué dans un précédent <a href="/post/2011/08/19/Bulk-build-partiel-de-pkgsrc">post</a>, voici comment faire :</p>
+<p>​1. On vérifie avec <code>mount</code> que la standbox n&rsquo;est pas montée ni qu&rsquo;un
+build tourne (dans ce cas faut le killer), sinon :</p>
+<pre><code># /usr/sandbox/sandbox umount
+</code></pre>
+<p>​2. On vérifie que le contenu des mk.conf du système et de la sandbox
+sont en phase, c&rsquo;est le seul fichier de la sandbox à sauver</p>
+<p>​3. On recrée la sandbox :</p>
+<pre><code># rm -rf /usr/sandbox
+# cd /usr/pkgsrc/mk/bulk
+# sh mksandbox --without-x /usr/sandbox
+</code></pre>
+<p>​4. On nettoie les packages déjà compilés, pour forcer leur
+recompilation, et les fichiers cachés du bulk build :</p>
+<pre><code># cd /usr/pkgsrc/packages/
+# mv CVS .CVS
+# rm -rf *
+# mv .CVS CVS
+# cd /usr/pkgsrc
+# rm .broken.html .bulk_build_id .bulk_db .bulklock .depends .dependstree .index  .order .start .supports
+# pkgclean
+</code></pre>
+<p>​5. On lance le bulk build et on attend, il faut prévoir entre 150 et
+200 packages supplémentaires à compiler.</p>
+<p>Les étapes suivantes sont simples, on sauvegarde tout ce qu&rsquo;il faut dans
+<code>/usr/pkg</code>, puis on supprime tous les packages installés :</p>
+<pre><code># cd /usr
+# mv pkg pkg.old
+# cd /var/db
+# mkdir old_pkgdb
+# mv pkg pkg.refcount old_pkgdb
+# rm -rf pkgin
+</code></pre>
+<p>A partir d&rsquo;ici, on n&rsquo;a plus de programmes issus de pkgsrc, en gros pas
+de sudo, vim et autres&hellip;</p>
+<p>Puis, il faut supprimer les fichiers des sets de X.org, on se base pour
+cela sur le contenu de <code>/etc/mtree/set.x*</code>. On en arrive donc à un stade
+où on est dans la même situation qu&rsquo;après une installation du système
+sans les sets de X.org natif.</p>
+<p>Enfin, on réinstalle tout les packages avec <a href="http://www.pkgin.net">pkgin</a>, qui dans sa
+version 0.5.0 (du CVS) peut importer une liste de packages au format de
+<code>pkg_chk</code>, qui se trouve être le même utilisé par le bulk-build, comme de
+par hasard :</p>
+<pre><code># pkg_add http://pkgsrc.orgrim.net/NetBSD/5.1/amd64/All/pkg_install-20110805.tgz
+# mkdir -p /usr/pkg/etc
+# cp -r /usr/pkg.old/etc/pkgin /usr/pkg/etc
+# ./pkgin up
+# ./pkgin im pkgchk.conf
+</code></pre>
+<p><strong>Note :</strong> si le <code>pkg_add</code> de pkg_install ne passe pas, essayer avec
+<code>-f</code>.</p>
+<p>et hop, reste plus qu&rsquo;à reconfigurer les chemins dans
+<code>/etc/X11/xorg.conf</code> et c&rsquo;est bon.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-09-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

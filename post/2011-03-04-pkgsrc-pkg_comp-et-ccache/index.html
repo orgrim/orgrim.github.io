@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>pkgsrc, pkg_comp et ccache - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="pkgsrc, pkg_comp et ccache" />
+<meta property="og:description" content="Pour utiliser ccache dans un chroot pkg_comp, on commence par installer ccache :
+# pkg_comp build devel/ccache # pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz  En utilisant la cible package-install dans le chroot, ccache s&rsquo;y trouve installé. On l&rsquo;installe aussi sur le système pour surveiller les statistiques plus tard.
+Ensuite, on édite le etc/mk.conf du chroot, par exemple /local/pkg_comp/default/etc/mk.conf, pour y définir les variables suivantes :
+# ... # fin de la conf speciale pkg_comp CCACHE_DIR=${WRKOBJDIR}/." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/" />
+<meta property="article:published_time" content="2011-03-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-03-04T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="pkgsrc, pkg_comp et ccache"/>
+<meta name="twitter:description" content="Pour utiliser ccache dans un chroot pkg_comp, on commence par installer ccache :
+# pkg_comp build devel/ccache # pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz  En utilisant la cible package-install dans le chroot, ccache s&rsquo;y trouve installé. On l&rsquo;installe aussi sur le système pour surveiller les statistiques plus tard.
+Ensuite, on édite le etc/mk.conf du chroot, par exemple /local/pkg_comp/default/etc/mk.conf, pour y définir les variables suivantes :
+# ... # fin de la conf speciale pkg_comp CCACHE_DIR=${WRKOBJDIR}/."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">pkgsrc, pkg_comp et ccache</h1>
+        </header>
+        <div class="content">
+            <p>Pour utiliser ccache dans un chroot <code>pkg_comp</code>, on commence par installer
+ccache :</p>
+<pre><code># pkg_comp build devel/ccache
+# pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz
+</code></pre>
+<p>En utilisant la cible <code>package-install</code> dans le chroot, ccache s&rsquo;y
+trouve installé. On l&rsquo;installe aussi sur le système pour surveiller les
+statistiques plus tard.</p>
+<p>Ensuite, on édite le <code>etc/mk.conf</code> du chroot, par exemple
+<code>/local/pkg_comp/default/etc/mk.conf</code>, pour y définir les variables
+suivantes :</p>
+<pre><code># ...
+# fin de la conf speciale pkg_comp
+
+CCACHE_DIR=${WRKOBJDIR}/.ccache
+PKGSRC_COMPILER = ccache gcc
+</code></pre>
+<p>On créé ensuite le répertoire du cache, si le chemin du chroot est
+<code>/local/pkg_comp/default</code>, avec la variable <code>WRKOBJDIR</code> laissée par
+défaut :</p>
+<pre><code># mkdir /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
+</code></pre>
+<p>Ensuite, il suffit de compiler ses packages comme d&rsquo;habitude.</p>
+<p>Enfin, on peut suivre les statistiques du cache avec la commande
+suivante :</p>
+<pre><code># CCACHE_DIR=/local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache ccache -s
+cache directory                     /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
+cache hit                            133
+cache miss                          3053
+called for link                      383
+compile failed                        43
+preprocessor error                    34
+autoconf compile/link                388
+unsupported compiler option          216
+no input file                         55
+files in cache                      6201
+cache size                          58.7 Mbytes
+max cache size                    1024.0 Mbytes
+</code></pre>
+<p>P.S. : Une doc pour mettre en place un chroot <code>pkg_comp</code> est disponible
+<a href="http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp">sur le wiki</a></p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-03-04</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkg_comp">#pkg_comp</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ccache">#ccache</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

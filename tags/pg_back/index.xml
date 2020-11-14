@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>pg_back on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/pg_back/</link>
+    <description>code. grind. sleep. (pg_back)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Thu, 12 Mar 2015 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/pg_back/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>pg_back le script de base pour sauvegarder PostgreSQL</title>
+      <link>https://www.orgrim.net/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/</link>
+      <pubDate>Thu, 12 Mar 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/</guid>
+      <description>&lt;p&gt;Il y a fort longtemps, et c&amp;rsquo;est ma première contribution relative à
+PostgreSQL, j&amp;rsquo;ai écrit un script de backup qui dump tout un serveur
+PostgreSQL avec &lt;code&gt;pg_dump&lt;/code&gt; et &lt;code&gt;pg_dumpall&lt;/code&gt;. Il s&amp;rsquo;agit de pg_back.&lt;/p&gt;
+&lt;p&gt;Cela peut paraître curieux de publier un simple script de sauvegarde
+que tout DBA PostgreSQL a écrit dans sa vie et sait écrire par
+cœur. Surtout qu&amp;rsquo;on le réécrit en permanence ce script, pour ajuster
+des chemins, des cas particuliers du serveur à sauvegarder et de
+l&amp;rsquo;environnement où l&amp;rsquo;on sauvegarde&amp;hellip;&lt;/p&gt;
+&lt;p&gt;En bien justement, c&amp;rsquo;est parce qu&amp;rsquo;on le réécrit tout le temps que
+pg_back fait gagner du temps. Il est simple et court, facilement
+lisible, c&amp;rsquo;est du shell : tout ce qu&amp;rsquo;il faut pour en faire une bonne
+base pour créer un script de sauvegarde adapté. Quand on l&amp;rsquo;utilise
+comme patron pour en faire un outil plus évolué, on gagne du temps.&lt;/p&gt;
+&lt;p&gt;Justement rajouter du code pour l&amp;rsquo;adapter peut se faire au début. Si
+on n&amp;rsquo;a pas envie d&amp;rsquo;utiliser le fichier de configuration, on adapte la
+liste de variables au début du script, quitte à en rajouter.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;autre endroit intéressant c&amp;rsquo;est tout à la fin, avant le &lt;code&gt;exit&lt;/code&gt;, on
+peut rajouter tout ce qu&amp;rsquo;il faut pour externaliser ses sauvegardes.&lt;/p&gt;
+&lt;p&gt;C&amp;rsquo;est par &lt;a href=&#34;https://github.com/orgrim/pg_back&#34;&gt;ici&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+	<meta name="generator" content="Hugo 0.76.4" />
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="alternate" type="application/rss+xml" href="https://www.orgrim.net/index.xml" title="code. grind. sleep." />
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="code. grind. sleep." />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.orgrim.net/" />
+<meta property="og:updated_time" content="2020-07-28T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="code. grind. sleep."/>
+<meta name="twitter:description" content=""/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    <div class="homepage-content">
+        
+    </div>
+
+    
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/">pbulk-builder et pkgtools/mksandbox</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Après la réinstall d&rsquo;une de mes machines de build en 6.0.1, j&rsquo;ai eu la
+bonne surprise de voir que le script de build <code>pbulk-builder</code>
+(<a href="https://github.com/orgrim/nb-utils">https://github.com/orgrim/nb-utils</a>) ne trouvait plus <code>mksandbox</code>
+dans l&rsquo;arbre de pkgsrc. Il est désormais dans son paquet :
+<code>pkgtools/mksandbox</code></p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2013-01-26</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2012-01-25-got-guc/">Got GUC?</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&rsquo;un paramètre au niveau d&rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2012-01-25</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/configuration">#configuration</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2012-01-24-compiler-dans-larbre-des-sources/">Compiler dans l&#39;arbre des sources</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Je m&rsquo;occupe actuellement de préparer ma box pour le FOSDEM, et il
+s&rsquo;avère qu&rsquo;il manque le support du DRM (Direct Rendering Manager, le
+truc pour avoir de l&rsquo;accélération graphique dans le kernel pour X.org)
+pour ma carte vidéo. Il s&rsquo;agit de NetBSD 5.1.1, la version 6 n&rsquo;aura pas
+ce manque.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2012-01-24</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/build">#build</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/">X11 forwarding request failed on channel 0</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Quand j&rsquo;essaye de me logguer sur ma box NetBSD fraichement passé en X.org modular, j&rsquo;ai ça :
+orgrim@serfouette ~ $ ssh rateau X11 forwarding request failed on channel 0 Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net  WTF? ça tombe en marche SSH normalement.
+Et bien le souci vient de l&rsquo;échange des magic cookies pour l&rsquo;authentification entre serveurs X à travers SSH, c&rsquo;est utilisé par le X11 forwarding et on a besoin de plusieurs choses pour ça :
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-10-21</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/x11">#X11</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ssh">#ssh</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/">Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&rsquo;expérimentation est nécessaire pour se rassurer&hellip;
+On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
+L&rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est pourquoi on a besoin de plusieurs tablespaces.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-10-14</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-09-19-passer-de-xorg-natif-a-modular/">Passer de X.org natif à modular</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
+« native » et le second « modular » selon la valeur de la variable
+<code>X11_TYPE</code> que l&rsquo;on positionne dans son <code>/etc/mk.conf</code> pour signifier à
+pkgsrc sur lequel linker.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-09-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-19-bulk-build-partiel-de-pkgsrc/">Bulk build partiel de pkgsrc</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        En suivant l'excellent tip de Mr GuiGui2, j&rsquo;ai pu monter ma petite archi de bulk build personnelle pour fournir du package tout frais à pkgin.
+J&rsquo;ai donc ajouté le bloc magique suivant à mon /etc/mk.conf, qui permet de gérer la présence de commentaires dans pkgchk.conf :
+# bulk build config DEPENDS_TARGET= bulk-install BATCH= yes BULK_PREREQ+= pkgtools/lintpkgsrc .if defined(SPECIFIC_PKGS) PKGLIST!= awk '$$1 !~ /^\\#/ {print $$1}' ${PKGCHK_CONF} . for _pkg_ in ${PKGLIST} HOST_SPECIFIC_PKGS+= ${_pkg_} .
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/">Montrer les dépendances avec make dans pkgsrc</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        Généralement, on peut savoir quelles sont les dépendances d&rsquo;un package en utilisant make show-depends, mais cela ne montre que les dépendances pour l&rsquo;installation, les dépendances pour la compilation ne sont pas montrées.
+$ cd /usr/pkgsrc/databases/postgresql90-server/ $ make show-depends postgresql90-client&gt;=9.0.4:../../databases/postgresql90-client  Pour connaître les dépendances selon leur type (installation ou compilation), on peut utiliser la cible show-depends-pkgpaths alliée à la variable DEPENDS_TYPE.
+Pour avoir seulement les dépendances de compilation :
+$ make DEPENDS_TYPE=build show-depends-pkgpaths devel/bison devel/gmake pkgtools/digest  Pour avoir seulement celles d&rsquo;installation :
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-18</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/">Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
+pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
+pour pkgsrc : <a href="http://pkgsrc.se/wip/pgbuildfarm">http://pkgsrc.se/wip/pgbuildfarm</a>.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-06</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-04-could-not-open-relation-with-oid-n/">Could not open relation with oid N</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        On peut parfois trouver cet étrange message d&rsquo;erreur dans les traces de PostgreSQL (N étant un nombre) ou lors de l&rsquo;exécution d&rsquo;une requête :
+ERROR: could not open relation with OID N  Si on recherche ce message dans les mailing-lists du projet, on peut facilement conclure que la base de données est corrompue, qu&rsquo;il y a des problèmes matériels et que la sécurité des données est en péril. Et bien, ce n&rsquo;est pas forcément le cas : obtenir ce message peut être tout à fait normal.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-04</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/lock">#lock</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+    
+    
+        
+    <div class="pagination">
+        <div class="left pagination-item ">
+            
+                <a href="/">articles &#43; récents</a>
+            
+        </div>
+        <div class="right pagination-item ">
+            
+                <a href="/page/3/">articles &#43; anciens</a>
+            
+        </div>
+    </div>
+
+
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

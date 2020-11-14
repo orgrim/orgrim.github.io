@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger" />
+<meta property="og:description" content="Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&rsquo;expérimentation est nécessaire pour se rassurer&hellip;
+On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
+L&rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est pourquoi on a besoin de plusieurs tablespaces." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/" />
+<meta property="article:published_time" content="2011-10-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-10-14T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger"/>
+<meta name="twitter:description" content="Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&rsquo;expérimentation est nécessaire pour se rassurer&hellip;
+On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
+L&rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est pourquoi on a besoin de plusieurs tablespaces."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger</h1>
+        </header>
+        <div class="content">
+            <p>Voilà donc une question intéressante, comment se comporte PostgreSQL
+face à un système de fichier plein ? Un peu d&rsquo;expérimentation est
+nécessaire pour se rassurer&hellip;</p>
+<p>On crée deux systèmes de fichiers de faible taille pour les tests. Le
+premier stockera <code>PGDATA</code>, ainsi qu&rsquo;une base de données nommée <code>db_data</code>. Le
+second sera le tablesapce <code>ts1</code>, dans lequel oncréera une base de données
+<code>db_ts1</code>.</p>
+<p>L&rsquo;objectif est de montrer que seules les transactions modifiant des
+objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est
+pourquoi on a besoin de plusieurs tablespaces.</p>
+<p>Les binaires se trouvent dans <code>/home/pgsql/postgresql-9.0.4</code>, <code>PGDATA</code> dans
+<code>/home/pgsql/postgresql-9.0.4/data</code>, et le tablespace dans
+<code>/home/pgsql/postgresql-9.0.4/ts1</code>. On a donc monté et donné la propriété
+des deux filesystèmes à orgrim, que fera tourner PostgreSQL :</p>
+<pre><code># df -h
+...
+/dev/mapper/sys-pg1   504M   54M  425M  12% /home/pgsql/postgresql-9.0.4/data
+/dev/mapper/sys-pg2   504M   17M  462M   4% /home/pgsql/postgresql-9.0.4/ts1
+...
+
+# cd /home/pgsql/postgresql-9.0.4/
+# chown orgrim: data ts1
+# chmod 700 data ts1
+</code></pre>
+<p>Le cluster est préparé avec l&rsquo;environnement suivant :</p>
+<pre><code>$ env | grep PG
+PGPORT=5904
+PGDATABASE=postgres
+PGDATA=/home/pgsql/postgresql-9.0.4/data
+PATH=/home/pgsql/postgresql-9.0.4/bin:$PATH
+</code></pre>
+<p>On lance donc <code>initdb</code>, puis on crée les bases avec le tablespace :</p>
+<pre><code>$ initdb
+$ psql
+psql (9.0.4)
+Type &quot;help&quot; for help.
+
+postgres=# CREATE DATABASE db_data;
+CREATE DATABASE
+postgres=# CREATE TABLESPACE ts1 LOCATION '/home/pgsql/postgresql-9.0.4/ts1';
+CREATE TABLESPACE
+postgres=# CREATE DATABASE db_ts1 TABLESPACE ts1;
+CREATE DATABASE
+</code></pre>
+<p>Ensuite, on se connecte à la base de données <code>db_ts1</code> et on y crée une
+base qui permettra de remplir le tablespace <code>ts1</code> :</p>
+<pre><code>$ while ((1)); do psql -c &quot;INSERT INTO t SELECT generate_series(1, 1000) AS i;&quot; db_ts1; done
+</code></pre>
+<p>Au bout, d&rsquo;un moment le système de fichier du tablespace est plein et
+tout requête générant des écritures sort en erreur avec un message de
+cette forme :</p>
+<pre><code>ERROR:  could not extend file &quot;pg_tblspc/16385/PG_9.0_201008051/16386/16390&quot;: wrote only 4096 of 8192 bytes at block 58438
+HINT:  Check free disk space.
+</code></pre>
+<p>Ensuite, on essaye avec le répertoire <code>PGDATA</code>, on crée donc une table
+dans la base <code>db_data</code> :</p>
+<pre><code>$ psql db_data
+psql (9.0.4)
+Type &quot;help&quot; for help.
+
+db_data=# CREATE TABLE t (i int);
+CREATE TABLE
+</code></pre>
+<p>De la même façon, on remplit cette table jusqu&rsquo;à épuisement de l&rsquo;espace
+libre :</p>
+<pre><code>$ while ((1)); do psql -c &quot;INSERT INTO t SELECT generate_series(1, 1000) AS i;&quot; db_data; done
+</code></pre>
+<p>Résultat, les requêtes sortent en erreur de la même façon. On a
+peut-être de la chance ici, le filesystem contenant <code>pg_xlog</code>, les
+problèmes pourraient être pis.</p>
+<p>Il est également possible de remplir le système de fichiers de journaux
+de transactions, ce qui est problématique du fait que chaque transaction
+est écrite ici tout tablespace confondu. On vide donc les deux bases :</p>
+<pre><code>$ psql db_ts1
+psql (9.0.4)
+Type &quot;help&quot; for help.
+
+db_ts1=# TRUNCATE t;
+TRUNCATE TABLE
+
+$ psql db_data
+psql (9.0.4)
+Type &quot;help&quot; for help.
+
+db_data=# TRUNCATE t;
+TRUNCATE TABLE
+</code></pre>
+<p>Et on place le paramètre <code>checkpoint_segments</code> à 300, valeur démesurée
+par rapport à la place disponible dans <code>PGDATA</code>.</p>
+<p>Après un reload, on refait alors le test de remplissage de la base
+<code>db_ts1</code>, qui assure que les journaux de transactions seuls remplissent
+<code>PGDATA</code>.</p>
+<p>Le serveur PostgreSQL s&rsquo;arrête parce qu&rsquo;il ne peut écrire le journal de
+transaction :</p>
+<pre><code>PANIC:  could not write to file &quot;pg_xlog/xlogtemp.8795&quot;: No space left on device
+STATEMENT:  INSERT INTO t SELECT generate_series(1, 1000) AS i;
+LOG:  server process (PID 8795) was terminated by signal 6: Aborted
+LOG:  terminating any other active server processes
+WARNING:  terminating connection because of crash of another server process
+DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+LOG:  all server processes terminated; reinitializing
+</code></pre>
+<p>Il redémarre illico, mais le problème persiste :</p>
+<pre><code>FATAL:  the database system is in recovery mode
+LOG:  database system was interrupted; last known up at 2011-10-12 00:01:40 CEST
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  consistent recovery state reached at 0/5FDB7480
+LOG:  redo starts at 0/5AA57D68
+LOG:  could not open file &quot;pg_xlog/000000010000000000000074&quot; (log file 0, segment 116): No such file or directory
+LOG:  redo done at 0/73FFFF90
+LOG:  last completed transaction was at log time 2011-10-12 00:05:11.710639+02
+PANIC:  could not write to file &quot;pg_xlog/xlogtemp.8797&quot;: No space left on device
+LOG:  startup process (PID 8797) was terminated by signal 6: Aborted
+LOG:  aborting startup due to startup process failure
+</code></pre>
+<p>Le seul moyen de se sortir de cette situation est d&rsquo;utiliser les 5%
+d&rsquo;espace libre du filesystem réservés au super utilisateur, de baisser
+la valeur de <code>checkpoint_segments</code> à une valeur évitant le filesystem
+full, les checkpoints successif supprimeront les fichiers en trop.</p>
+<p>Lorsqu&rsquo;on a plus besoin des 5% réservés, il ne faut pas oublier de
+remettre la réservation.</p>
+<p>Enfin, ce cas le plus critique peut arriver assez facilement lorsqu&rsquo;on a
+de l&rsquo;archivage, si le serveur ne peut plus archiver les fichiers WAL,
+alors il les conserve, un filesystem full sur un espace d&rsquo;archivage peut
+donc être transmis au serveur&hellip;</p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-10-14</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

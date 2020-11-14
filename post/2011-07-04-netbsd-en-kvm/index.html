@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>NetBSD en KVM - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="NetBSD en KVM" />
+<meta property="og:description" content="Comme je viens d&rsquo;investir dans un serveur kimsufi (le 16G), je me suis dis qu&rsquo;avoir
+quelques machines NetBSD pour servir la bonne cause ça serait bien cool." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/" />
+<meta property="article:published_time" content="2011-07-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-07-04T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="NetBSD en KVM"/>
+<meta name="twitter:description" content="Comme je viens d&rsquo;investir dans un serveur kimsufi (le 16G), je me suis dis qu&rsquo;avoir
+quelques machines NetBSD pour servir la bonne cause ça serait bien cool."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">NetBSD en KVM</h1>
+        </header>
+        <div class="content">
+            <p>Comme je viens d&rsquo;investir dans un <a href="http://www.kimsufi.com/fr/">serveur kimsufi</a> (le 16G), je me suis dis qu&rsquo;avoir
+quelques machines NetBSD pour servir la bonne cause ça serait bien cool.</p>
+<p>En fait, j&rsquo;ai deux besoins :</p>
+<ul>
+<li>Avoir un dépôt de paquet et de quoi fait des bulk build réduits de
+pkgsrc pour me permettre de n&rsquo;utiliser uniquement l&rsquo;excellent pkgin</li>
+<li>Fournir des machines à la Build Farm de PostgreSQL, parce qu&rsquo;il n&rsquo;y
+a même pas de machine NetBSD en i386 et en amd64 (seulement powerpc
+et mips)</li>
+</ul>
+<p>J&rsquo;ai donc décidé de monter 2 machines NetBSD en KVM sur ma grosse box
+Debian, qui fait tourner ça grâce à KVM.</p>
+<p>Pour l&rsquo;installation, il y a 2 possibilités, soit on fait du VNC, soit on
+redirige la sortie VGA dans du curses. Pour le disque j&rsquo;ai choisi de
+poser directement les données sur des volumes logiques, dans ce cas, il
+faut désactiver le cache ce qui permet une infime perte de puissance en
+I/O.</p>
+<p>Il faut commencer par récupérer l&rsquo;ISO d&rsquo;installation :</p>
+<pre><code>wget ftp://ftp.fr.netbsd.org/pub/NetBSD/iso/5.1/amd64cd-5.1.iso
+</code></pre>
+<p>Ensuite, créer le volume logique (on a choisi de donner 50 Go) et lancer
+l&rsquo;installation, en curses ça passe nickel, il faut choisir d&rsquo;utiliser la
+console serie :</p>
+<pre><code>kvm -drive file=/dev/system/kvm-nb64-d1,cache=none \\
+    -m 1024 \\
+    -net nic,model=e1000 -net tap \\
+    -name nb64 \\
+    -curses \\
+    -cdrom /home/orgrim/netbsd/amd64cd-5.1.iso \\
+    -boot d \\
+    -k fr
+</code></pre>
+<p>Une fois installé, on lance la commande suivante dans un screen, on
+demande à KVM de fournir l&rsquo;accès console en série dans un fichier, ce
+qui permet d&rsquo;avoir la console QEMU disponible directement dans le
+screen :</p>
+<pre><code>kvm -nographic \\
+    -drive file=/dev/system/kvm-nb64-d1,cache=none \\
+    -m 1024 \\
+    -net nic,model=e1000,macaddr=DE:AD:BE:EF:37:D1 -net tap \\
+    -name nb64 \\
+    -boot c \\
+    -serial unix:/tmp/nb64.sock,server,nowait
+</code></pre>
+<p>Note: merci de changer la MAC de l&rsquo;interface réseau, c&rsquo;est utilisé en
+prod chez moi :)</p>
+<p>Enfin, il est important de démarrer le noyau NetBSD sans ACPI ni SMP (en
+mettant le defaut à 4 dans <code>/boot.cfg</code>)</p>
+<p>Pour accéder à la machine en console série :</p>
+<pre><code>minicom -D unix#/tmp/nd64.sock
+</code></pre>
+<p>Si on a oublié de choisir la console série, on peut l&rsquo;activer de cette
+façon :</p>
+<ol>
+<li>
+<p>Booter avec <code>-curses -k fr</code> à la place de <code>-nographic</code></p>
+</li>
+<li>
+<p>Lancer la commande suivante pour activer la console série :</p>
+<pre><code> # installboot -v -o console=com0,speed=19200 /dev/rwd0a /usr/mdec/bootxx_ffsv1
+ File system:         /dev/rwd0a
+ Primary bootstrap:   /usr/mdec/bootxx_ffsv1
+ Boot options:        timeout 5, flags 0, speed 19200, ioaddr 0, console com0
+</code></pre>
+</li>
+</ol>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-07-04</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/kvm">#kvm</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

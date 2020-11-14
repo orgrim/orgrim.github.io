@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Confiner PostgreSQL avec SELinux - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="Confiner PostgreSQL avec SELinux" />
+<meta property="og:description" content="
+
+RemarqueCe post est partiellement obsolète, avec le passage à systemd.
+
+J&rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
+aller trop loin, parce que j&rsquo;entendais souvent la phrase &ldquo;Si on veut
+de la sécurité, il faut SELinux&rdquo; et surtout à cause de l&rsquo;arrivée de
+l&rsquo;extension sepgsql dans les modules contrib de PostgreSQL. Ça avait
+donné une conf pour le Fosdem où finalement, j&rsquo;ai plus parlé des
+privilèges classiques que de SELinux." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/" />
+<meta property="article:published_time" content="2014-09-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2014-09-22T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Confiner PostgreSQL avec SELinux"/>
+<meta name="twitter:description" content="
+
+RemarqueCe post est partiellement obsolète, avec le passage à systemd.
+
+J&rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
+aller trop loin, parce que j&rsquo;entendais souvent la phrase &ldquo;Si on veut
+de la sécurité, il faut SELinux&rdquo; et surtout à cause de l&rsquo;arrivée de
+l&rsquo;extension sepgsql dans les modules contrib de PostgreSQL. Ça avait
+donné une conf pour le Fosdem où finalement, j&rsquo;ai plus parlé des
+privilèges classiques que de SELinux."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Confiner PostgreSQL avec SELinux</h1>
+        </header>
+        <div class="content">
+            <style type="text/css">.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:#444;background:#e7f2fa}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:#fff;background:#6ab0de}.notice.warning .notice-title{background:rgba(217,83,79,.9)}.notice.warning{background:#fae2e2}.notice.info .notice-title{background:#f0b37e}.notice.info{background:#fff2db}.notice.note .notice-title{background:#6ab0de}.notice.note{background:#e7f2fA}.notice.tip .notice-title{background:rgba(92,184,92,.8)}.notice.tip{background:#e6f9e6}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:0.125em;position:relative}</style>
+<svg width="0" height="0" display="none" xmlns="http://www.w3.org/2000/svg"><symbol id="tip-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"/></symbol><symbol id="note-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></symbol><symbol id="warning-notice" viewBox="0 0 576 512" preserveAspectRatio="xMidYMid meet"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></symbol><symbol id="info-notice" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></symbol></svg><div class="notice note" >
+<p class="first notice-title"><span class="icon-notice baseline"><svg><use href="#note-notice"></use></svg></span>Remarque</p><p>Ce post est partiellement obsolète, avec le passage à systemd.</p></div>
+
+<p>J&rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
+aller trop loin, parce que j&rsquo;entendais souvent la phrase &ldquo;Si on veut
+de la sécurité, il faut SELinux&rdquo; et surtout à cause de l&rsquo;arrivée de
+l&rsquo;extension <code>sepgsql</code> dans les modules contrib de PostgreSQL. Ça avait
+donné une conf pour le Fosdem où finalement, j&rsquo;ai plus parlé des
+privilèges classiques que de SELinux.</p>
+<p>Suite à une demande au ${BOULOT}, je me suis replongé dedans, et les
+choses ont peu évolué. Dans la majorité des recherches que j&rsquo;ai pu
+faire, SELinux reste tout de même un truc qui se met en travers la
+route, c&rsquo;est-à-dire, qu&rsquo;il y a toujours plus de résultats sur comment
+le désactiver plutôt que configurer les choses correctement. Ensuite,
+certains proposent de faire aveuglement confiance à <code>setroubleshoot</code>
+et <code>audit2allow</code> pour faire taire la bête. Enfin, j&rsquo;ai dû trouver une
+page ou deux après en deux semaines à temps plein sur le sujet qui
+parlent de comment confiner un utilisateur dans le but d&rsquo;implémenter ce
+que promet SELinux et que toutes les entreprises demandent : le RBAC,
+Role Based Access Control, ou comment donner le moins de droits
+possibles aux sous-traitants qui hébergent les serveurs.</p>
+<p>Cette fois ci, je suis allé plus loin. Déjà, je suis parti sur une
+installation de CentOS 6, la famille de distribution
+RHEL/CentOS/Fedora semble être la plus en avance par rapport à
+SELinux : à peu près tous les services/daemons fournis dans l&rsquo;install
+sont confinés par SELinux. Les utilisateurs ne le sont pas au login,
+il n&rsquo;y a donc aucune configuration de RBAC. On verra peut-être ça plus
+tard, j&rsquo;ai pas encore obtenu de résultat satisfaisant sur ce sujet, et
+il vaut mieux expliquer comment confiner correctement PostgreSQL avant
+de passer aux roles. Tout simplement, parce qu&rsquo;il est très simple de
+casser ce confinement avec la configuration par défaut de RHEL, grâce
+à <code>pg_ctl</code>. Enfin, l&rsquo;installation des paquets du PGDG n&rsquo;est pas
+confinée par défaut, il manque les file contexts adaptés aux chemins
+particuliers de ces paquets, prévu pour faire cohabiter plusieurs
+versions majeures ; ce qui ne correspond pas ce qu&rsquo;à prévu Red Hat
+pour PostgreSQL.</p>
+<p>Après cette longue introduction, mais avant de commencer, il faut
+savoir administrer un minumum SELinux : si vous ne savez pas qu&rsquo;il
+existe des options <code>-Z</code>, ce que sont les contexts, les types et les
+domaines, mieux vaut d&rsquo;abord se documenter, par exemple <a href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security-Enhanced_Linux/index.html">chez Red
+Hat</a>.</p>
+<p>Voici donc les file contexts à ajouter dans un fichier <em>module.te</em> pour
+confiner l&rsquo;installation PostgreSQL du PGDG :</p>
+<pre><code>/etc/rc\.d/init\.d/(se)?postgresql(-.*)?    --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb        --  gen_context(system_u:object_r:postgresql_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl        --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
+/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres      --  gen_context(system_u:object_r:postgresql_exec_t,s0)
+/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?	    gen_context(system_u:object_r:locale_t,s0)
+/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?        gen_context(system_u:object_r:man_t,s0)
+</code></pre>
+<p>Tout d&rsquo;abord, pour l&rsquo;init script et <code>pg_ctl</code>, on utilise le type
+<code>postgresql_initrc_exec_t</code>, c&rsquo;est ce qui permet de lancer PostgreSQL
+dans le domaine confiné <code>postgresql_t</code> au boot, via l&rsquo;init script, et
+manuellement. La méthode la plus propre est de toujours utiliser
+l&rsquo;init script, idéalement par l&rsquo;intermédiaire de <code>run_init</code> pour
+démarrer, arrêter ou redémarrer le postmaster. On évite alors de
+laisser trainer des choses dans <code>/var/{run,lock}</code>.</p>
+<p>Les programmes <code>postgres</code> et <code>initdb</code> doivent avoir le type
+<code>postgresql_exec_t</code> car ils exécutent le serveur PostgreSQL ; cela
+doit se faire dans le domaine <code>postgresql_t</code>.</p>
+<p>Enfin, on a placé les labels corrects sur les fichiers de traduction
+et les pages de man, pour faire plus propre. Ce code source de module
+SELinux alors doit être compilé et chargé.</p>
+<p>Cette configuration est reprise dans le module SELinux disponible sur
+<a href="http://github.com/dalibo/selinux-pgsql-pgdg">github</a>. On peut aussi l&rsquo;ajouter manuellement avec <code>semanage</code> :</p>
+<pre><code>semanage fcontext -a -t postgresql_initrc_exec_t '/etc/rc\.d/init\.d/(se)?postgresql(-.*)?'
+semanage fcontext -a -t postgresql_exec_t '/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb'
+semanage fcontext -a -t postgresql_initrc_exec_t '/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl'
+semanage fcontext -a -t postgresql_exec_t '/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres'
+semanage fcontext -a -t locale_t '/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?'
+semanage fcontext -a -t man_t '/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?'
+</code></pre>
+<p>Il existe un certain nombre de booleans pour la configuration des
+droits SELinux de PostgreSQL, le plus important concerne <code>rsync</code>,
+souvent nécessaire pour faire des base backups. Il s&rsquo;agit de
+<code>postgresql_can_rsync</code>, pour l&rsquo;activer :</p>
+<pre><code>semanage boolean -m --on postgresql_can_rsync
+</code></pre>
+<p>Si on lance l&rsquo;instance sur un port TCP différent de 5432, il faut
+l&rsquo;autoriser dans la configuration locale de SELinux :</p>
+<pre><code>semanage port -a -t postgresql_port_t -p tcp &lt;port&gt;
+</code></pre>
+<p>Enfin, il ne faut pas oublier d&rsquo;appliquer les contexts aux fichiers
+soit avec <code>restorecon</code>, un relabel complet au reboot ou <code>chcon</code>.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2014-09-22</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/selinux">#selinux</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

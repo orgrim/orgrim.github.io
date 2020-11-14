@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>DNSSEC et Bind sur NetBSD - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1605390221" />
+<style>
+
+    [data-theme="dark"] {   
+        --font-color: #eee;
+--bg-color: #212121;
+
+--link-color:#599ada;
+--link-state-color:#ff5858;
+--link-state-border-color: rgba(238, 54, 54, 0.5);
+
+--thead-bg-color: #343a40;
+--table-border-color: lightgrey;
+
+--pre-color: #333;
+--pre-bg-color: #f1f1f1;
+
+--bq-color: #ccc;
+--hr-color: #333;
+
+--pagination-bg-color: #373737;
+--pagination-link-color: #b6b6b6;
+
+--post-info-color: grey;
+
+--switcher-color: #333;
+--switcher-bg-color: #fff;
+
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1605390221" />
+
+<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1605390221"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1605390221">
+
+
+
+<meta property="og:title" content="DNSSEC et Bind sur NetBSD" />
+<meta property="og:description" content="En reconfigurant ma gateway sur NetBSD, le serveur Bind fournit dans
+« basesys » refusait de fonctionner à cause de l&rsquo;activation de DNSSEC
+par défaut." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/" />
+<meta property="article:published_time" content="2011-03-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2011-03-03T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="DNSSEC et Bind sur NetBSD"/>
+<meta name="twitter:description" content="En reconfigurant ma gateway sur NetBSD, le serveur Bind fournit dans
+« basesys » refusait de fonctionner à cause de l&rsquo;activation de DNSSEC
+par défaut."/>
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Passer au contenu principal</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">DNSSEC et Bind sur NetBSD</h1>
+        </header>
+        <div class="content">
+            <p>En reconfigurant ma gateway sur NetBSD, le serveur Bind fournit dans
+« basesys » refusait de fonctionner à cause de l&rsquo;activation de DNSSEC
+par défaut.</p>
+<p>Pour le désactiver, il suffit de modifier les paramètres
+suivants dans <code>/etc/named.conf</code> :</p>
+<pre><code>options {
+        # ...
+
+        dnssec-enable no;
+        dnssec-validation no;
+#        dnssec-lookaside auto;
+
+        # ...
+};
+</code></pre>
+<p>Mais ce n&rsquo;est pas la solution idéale, sachant que DNSSEC est activé sur
+la zone root depuis juin 2010, autant l&rsquo;utiliser. Pour avoir DNSSEC dans
+le Bind du basesys, il manque juste la configuration des clés. On
+récupère la DNSKEY de la zone root avec la commande qui va bien :</p>
+<pre><code># dig +dnssec +multiline . dnskey &gt; /chemin/vers/root_dnskey
+</code></pre>
+<p>On obtient la clé qu&rsquo;il faut vérifier, on génère donc l&rsquo;enregistrement
+DS correspondant :</p>
+<pre><code># dnssec-dsfromkey -2 -f /chemin/vers/root_dnskey .
+. IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32 F24E8FB5
+</code></pre>
+<p><strong>Attention :</strong> le dernier espace doit être ignoré.</p>
+<p>On compare donc à ce que fournit l&rsquo;IANA
+(<a href="http://data.iana.org/root-anchors/root-anchors.xml">http://data.iana.org/root-anchors/root-anchors.xml</a>) et d&rsquo;autres
+comme Kirei (<a href="http://www.kirei.se/en/2010/06/20/root-ksk/">http://www.kirei.se/en/2010/06/20/root-ksk/</a>) qui
+fournissent également les signatures PGP à vérifier.</p>
+<p>Quand c&rsquo;est bon (GPG dit OK), on ajoute un bloc <code>managed-keys</code> avec le
+contenu de l&rsquo;enregistrement DNSKEY de la zone root dans
+<code>/etc/named.conf</code> :</p>
+<pre><code>options {
+        # ...
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+        managed-keys-directory &quot;keys&quot;;
+
+        # ...
+};
+
+managed-keys {
+        &quot;.&quot; initial-key 257 3 8 &quot;AwEAAagAIKlVZrp...&quot;;
+};
+</code></pre>
+<p>Pour bénéficier du « look aside », c&rsquo;est à dire une autre source de
+vérification des données du DNS, il faut ajouter la clé sur service DLV
+de ISC (l&rsquo;organisation qui code Bind), en récupérant la clé là :
+<a href="https://www.isc.org/solutions/dlv">https://www.isc.org/solutions/dlv</a> et après vérification des
+signatures PGP, on peut ajouter un bloc <code>trusted-keys</code> à
+<code>/etc/named.conf</code> :</p>
+<pre><code>trusted-keys {
+        dlv.isc.org. 257 3 5 &quot;BEAAAAP...&quot;;
+};
+</code></pre>
+<p>Avant de relancer le service, on peut configurer des logs (voir le
+<a href="http://wiki.orgrim.net/netbsd/named#configurer-les-logs">wiki</a> pour les logs dans le chroot) pour mettre du debug sur la
+partie DNSSEC :</p>
+<pre><code>logging {
+        # ...
+        channel dnssec_log_file {
+                file &quot;/var/log/dnssec.log&quot; versions 3 size 20m;
+                severity debug 3;
+                print-category yes;
+                print-severity yes;
+                print-time yes;
+        };
+
+        category dnssec { dnssec_log_file; };
+        # ...
+};
+</code></pre>
+<p>Et corriger quelques permissions :</p>
+<pre><code># mkdir /etc/namedb/keys
+# chown named:named /etc/namedb/keys
+</code></pre>
+<p>Enfin, on peut redémarrer le service et surveiller les logs :</p>
+<pre><code># /etc/rc.d/named restart
+</code></pre>
+<p>Pour tester, on utilise <code>dig</code> sur zone signée :</p>
+<pre><code># dig +dnssec +multiline net
+
+; &lt;&lt;&gt;&gt; DiG 9.7.2-P3 &lt;&lt;&gt;&gt; +dnssec +multiline net
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 5595
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 0, AUTHORITY: 4, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags: do; udp: 4096
+;; QUESTION SECTION:
+;net.                   IN A
+
+;; AUTHORITY SECTION:
+net.                    518 IN SOA a.gtld-servers.net. nstld.verisign-grs.com. (
+                                1299183189 ; serial
+                                1800       ; refresh (30 minutes)
+                                900        ; retry (15 minutes)
+                                604800     ; expire (1 week)
+                                86400      ; minimum (1 day)
+                                )
+net.                    518 IN RRSIG SOA 8 1 900 20110310201309 (
+                                20110303200309 3980 net.
+                                TUwUOfzcgGN/lXERU2Y+l3xMr8h6cg/t7ODOiGh8wSNq
+                                8zOEvaTYeR+aKY76mY9X1d+odTcHv52ewLs0nQLlvzFb
+                                iz48fxJrWoNKz5D1HxYDJGNqAsxh3usX0xxnNQoM0cIm
+                                vvw5uFWxFK8cJ0Xha1s4Rpd2z2gVse3yZB3kU78= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN RRSIG NSEC3 8 2 86400 20110310193846 (
+                                20110303192846 3980 net.
+                                IhkKHupik3uQMq94xJQqaLmTeXPCeROIdcicFRh5ocsP
+                                Mzfm/sO+9MpPdPpffCeCg3TtPxHhln6N0ffUa5jNoNnK
+                                kmxZTqF6OUPnW7+pUm2kIysZxjOR5wK4n40IyTj8QNWZ
+                                DspTJTVV7v/4RHgqnoHo2vHcZvLR744Y8PDEBH4= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN NSEC3 1 1 0 - A25R64HGRKT76GSK0JS1PNJ44MEELOJ6 NS SOA RRSIG DNSKEY NSEC3PARAM
+
+;; Query time: 12 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Thu Mar  3 21:20:00 2011
+;; MSG SIZE  rcvd: 511
+</code></pre>
+<p>Le flag <strong>ad</strong> indique que la réponse est valide selon DNSSEC.</p>
+<p>On voit des trucs du genre dans les logs :</p>
+<pre><code>03-Mar-2011 18:22:12.734 dnssec: debug 3: validating @0xba5c7000: net DS: starting
+03-Mar-2011 18:22:12.735 dnssec: debug 3: validating @0xba5c7000: net DS: attempting positive response validation
+03-Mar-2011 18:22:12.738 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: attempting insecurity proof
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: insecurity proof failed
+03-Mar-2011 18:22:12.740 dnssec: info: validating @0xba5ca000: . NS: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.740 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.778 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: starting
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: attempting insecurity proof
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: insecurity proof failed
+03-Mar-2011 18:22:12.779 dnssec: info: validating @0xba5ca000: . DNSKEY: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.791 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.792 dnssec: debug 3: validating @0xba5ca000: . NS: attempting positive response validation
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: starting
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: attempting positive response validation
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: verify rdataset (keyid=19036): success
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: signed by trusted key; marking as secure
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validator @0xba5c4000: dns_validator_destroy
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: in fetch_callback_validator
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: keyset with trust 8
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: resuming validate
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: in fetch_callback_validator
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: keyset with trust 8
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: resuming validate
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validator @0xba5c7000: dns_validator_destroy
+</code></pre>
+<p>On voit bien, que lors de la vérification de la signature de <em>net</em>, Bind
+commence par vérifier <em>.</em> (la zone root) et que ça marche.</p>
+<p>PS : ne pas oublier de (re)mettre la verbosité des logs à <em>info</em> après
+coup.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-03-03</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/bind">#bind</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/dnssec">#dnssec</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© 2020<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème léger" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>dual-boot on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/dual-boot/</link>
+    <description>code. grind. sleep. (dual-boot)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Mon, 29 Nov 2010 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/dual-boot/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dual boot Debian/NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/</link>
+      <pubDate>Mon, 29 Nov 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-02-23-dual-boot-debiannetbsd/</guid>
+      <description>&lt;p&gt;L&amp;rsquo;installation d&amp;rsquo;un dual boot Linux/BSD est somme toute assez simple, on
+coupe le disque en deux et on installe les systèmes l&amp;rsquo;un après l&amp;rsquo;autre.
+La seule difficulté reste sur l&amp;rsquo;installation/configuration des
+bootloaders.&lt;/p&gt;
+&lt;p&gt;Voici comment j&amp;rsquo;ai installé mon laptop en dual boot Debian/NetBSD.
+D&amp;rsquo;abord, quelques principes/astuces:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux s&amp;rsquo;installe dans différentes partitions DOS&lt;/li&gt;
+&lt;li&gt;NetBSD installe ses partitions à l&amp;rsquo;intérieur d&amp;rsquo;une partition DOS qui
+lui est dédiée&lt;/li&gt;
+&lt;li&gt;On peut partager la swap entre les deux systèmes&lt;/li&gt;
+&lt;li&gt;On installe d&amp;rsquo;abord Linux et on utilise du LVM pour éviter de créer
+des partitions étendues&lt;/li&gt;
+&lt;li&gt;GRUB sera le boot loader principal et on chainload&amp;rsquo;era le boot
+loader de NetBSD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Table des partitions DOS:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Part 1: /boot (100Mb) - type Linux&lt;/li&gt;
+&lt;li&gt;Part 2: swap (taille de la RAM) - type Swap&lt;/li&gt;
+&lt;li&gt;Part 3: LVM (moitié du reste) - type Linux LVM&lt;/li&gt;
+&lt;li&gt;Part 4: NetBSD (le reste) - type NetBSD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Etapes:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Installer Debian (on prend une squeeze avec grub2)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Installer NetBSD&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Booter NetBSD et lancer:
+&lt;code&gt;installboot -v /dev/rwd0a /usr/mdec/bootxx_ffsv1&lt;/code&gt; (wd0a est la
+partition / et commence au début de la partition DOS allouée à
+NetBSD)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebooter sur le mode Rescue de Debian:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Choisir son root fs et executer un shell dedans&lt;/li&gt;
+&lt;li&gt;Monter tous les FS: &lt;code&gt;mount -t ext3 -a&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Editer &lt;code&gt;/etc/grub.d/40_custom&lt;/code&gt; (voir plus bas) :&lt;/li&gt;
+&lt;li&gt;Lancer: &lt;code&gt;grub-install&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebooter et vérifier que tout est bien accessible&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;/etc/grub.d/40_custom&lt;/code&gt; :&lt;/p&gt;
+&lt;p&gt;{% highlight bash %}
+#!/bin/sh
+exec tail -n +3 $0
+menuentry &amp;ldquo;NetBSD&amp;rdquo; {
+set root=(hd0,4)
+chainloader +1
+}&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

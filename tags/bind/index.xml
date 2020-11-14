@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>bind on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/bind/</link>
+    <description>code. grind. sleep. (bind)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Thu, 03 Mar 2011 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/bind/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DNSSEC et Bind sur NetBSD</title>
+      <link>https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/</link>
+      <pubDate>Thu, 03 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2011-03-03-dnssec-et-bind-sur-netbsd/</guid>
+      <description>&lt;p&gt;En reconfigurant ma gateway sur NetBSD, le serveur Bind fournit dans
+« basesys » refusait de fonctionner à cause de l&amp;rsquo;activation de DNSSEC
+par défaut.&lt;/p&gt;
+&lt;p&gt;Pour le désactiver, il suffit de modifier les paramètres
+suivants dans &lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options {
+        # ...
+
+        dnssec-enable no;
+        dnssec-validation no;
+#        dnssec-lookaside auto;
+
+        # ...
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Mais ce n&amp;rsquo;est pas la solution idéale, sachant que DNSSEC est activé sur
+la zone root depuis juin 2010, autant l&amp;rsquo;utiliser. Pour avoir DNSSEC dans
+le Bind du basesys, il manque juste la configuration des clés. On
+récupère la DNSKEY de la zone root avec la commande qui va bien :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dig +dnssec +multiline . dnskey &amp;gt; /chemin/vers/root_dnskey
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On obtient la clé qu&amp;rsquo;il faut vérifier, on génère donc l&amp;rsquo;enregistrement
+DS correspondant :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dnssec-dsfromkey -2 -f /chemin/vers/root_dnskey .
+. IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32 F24E8FB5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Attention :&lt;/strong&gt; le dernier espace doit être ignoré.&lt;/p&gt;
+&lt;p&gt;On compare donc à ce que fournit l&amp;rsquo;IANA
+(&lt;a href=&#34;http://data.iana.org/root-anchors/root-anchors.xml&#34;&gt;http://data.iana.org/root-anchors/root-anchors.xml&lt;/a&gt;) et d&amp;rsquo;autres
+comme Kirei (&lt;a href=&#34;http://www.kirei.se/en/2010/06/20/root-ksk/&#34;&gt;http://www.kirei.se/en/2010/06/20/root-ksk/&lt;/a&gt;) qui
+fournissent également les signatures PGP à vérifier.&lt;/p&gt;
+&lt;p&gt;Quand c&amp;rsquo;est bon (GPG dit OK), on ajoute un bloc &lt;code&gt;managed-keys&lt;/code&gt; avec le
+contenu de l&amp;rsquo;enregistrement DNSKEY de la zone root dans
+&lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options {
+        # ...
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+        managed-keys-directory &amp;quot;keys&amp;quot;;
+
+        # ...
+};
+
+managed-keys {
+        &amp;quot;.&amp;quot; initial-key 257 3 8 &amp;quot;AwEAAagAIKlVZrp...&amp;quot;;
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour bénéficier du « look aside », c&amp;rsquo;est à dire une autre source de
+vérification des données du DNS, il faut ajouter la clé sur service DLV
+de ISC (l&amp;rsquo;organisation qui code Bind), en récupérant la clé là :
+&lt;a href=&#34;https://www.isc.org/solutions/dlv&#34;&gt;https://www.isc.org/solutions/dlv&lt;/a&gt; et après vérification des
+signatures PGP, on peut ajouter un bloc &lt;code&gt;trusted-keys&lt;/code&gt; à
+&lt;code&gt;/etc/named.conf&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;trusted-keys {
+        dlv.isc.org. 257 3 5 &amp;quot;BEAAAAP...&amp;quot;;
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Avant de relancer le service, on peut configurer des logs (voir le
+&lt;a href=&#34;http://wiki.orgrim.net/netbsd/named#configurer-les-logs&#34;&gt;wiki&lt;/a&gt; pour les logs dans le chroot) pour mettre du debug sur la
+partie DNSSEC :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;logging {
+        # ...
+        channel dnssec_log_file {
+                file &amp;quot;/var/log/dnssec.log&amp;quot; versions 3 size 20m;
+                severity debug 3;
+                print-category yes;
+                print-severity yes;
+                print-time yes;
+        };
+
+        category dnssec { dnssec_log_file; };
+        # ...
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Et corriger quelques permissions :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mkdir /etc/namedb/keys
+# chown named:named /etc/namedb/keys
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enfin, on peut redémarrer le service et surveiller les logs :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /etc/rc.d/named restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pour tester, on utilise &lt;code&gt;dig&lt;/code&gt; sur zone signée :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# dig +dnssec +multiline net
+
+; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.7.2-P3 &amp;lt;&amp;lt;&amp;gt;&amp;gt; +dnssec +multiline net
+;; global options: +cmd
+;; Got answer:
+;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 5595
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 0, AUTHORITY: 4, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags: do; udp: 4096
+;; QUESTION SECTION:
+;net.                   IN A
+
+;; AUTHORITY SECTION:
+net.                    518 IN SOA a.gtld-servers.net. nstld.verisign-grs.com. (
+                                1299183189 ; serial
+                                1800       ; refresh (30 minutes)
+                                900        ; retry (15 minutes)
+                                604800     ; expire (1 week)
+                                86400      ; minimum (1 day)
+                                )
+net.                    518 IN RRSIG SOA 8 1 900 20110310201309 (
+                                20110303200309 3980 net.
+                                TUwUOfzcgGN/lXERU2Y+l3xMr8h6cg/t7ODOiGh8wSNq
+                                8zOEvaTYeR+aKY76mY9X1d+odTcHv52ewLs0nQLlvzFb
+                                iz48fxJrWoNKz5D1HxYDJGNqAsxh3usX0xxnNQoM0cIm
+                                vvw5uFWxFK8cJ0Xha1s4Rpd2z2gVse3yZB3kU78= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN RRSIG NSEC3 8 2 86400 20110310193846 (
+                                20110303192846 3980 net.
+                                IhkKHupik3uQMq94xJQqaLmTeXPCeROIdcicFRh5ocsP
+                                Mzfm/sO+9MpPdPpffCeCg3TtPxHhln6N0ffUa5jNoNnK
+                                kmxZTqF6OUPnW7+pUm2kIysZxjOR5wK4n40IyTj8QNWZ
+                                DspTJTVV7v/4RHgqnoHo2vHcZvLR744Y8PDEBH4= )
+A1RT98BS5QGC9NFI51S9HCI47ULJG6JH.net. 518 IN NSEC3 1 1 0 - A25R64HGRKT76GSK0JS1PNJ44MEELOJ6 NS SOA RRSIG DNSKEY NSEC3PARAM
+
+;; Query time: 12 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Thu Mar  3 21:20:00 2011
+;; MSG SIZE  rcvd: 511
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Le flag &lt;strong&gt;ad&lt;/strong&gt; indique que la réponse est valide selon DNSSEC.&lt;/p&gt;
+&lt;p&gt;On voit des trucs du genre dans les logs :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;03-Mar-2011 18:22:12.734 dnssec: debug 3: validating @0xba5c7000: net DS: starting
+03-Mar-2011 18:22:12.735 dnssec: debug 3: validating @0xba5c7000: net DS: attempting positive response validation
+03-Mar-2011 18:22:12.738 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: attempting insecurity proof
+03-Mar-2011 18:22:12.739 dnssec: debug 3: validating @0xba5ca000: . NS: insecurity proof failed
+03-Mar-2011 18:22:12.740 dnssec: info: validating @0xba5ca000: . NS: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.740 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.778 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: starting
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: attempting insecurity proof
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validating @0xba5ca000: . DNSKEY: insecurity proof failed
+03-Mar-2011 18:22:12.779 dnssec: info: validating @0xba5ca000: . DNSKEY: got insecure response; parent indicates it should be secure
+03-Mar-2011 18:22:12.779 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:12.791 dnssec: debug 3: validating @0xba5ca000: . NS: starting
+03-Mar-2011 18:22:12.792 dnssec: debug 3: validating @0xba5ca000: . NS: attempting positive response validation
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: starting
+03-Mar-2011 18:22:12.988 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: attempting positive response validation
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: verify rdataset (keyid=19036): success
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validating @0xba5c4000: . DNSKEY: signed by trusted key; marking as secure
+03-Mar-2011 18:22:13.002 dnssec: debug 3: validator @0xba5c4000: dns_validator_destroy
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: in fetch_callback_validator
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: keyset with trust 8
+03-Mar-2011 18:22:13.003 dnssec: debug 3: validating @0xba5ca000: . NS: resuming validate
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validating @0xba5ca000: . NS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.006 dnssec: debug 3: validator @0xba5ca000: dns_validator_destroy
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: in fetch_callback_validator
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: keyset with trust 8
+03-Mar-2011 18:22:13.008 dnssec: debug 3: validating @0xba5c7000: net DS: resuming validate
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: verify rdataset (keyid=21639): success
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validating @0xba5c7000: net DS: marking as secure, noqname proof not needed
+03-Mar-2011 18:22:13.011 dnssec: debug 3: validator @0xba5c7000: dns_validator_destroy
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On voit bien, que lors de la vérification de la signature de &lt;em&gt;net&lt;/em&gt;, Bind
+commence par vérifier &lt;em&gt;.&lt;/em&gt; (la zone root) et que ça marche.&lt;/p&gt;
+&lt;p&gt;PS : ne pas oublier de (re)mettre la verbosité des logs à &lt;em&gt;info&lt;/em&gt; après
+coup.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
