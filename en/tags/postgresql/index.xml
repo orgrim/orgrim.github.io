@@ -55,7 +55,7 @@ systemctl disable --now etcd
 &lt;ul&gt;
 &lt;li&gt;Console 1:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;
+&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
 etcd --data-dir=data/etcd --enable-v2=true
 &lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
 &lt;li&gt;Console 2, ensure no other Postgres instance is using TCP port 5432:&lt;/li&gt;

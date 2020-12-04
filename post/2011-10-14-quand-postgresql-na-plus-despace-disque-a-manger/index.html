@@ -16,41 +16,47 @@
 <link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
 <link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
 
-<link rel="stylesheet" href="https://www.orgrim.net/css/light.css?rnd=1607118025" />
-<style>
 
-    [data-theme="dark"] {   
-        --font-color: #eee;
---bg-color: #212121;
 
---link-color:#599ada;
---link-state-color:#ff5858;
---link-state-border-color: rgba(238, 54, 54, 0.5);
+    
 
---thead-bg-color: #343a40;
---table-border-color: lightgrey;
 
---pre-color: #333;
---pre-bg-color: #f1f1f1;
 
---bq-color: #ccc;
---hr-color: #333;
 
---pagination-bg-color: #373737;
---pagination-link-color: #b6b6b6;
 
---post-info-color: grey;
+    
+    
+    
 
---switcher-color: #333;
---switcher-bg-color: #fff;
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/style.6155b6d8eded05b985178f56a637943b3e7fcfccc913d9c656bbebce7c91cc6b.css" integrity="sha256-YVW22O3tBbmFF49WpjeUOz5/z8zJE9nGVrvrznyRzGs=">
+    
 
-    }
 
-</style>
 
-<link rel="stylesheet" href="https://www.orgrim.net/css/style.css?rnd=1607118025" />
 
-<link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1607118025"><link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1607118025">
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1607118479">
+    
+
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1607118479">
+    
+
 
 
 
@@ -68,6 +74,7 @@ L&rsquo;objectif est de montrer que seules les transactions modifiant des objets
 <meta name="twitter:description" content="Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&rsquo;expérimentation est nécessaire pour se rassurer&hellip;
 On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
 L&rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&rsquo;est pourquoi on a besoin de plusieurs tablespaces."/>
+
 
 
 
