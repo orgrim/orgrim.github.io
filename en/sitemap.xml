@@ -4,6 +4,7 @@
   
   <url>
     <loc>https://www.orgrim.net/en/categories/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -17,7 +18,13 @@
   </url>
   
   <url>
+    <loc>https://www.orgrim.net/en/categories/code/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.orgrim.net/en/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -31,7 +38,68 @@
   </url>
   
   <url>
+    <loc>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/en/tags/patroni/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/en/categories/postgresql/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/categories/postgresql/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/categories/postgresql/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/en/tags/postgresql/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/postgresql/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/postgresql/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/en/post/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/post/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/post/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/en/tags/python/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.orgrim.net/en/tags/</loc>
+    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
