@@ -44,7 +44,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611178028">
     
 
 
@@ -55,7 +55,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611178028">
     
 
 
@@ -65,7 +65,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://www.orgrim.net/categories/postgresql/" />
-<meta property="og:updated_time" content="2021-01-19T00:00:00+00:00" />
+<meta property="og:updated_time" content="2017-10-30T00:00:00+00:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="PostgreSQL"/>
@@ -110,52 +110,6 @@
     <div class="post-info">
         <a href="https://www.orgrim.net/categories">Vers toutes les catégories</a>
     </div>
-    
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2021-01-07-configuration-de-postgresql-avec-patroni/">Configuration de PostgreSQL dans un cluster Patroni</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
-Some configuration parameters are controled by Patroni
-Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
- Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2021-01-19</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/ha">#ha</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/patroni">#patroni</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
     
         <article class="post-list">
     <header class="post-header">
@@ -550,6 +504,48 @@ ERROR: could not open relation with OID N  Si on recherche ce message dans les m
                         <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
                     
                         <li><a href="https://www.orgrim.net/tags/lock">#lock</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/">Retrouver un trigger à partir du nom de la fonction associée</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Ici encore, tout est dans le catalogue système de PostgreSQL, il suffit
+de regarder dans la table <code>pg_trigger</code>.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-04-07</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
                     
                         <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
                     

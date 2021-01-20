@@ -45,7 +45,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611178028">
     
 
 
@@ -56,7 +56,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611178028">
     
 
 
@@ -151,52 +151,6 @@ d&rsquo;utiliser les binaires compilés fournis sur le site officiel.</p>
                         <li><a href="https://www.orgrim.net/tags/go">#go</a></li>
                     
                         <li><a href="https://www.orgrim.net/tags/install">#install</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
-    
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2021-01-07-configuration-de-postgresql-avec-patroni/">Configuration de PostgreSQL dans un cluster Patroni</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
-Some configuration parameters are controled by Patroni
-Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
- Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2021-01-19</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/ha">#ha</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/patroni">#patroni</a></li>
                     
                 </ul>
         
@@ -583,6 +537,48 @@ chose qu&rsquo;on n&rsquo;a pas encore dans notre kernel.</p>
                         <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
                     
                         <li><a href="https://www.orgrim.net/tags/x11">#X11</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/">Un bulk build par jour dans un screen</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Mes packages NetBSD sont préparés par pbulk, qui tourne en continu grâce
+au script <a href="https://github.com/orgrim/nb-utils/blob/master/pkgsrc/pbulk-builder">pbulk-builder</a>.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2013-05-10</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
                     
                         <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
                     

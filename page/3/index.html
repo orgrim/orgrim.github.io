@@ -45,7 +45,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611178028">
     
 
 
@@ -56,7 +56,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611178028">
     
 
 
@@ -112,53 +112,6 @@
     </div>
 
     
-    
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/">Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p>Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
-BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
-qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
-pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
-pour pkgsrc : <a href="http://pkgsrc.se/wip/pgbuildfarm">http://pkgsrc.se/wip/pgbuildfarm</a>.</p>
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2011-08-06</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
     
         <article class="post-list">
     <header class="post-header">
@@ -520,6 +473,53 @@ preuve par l&rsquo;exemple.</p>
         <p>Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots <code>pkg_comp</code> pour
 tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
 <code>pkgin</code> pour la gestion de mes paquets une fois préparés dans le chroot.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-03-12</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-03-12-pkgin-adventures-conflit-resolu/">pkgin adventures - conflit résolu</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Il y a quelques jours, il a été décidé de remplacer <code>libungif</code> par
+<code>giflib</code> dans pkgsrc. Pour éviter de mixer les deux et donc avoir des
+problèmes, les deux paquets se déclarent mutuellement en conflit. A
+partir de maintenant la dépendance par défaut est sur <code>giflib</code>, ce qui a
+donc fait que ma mise à jour (<code>pkg_chk</code> dans un <code>pkg_comp</code>) a tellement
+buté dessus que j&rsquo;ai décidé qu&rsquo;il serait plus simple de repartir d&rsquo;un
+chroot <code>pkg_comp</code> tout neuf&hellip;</p>
     </div>
     
     
