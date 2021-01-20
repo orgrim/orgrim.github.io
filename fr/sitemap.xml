@@ -4,7 +4,7 @@
   
   <url>
     <loc>https://www.orgrim.net/categories/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -18,13 +18,23 @@
   </url>
   
   <url>
-    <loc>https://www.orgrim.net/tags/cloud-init/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <loc>https://www.orgrim.net/categories/code/</loc>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/categories/code/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/categories/code/"
+                />
   </url>
   
   <url>
     <loc>https://www.orgrim.net/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -38,18 +48,23 @@
   </url>
   
   <url>
-    <loc>https://www.orgrim.net/tags/libvirt/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <loc>https://www.orgrim.net/tags/go/</loc>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <loc>https://www.orgrim.net/tags/install/</loc>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2021-01-20-installer-go/</loc>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.orgrim.net/post/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -64,7 +79,7 @@
   
   <url>
     <loc>https://www.orgrim.net/tags/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -75,6 +90,76 @@
                 hreflang="fr"
                 href="https://www.orgrim.net/tags/"
                 />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2021-01-07-configuration-de-postgresql-avec-patroni/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/ha/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/patroni/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/patroni/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/patroni/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/categories/postgresql/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/categories/postgresql/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/categories/postgresql/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/postgresql/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/postgresql/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/postgresql/"
+                />
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/cloud-init/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/tags/libvirt/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</loc>
+    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -100,21 +185,6 @@
   <url>
     <loc>https://www.orgrim.net/tags/pgbouncer/</loc>
     <lastmod>2017-10-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.orgrim.net/categories/postgresql/</loc>
-    <lastmod>2017-10-30T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/categories/postgresql/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/categories/postgresql/"
-                />
   </url>
   
   <url>
@@ -165,21 +235,6 @@
   <url>
     <loc>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</loc>
     <lastmod>2014-09-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.orgrim.net/tags/postgresql/</loc>
-    <lastmod>2014-09-22T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/postgresql/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/postgresql/"
-                />
   </url>
   
   <url>

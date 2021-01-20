@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+
+<html lang="fr" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>Configuration de PostgreSQL dans un cluster Patroni - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+
+
+    
+
+
+
+
+
+    
+    
+    
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/style.6155b6d8eded05b985178f56a637943b3e7fcfccc913d9c656bbebce7c91cc6b.css" integrity="sha256-YVW22O3tBbmFF49WpjeUOz5/z8zJE9nGVrvrznyRzGs=">
+    
+
+
+
+
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
+    
+
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
+    
+
+
+
+
+<meta property="og:title" content="Configuration de PostgreSQL dans un cluster Patroni" />
+<meta property="og:description" content="When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
+Some configuration parameters are controled by Patroni
+Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
+ Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/post/2021-01-07-configuration-de-postgresql-avec-patroni/" />
+<meta property="article:published_time" content="2021-01-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-01-19T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Configuration de PostgreSQL dans un cluster Patroni"/>
+<meta name="twitter:description" content="When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
+Some configuration parameters are controled by Patroni
+Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
+ Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :"/>
+
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Aller au contenu</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/post" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">Configuration de PostgreSQL dans un cluster Patroni</h1>
+        </header>
+        <div class="content">
+            <p>When Patroni operates some replicated PostgreSQL instances, it takes
+over some configuration parameters to ensure they remains consistent
+within the cluster.</p>
+<p>Some configuration parameters are controled by Patroni</p>
+<p>Certains paramètres sont contrôlés par Patroni au niveau de la ligne
+de commande de démarrage de l&rsquo;instance, on ne peut que les modifier
+via patronictl. Pour déterminer les paramètres contrôlés par Patroni,
+vérifier :</p>
+<ul>
+<li>Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters</li>
+<li>Avec patronictl show-config</li>
+<li>Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)</li>
+</ul>
+<p>Pour les paramètres avec redémarrage non contrôlés par Patroni :</p>
+<ul>
+<li>Modifier le paramètre dans $PGDATA/postgresql.base.conf sur tous les nœuds</li>
+<li>Redémarrer avec patronictl (voir plus loin).</li>
+</ul>
+<p>Pour les paramètres avec redémarrage contrôlés par Patroni :</p>
+<ul>
+<li>Exécuter patronictl -c /etc/patroni/patroni-12-{instance}.yml edit-config -p &lsquo;parametre=valeur&rsquo; pour les modifier au niveau du DCS (etcd)</li>
+<li>Redémarrer avec patronictl (voir plus loin).</li>
+</ul>
+<p>Pour les paramètres sans redémarrage :</p>
+<ul>
+<li>Modifier le paramètre dans $PGDATA/postgresql.base.conf sur tous les nœuds</li>
+<li>Recharger la configuration via la fonction pg_reload_conf() sur chaque nœud impacté ou demander à Patroni de le faire pour tout le cluster : patronictl -c /etc/patroni/patroni-12-{instance}.yml reload cluster_name</li>
+</ul>
+<p>Pour les paramètres avec redémarrage, redémarrer les instances :</p>
+<ol start="0">
+<li>Vérifier l&rsquo;état de la colonne &ldquo;Pending restart&rdquo; de la sortie de patronictl -c /etc/patroni/patroni-12-{instance}.yml list</li>
+<li>Redémarrer les instances standby : patronictl -c /etc/patroni/patroni-12-{instance}.yml restart cluster_name member_name</li>
+<li>Soit :</li>
+</ol>
+<ul>
+<li>Effectuer un switchover pour redémarrer l&rsquo;instance primaire (Leader) : patronictl -c /etc/patroni/patroni-12-{instance}.yml switchover</li>
+<li>Redémarrer avec patronictl : patronictl -c /etc/patroni/patroni-12-{instance}.yml restart cluster_name member_name</li>
+</ul>
+<p>Enfin, l&rsquo;ordre de redémarrage des instances selon qu&rsquo;elles soient primaire ou standby est important pour les paramètres suivants, où la valeur doit être supérieure ou égale sur le standby :</p>
+<ul>
+<li>max_connections</li>
+<li>max_prepared_transactions</li>
+<li>max_locks_per_transaction</li>
+<li>max_wal_senders</li>
+<li>max_worker_processes</li>
+</ul>
+<p>Note : pour modifier un paramètre et garantir que la même valeur soit configurée sur l&rsquo;ensemble du cluster, utiliser patronictl edit-config est la méthode la plus simple. Par contre, il faut continuer à utiliser cette méthode par la suite.</p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2021-01-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ha">#ha</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/patroni">#patroni</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+            
+            <ul class="footer-menu">
+            
+            <li><a class="" href="https://twitter.com/orgrim" title="Twitter">@orgrim</a></li>
+            
+            <li><a class="" href="https://github.com/orgrim" title="">github</a></li>
+            
+            </ul>
+        
+        <div class="copyright">
+            <p>© Nicolas Thauvin, 2021<br>
+            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Thème sombre
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Thème clair" : "Thème sombre"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

@@ -44,7 +44,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
     
 
 
@@ -55,7 +55,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
     
 
 
@@ -65,7 +65,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://www.orgrim.net/tags/postgresql/" />
-<meta property="og:updated_time" content="2014-09-22T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-19T00:00:00+00:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="postgresql"/>
@@ -110,6 +110,52 @@
     <div class="post-info">
         <a href="https://www.orgrim.net/tags">Vers toutes les étiquettes</a>
     </div>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2021-01-07-configuration-de-postgresql-avec-patroni/">Configuration de PostgreSQL dans un cluster Patroni</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
+Some configuration parameters are controled by Patroni
+Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
+ Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2021-01-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ha">#ha</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/patroni">#patroni</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
     
         <article class="post-list">
     <header class="post-header">
@@ -516,52 +562,20 @@ taille de chacune des bases de données d&rsquo;un cluster :</p>
 
 </article>
     
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2011-02-22-recreer-une-sequence/">Recréer une séquence</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p>On peut faire ça dans 2 cas :</p>
-<ul>
-<li>On a fait n&rsquo;importe quoi, et la séquence a disparu :-(</li>
-<li>On veut transformer une colonne en « SERIAL »</li>
-</ul>
-    </div>
     
     
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2011-02-22</div>
-    
-    <div class="post-taxonomies">
         
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
-                
-            </ul>
+    <div class="pagination">
+        <div class="left pagination-item disabled">
             
+        </div>
+        <div class="right pagination-item ">
             
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/sequence">#sequence</a></li>
-                    
-                </ul>
-        
+                <a href="/tags/postgresql/page/2/">articles &#43; anciens</a>
+            
+        </div>
     </div>
-</div>
 
-</article>
-    
-    
 
 
 
@@ -572,9 +586,9 @@ taille de chacune des bases de données d&rsquo;un cluster :</p>
     
         <ul class="language-select">
 
-<li><a href="https://www.orgrim.net/en/">English</a></li>
-
 <li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
 
 </ul>
     

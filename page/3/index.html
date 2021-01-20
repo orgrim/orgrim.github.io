@@ -45,7 +45,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
     
 
 
@@ -56,7 +56,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
     
 
 
@@ -66,7 +66,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://www.orgrim.net/" />
-<meta property="og:updated_time" content="2020-07-28T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-20T21:58:54+01:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="code. grind. sleep."/>
@@ -112,6 +112,97 @@
     </div>
 
     
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/">Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Comme j&rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
+BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
+qu&rsquo;après la configuration du client (écrit en Perl). Il n&rsquo;est d&rsquo;ailleurs
+pas forcément très convi à installer, c&rsquo;est pourquoi je l&rsquo;ai packagé
+pour pkgsrc : <a href="http://pkgsrc.se/wip/pgbuildfarm">http://pkgsrc.se/wip/pgbuildfarm</a>.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-06</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2011-08-04-could-not-open-relation-with-oid-n/">Could not open relation with oid N</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        On peut parfois trouver cet étrange message d&rsquo;erreur dans les traces de PostgreSQL (N étant un nombre) ou lors de l&rsquo;exécution d&rsquo;une requête :
+ERROR: could not open relation with OID N  Si on recherche ce message dans les mailing-lists du projet, on peut facilement conclure que la base de données est corrompue, qu&rsquo;il y a des problèmes matériels et que la sécurité des données est en péril. Et bien, ce n&rsquo;est pas forcément le cas : obtenir ce message peut être tout à fait normal.
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2011-08-04</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/lock">#lock</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
     
         <article class="post-list">
     <header class="post-header">
@@ -463,99 +554,6 @@ tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
 
 </article>
     
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2011-03-12-pkgin-adventures-conflit-resolu/">pkgin adventures - conflit résolu</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p>Il y a quelques jours, il a été décidé de remplacer <code>libungif</code> par
-<code>giflib</code> dans pkgsrc. Pour éviter de mixer les deux et donc avoir des
-problèmes, les deux paquets se déclarent mutuellement en conflit. A
-partir de maintenant la dépendance par défaut est sur <code>giflib</code>, ce qui a
-donc fait que ma mise à jour (<code>pkg_chk</code> dans un <code>pkg_comp</code>) a tellement
-buté dessus que j&rsquo;ai décidé qu&rsquo;il serait plus simple de repartir d&rsquo;un
-chroot <code>pkg_comp</code> tout neuf&hellip;</p>
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2011-03-12</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
-    
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/">pkgin adventures - utiliser pkgin avec pkgsrc-current</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p><strong>pkgin</strong> est un outil de gestion de paquets binaires pour pkgsrc, le
-système de paquets de NetBSD. Pour pouvoir l&rsquo;utiliser il faut donc des
-paquets binaires, sauf que les binaires ne sont officiellement
-disponibles que pour les releases trimestrielles de pkgsrc. Quand on
-suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
-dépôt.</p>
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2011-03-12</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
-    
     
     
         
@@ -582,9 +580,9 @@ dépôt.</p>
     
         <ul class="language-select">
 
-<li><a href="https://www.orgrim.net/en/">English</a></li>
-
 <li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
 
 </ul>
     

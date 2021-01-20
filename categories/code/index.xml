@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Code on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/categories/code/</link>
+    <description>code. grind. sleep. (Code)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Wed, 20 Jan 2021 21:58:54 +0100</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Installer Go</title>
+      <link>https://www.orgrim.net/post/2021-01-20-installer-go/</link>
+      <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2021-01-20-installer-go/</guid>
+      <description>&lt;p&gt;Le langage Go est de plus en plus présent, on peut installer son
+compilateur et suite d&amp;rsquo;outil à partir des packages de sa distribution,
+mais le plus simple pour avoir une version la plus à jour possible est
+d&amp;rsquo;utiliser les binaires compilés fournis sur le site officiel.&lt;/p&gt;
+&lt;p&gt;Le version du package golang-go est trop ancienne dans Debian stable
+(1.11), je l&amp;rsquo;ai donc installé de la façon suivante.&lt;/p&gt;
+&lt;p&gt;Aller sur &lt;a href=&#34;https://golang.org/dl/&#34;&gt;https://golang.org/dl/&lt;/a&gt; pour trouver la dernière version
+stable. Pour la suite, on prend l&amp;rsquo;exemple de la version 1.15.7&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/install
+$ cd ~/install
+$ wget https://golang.org/dl/go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Recopier le checksum dans &lt;code&gt;go1.15.7.linux-amd64.tar.gz.sha256&lt;/code&gt; dans un
+format qui convient à &lt;code&gt;sha256sum&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;0d142143794721bb63ce6c8a6180c4062bcf8ef4715e7d6d6609f3a8282629b3  go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Vérifier le checksum :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sha256sum -c go1.15.7.linux-amd64.tar.gz.sha256
+go1.15.7.linux-amd64.tar.gz: OK
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Préparer le répertoire d&amp;rsquo;installation :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cd /usr/local/
+$ sudo rm -f go
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Extraire l&amp;rsquo;archive :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo tar xf ~/install/go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Versionner le répertoire et créer un lien symbolique :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo mv go go1.15.7
+$ sudo ln -s go1.15.7 go
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ajouter à son &lt;code&gt;~/.bashrc&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+export PATH
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Le sourcer et vérifier la version :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ . ~/.bashrc
+$ go version
+go version go1.15.7 linux/amd64
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;On peut alors purger les anciennes versions de go dans &lt;code&gt;/usr/local&lt;/code&gt; ou
+revenir en arrière grâce au lien symbolique.&lt;/p&gt;
+&lt;p&gt;On utilise la configuration par défaut de l&amp;rsquo;environnement de Go pour
+l&amp;rsquo;installation des binaires et modules avec &lt;code&gt;go get&lt;/code&gt; dans &lt;code&gt;~/go&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

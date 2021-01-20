@@ -45,7 +45,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1611177961">
     
 
 
@@ -56,7 +56,7 @@
 
 
     
-        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1609944863">
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1611177961">
     
 
 
@@ -66,7 +66,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://www.orgrim.net/" />
-<meta property="og:updated_time" content="2020-07-28T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-20T21:58:54+01:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="code. grind. sleep."/>
@@ -112,6 +112,98 @@
     </div>
 
     
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2021-01-20-installer-go/">Installer Go</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>Le langage Go est de plus en plus présent, on peut installer son
+compilateur et suite d&rsquo;outil à partir des packages de sa distribution,
+mais le plus simple pour avoir une version la plus à jour possible est
+d&rsquo;utiliser les binaires compilés fournis sur le site officiel.</p>
+<p>Le version du package golang-go est trop ancienne dans Debian stable
+(1.11), je l&rsquo;ai donc installé de la façon suivante.</p>
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2021-01-20</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">Code</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/go">#go</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/install">#install</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/post/2021-01-07-configuration-de-postgresql-avec-patroni/">Configuration de PostgreSQL dans un cluster Patroni</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        When Patroni operates some replicated PostgreSQL instances, it takes over some configuration parameters to ensure they remains consistent within the cluster.
+Some configuration parameters are controled by Patroni
+Certains paramètres sont contrôlés par Patroni au niveau de la ligne de commande de démarrage de l&rsquo;instance, on ne peut que les modifier via patronictl. Pour déterminer les paramètres contrôlés par Patroni, vérifier :
+ Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters Avec patronictl show-config Il n&rsquo;est pas sur la ligne de commande de l&rsquo;instanec (ps auxfww | grep postgres)  Pour les paramètres avec redémarrage non contrôlés par Patroni :
+    </div>
+    
+    
+    
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2021-01-19</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/ha">#ha</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/tags/patroni">#patroni</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+</article>
     
         <article class="post-list">
     <header class="post-header">
@@ -501,93 +593,6 @@ chose qu&rsquo;on n&rsquo;a pas encore dans notre kernel.</p>
 
 </article>
     
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/">Un bulk build par jour dans un screen</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p>Mes packages NetBSD sont préparés par pbulk, qui tourne en continu grâce
-au script <a href="https://github.com/orgrim/nb-utils/blob/master/pkgsrc/pbulk-builder">pbulk-builder</a>.</p>
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2013-05-10</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/pkgsrc">#pkgsrc</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
-    
-        <article class="post-list">
-    <header class="post-header">
-        <h1 class="post-title"><a href="/post/2013-04-06-oups-des-tablespaces-imbriques/">Oups... des tablespaces imbriqués</a></h1>
-    </header>
-
-    <div class="content post-summary">
-        <p>Imbriquer des tablespaces n&rsquo;a pas vraiment de sens dans PostgreSQL
-surtout si on veut se prendre la tête avec des montages dans tous les
-sens&hellip; Mais bon c&rsquo;est permis, car PostgreSQL utilise uniquement les
-liens symboliques dans <code>$PGDATA/pg_tblspc</code> pour accéder au contenu des
-tablespaces.</p>
-    </div>
-    
-    
-    
-
-    
-
-
-<div class="post-info">
-    
-        <div class="post-date">2013-04-06</div>
-    
-    <div class="post-taxonomies">
-        
-            <ul class="post-categories">
-                
-                    <li><a href="https://www.orgrim.net/categories/">PostgreSQL</a></li>
-                
-            </ul>
-            
-            
-                <ul class="post-tags">
-                    
-                        <li><a href="https://www.orgrim.net/tags/postgresql">#postgresql</a></li>
-                    
-                        <li><a href="https://www.orgrim.net/tags/pg_catalog">#pg_catalog</a></li>
-                    
-                </ul>
-        
-    </div>
-</div>
-
-</article>
-    
     
     
         
@@ -612,9 +617,9 @@ tablespaces.</p>
     
         <ul class="language-select">
 
-<li><a href="https://www.orgrim.net/en/">English</a></li>
-
 <li><a href="https://www.orgrim.net/">Français</a></li>
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
 
 </ul>
     

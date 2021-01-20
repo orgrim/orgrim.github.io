@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ha on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/tags/ha/</link>
+    <description>code. grind. sleep. (ha)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>fr</language>
+    <lastBuildDate>Tue, 19 Jan 2021 00:00:00 +0000</lastBuildDate>
+    
+    <atom:link href="https://www.orgrim.net/tags/ha/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Configuration de PostgreSQL dans un cluster Patroni</title>
+      <link>https://www.orgrim.net/post/2021-01-07-configuration-de-postgresql-avec-patroni/</link>
+      <pubDate>Tue, 19 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2021-01-07-configuration-de-postgresql-avec-patroni/</guid>
+      <description>&lt;p&gt;When Patroni operates some replicated PostgreSQL instances, it takes
+over some configuration parameters to ensure they remains consistent
+within the cluster.&lt;/p&gt;
+&lt;p&gt;Some configuration parameters are controled by Patroni&lt;/p&gt;
+&lt;p&gt;Certains paramètres sont contrôlés par Patroni au niveau de la ligne
+de commande de démarrage de l&amp;rsquo;instance, on ne peut que les modifier
+via patronictl. Pour déterminer les paramètres contrôlés par Patroni,
+vérifier :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Dans /etc/patroni/patroni-12-main.yml, section postgresql.parameters&lt;/li&gt;
+&lt;li&gt;Avec patronictl show-config&lt;/li&gt;
+&lt;li&gt;Il n&amp;rsquo;est pas sur la ligne de commande de l&amp;rsquo;instanec (ps auxfww | grep postgres)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pour les paramètres avec redémarrage non contrôlés par Patroni :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Modifier le paramètre dans $PGDATA/postgresql.base.conf sur tous les nœuds&lt;/li&gt;
+&lt;li&gt;Redémarrer avec patronictl (voir plus loin).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pour les paramètres avec redémarrage contrôlés par Patroni :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Exécuter patronictl -c /etc/patroni/patroni-12-{instance}.yml edit-config -p &amp;lsquo;parametre=valeur&amp;rsquo; pour les modifier au niveau du DCS (etcd)&lt;/li&gt;
+&lt;li&gt;Redémarrer avec patronictl (voir plus loin).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pour les paramètres sans redémarrage :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Modifier le paramètre dans $PGDATA/postgresql.base.conf sur tous les nœuds&lt;/li&gt;
+&lt;li&gt;Recharger la configuration via la fonction pg_reload_conf() sur chaque nœud impacté ou demander à Patroni de le faire pour tout le cluster : patronictl -c /etc/patroni/patroni-12-{instance}.yml reload cluster_name&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pour les paramètres avec redémarrage, redémarrer les instances :&lt;/p&gt;
+&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;Vérifier l&amp;rsquo;état de la colonne &amp;ldquo;Pending restart&amp;rdquo; de la sortie de patronictl -c /etc/patroni/patroni-12-{instance}.yml list&lt;/li&gt;
+&lt;li&gt;Redémarrer les instances standby : patronictl -c /etc/patroni/patroni-12-{instance}.yml restart cluster_name member_name&lt;/li&gt;
+&lt;li&gt;Soit :&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Effectuer un switchover pour redémarrer l&amp;rsquo;instance primaire (Leader) : patronictl -c /etc/patroni/patroni-12-{instance}.yml switchover&lt;/li&gt;
+&lt;li&gt;Redémarrer avec patronictl : patronictl -c /etc/patroni/patroni-12-{instance}.yml restart cluster_name member_name&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Enfin, l&amp;rsquo;ordre de redémarrage des instances selon qu&amp;rsquo;elles soient primaire ou standby est important pour les paramètres suivants, où la valeur doit être supérieure ou égale sur le standby :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;max_connections&lt;/li&gt;
+&lt;li&gt;max_prepared_transactions&lt;/li&gt;
+&lt;li&gt;max_locks_per_transaction&lt;/li&gt;
+&lt;li&gt;max_wal_senders&lt;/li&gt;
+&lt;li&gt;max_worker_processes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note : pour modifier un paramètre et garantir que la même valeur soit configurée sur l&amp;rsquo;ensemble du cluster, utiliser patronictl edit-config est la méthode la plus simple. Par contre, il faut continuer à utiliser cette méthode par la suite.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
