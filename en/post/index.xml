@@ -6,10 +6,56 @@
     <description>code. grind. sleep. (Posts)</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 04 Dec 2020 21:23:32 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 20 Jan 2021 21:58:54 +0100</lastBuildDate>
     
     <atom:link href="https://www.orgrim.net/en/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Install Go</title>
+      <link>https://www.orgrim.net/en/post/2021-01-20-install-go/</link>
+      <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
+      
+      <guid>https://www.orgrim.net/en/post/2021-01-20-install-go/</guid>
+      <description>&lt;p&gt;The Go language has been around for quite some time and one finds
+more and more programs written in Go. The Go compiler and tools can be
+installed using the packages of the Linux distribution, but the
+easiest way to have the latest version is to use the official compiled
+tools.&lt;/p&gt;
+&lt;p&gt;The version of the &lt;code&gt;golang-go&lt;/code&gt; package in Debian stable, 1.11, is too
+old, so I installed the official binaries this way.&lt;/p&gt;
+&lt;p&gt;Go to &lt;a href=&#34;https://golang.org/dl/&#34;&gt;https://golang.org/dl/&lt;/a&gt; to find out what is the lastest
+version. Here, we&amp;rsquo;ll be using 1.15.7.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/install
+$ cd ~/install
+$ wget https://golang.org/dl/go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Copy the checksum in &lt;code&gt;go1.15.7.linux-amd64.tar.gz.sha256&lt;/code&gt; as
+&lt;code&gt;sha256sum&lt;/code&gt; excepts it for checking:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;0d142143794721bb63ce6c8a6180c4062bcf8ef4715e7d6d6609f3a8282629b3  go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Check the sum:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sha256sum -c go1.15.7.linux-amd64.tar.gz.sha256
+go1.15.7.linux-amd64.tar.gz: OK
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Prepare the installation directory:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cd /usr/local/
+$ sudo rm -f go
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Extract the tarball:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo tar xf ~/install/go1.15.7.linux-amd64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Rename the directory to add the version number and create a symbolic
+link:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo mv go go1.15.7
+$ sudo ln -s go1.15.7 go
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Update the PATH in &lt;code&gt;~/.bashrc&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+export PATH
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Source it and check the version:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ . ~/.bashrc
+$ go version
+go version go1.15.7 linux/amd64
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The older versions can be purged from &lt;code&gt;/usr/local&lt;/code&gt; or we can go back to
+a previous version by updating the symbolic link.&lt;/p&gt;
+&lt;p&gt;The defaut environment configuration of Go is used to let &lt;code&gt;go get&lt;/code&gt; and
+others install binaires and modules into &lt;code&gt;~/go&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Development environment for Patroni</title>

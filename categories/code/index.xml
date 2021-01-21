@@ -21,7 +21,7 @@
 compilateur et suite d&amp;rsquo;outil à partir des packages de sa distribution,
 mais le plus simple pour avoir une version la plus à jour possible est
 d&amp;rsquo;utiliser les binaires compilés fournis sur le site officiel.&lt;/p&gt;
-&lt;p&gt;Le version du package golang-go est trop ancienne dans Debian stable
+&lt;p&gt;La version du package &lt;code&gt;golang-go&lt;/code&gt; est trop ancienne dans Debian stable
 (1.11), je l&amp;rsquo;ai donc installé de la façon suivante.&lt;/p&gt;
 &lt;p&gt;Aller sur &lt;a href=&#34;https://golang.org/dl/&#34;&gt;https://golang.org/dl/&lt;/a&gt; pour trouver la dernière version
 stable. Pour la suite, on prend l&amp;rsquo;exemple de la version 1.15.7&lt;/p&gt;
