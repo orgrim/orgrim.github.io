@@ -6,10 +6,93 @@
     <description>code. grind. sleep. (selinux)</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Mon, 22 Sep 2014 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 11 Feb 2021 10:00:00 +0100</lastBuildDate>
     
     <atom:link href="https://www.orgrim.net/tags/selinux/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>PostgreSQL et SELinux à l&#39;ère de systemd</title>
+      <link>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</link>
+      <pubDate>Thu, 11 Feb 2021 10:00:00 +0100</pubDate>
+      
+      <guid>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</guid>
+      <description>&lt;p&gt;Ce post se veut une mise à jour du &lt;a href=&#34;https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/&#34;&gt;post précédent&lt;/a&gt; sur le sujet. En
+effet, le module SELinux, les commandes utilisées ont évolué avec
+l&amp;rsquo;adoption de systemd. Les principes restent les mêmes.&lt;/p&gt;
+&lt;p&gt;Pour confiner une instance PostgreSQL avec SELinux, il faut configurer
+plusieurs éléments :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Les « file contexts » : les binaires et les données doivent avoir le
+bon type dans la famille des contexts PostgreSQL. Cela se fait avec
+des regexp et la commande &lt;code&gt;semanage fcontext&lt;/code&gt; en local ou par un
+module SELinux.&lt;/p&gt;
+&lt;p&gt;Par exemple pour créer une instance dans &lt;code&gt;/srv/pgsql&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage fcontext -a -t postgresql_db_t /srv/pgsql(/.*)?
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;On ajoutera des règles similaires pour les tablespaces.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;le port TCP : dans la politique par défaut du système le port 5432
+est bien taggué, pour faire écouter PostgreSQL sur un autre port, il
+ne doit pas être taggué avec un autre type SElinux et explicitement
+taggué avec le type &lt;code&gt;postgresql_port_t&lt;/code&gt; avec la commande &lt;code&gt;semanage port&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Par exemple pour faire écouter l&amp;rsquo;instance sur le port 5433 :&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage port -a -p tcp -t postgresql_port_t 5433
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;activer des « boolean » SELinux : par exemple pour autoriser
+l&amp;rsquo;utilisation de &lt;code&gt;rsync&lt;/code&gt; par un processus PostgreSQL confiné, utile
+pour l&amp;rsquo;archivage des WAL.&lt;/p&gt;
+&lt;p&gt;Par exemple :&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage boolean -m --on postgresql_can_rsync
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le module &lt;code&gt;postgresql-pgdg&lt;/code&gt; disponible ici :
+&lt;a href=&#34;https://github.com/dalibo/selinux-pgsql-pgdg&#34;&gt;https://github.com/dalibo/selinux-pgsql-pgdg&lt;/a&gt; fournit des file
+contexts et boolean pour cela.&lt;/p&gt;
+&lt;p&gt;Ensuite, il y a deux moyens pour confiner &lt;em&gt;vraiment&lt;/em&gt; l&amp;rsquo;instance :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Lancer le postmaster avec systemd&lt;/li&gt;
+&lt;li&gt;Lancer &lt;code&gt;pg_ctl&lt;/code&gt; avec &lt;code&gt;runcon&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Avec systemd, c&amp;rsquo;est automatique, mais il faut être root ou avoir
+l&amp;rsquo;autorisation de le faire avec sudo.&lt;/p&gt;
+&lt;p&gt;Avec &lt;code&gt;pg_ctl&lt;/code&gt;, c&amp;rsquo;est un peu plus délicat. Avec la politique par
+défaut, on a le plus souvent un shell de l&amp;rsquo;utilisateur &lt;code&gt;postgres&lt;/code&gt; non
+confiné, donc avec l&amp;rsquo;user SELinux &lt;code&gt;unconfiend_u&lt;/code&gt;. Cet user SELinux a
+les roles &lt;code&gt;system_r&lt;/code&gt; et &lt;code&gt;unconfined_r&lt;/code&gt;, il peut donc exécuter des
+process avec le role &lt;code&gt;system_r&lt;/code&gt; (voir la sortie &lt;code&gt;semanage user -l&lt;/code&gt;). Cela permet d&amp;rsquo;utiliser &lt;code&gt;runcon&lt;/code&gt; pour exécuter &lt;code&gt;pg_ctl&lt;/code&gt; dans le
+même context que celui utilisé par systemd pour confiner PostgreSQL :&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;$ runcon system_u:system_r:postgresql_t:s0 pg_ctl -D /srv/pgsql/12/main start
+$ ps xfZ
+LABEL                             PID TTY      STAT   TIME COMMAND
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 1317 pts/0 S   0:00 -bash
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 1334 pts/0 R+   0:00  \_ ps xfZ
+system_u:system_r:postgresql_t:s0 1144 ?       Ss     0:00 /usr/pgsql-12/bin/postgres -D /srv/pgsql/12/main
+system_u:system_r:postgresql_t:s0 1176 ?       Ss     0:00  \_ postgres: main: logger
+system_u:system_r:postgresql_t:s0 1178 ?       Ss     0:00  \_ postgres: main: checkpointer
+system_u:system_r:postgresql_t:s0 1179 ?       Ss     0:00  \_ postgres: main: background writer
+system_u:system_r:postgresql_t:s0 1180 ?       Ss     0:00  \_ postgres: main: walwriter
+system_u:system_r:postgresql_t:s0 1181 ?       Ss     0:00  \_ postgres: main: autovacuum launcher
+system_u:system_r:postgresql_t:s0 1182 ?       Ss     0:00  \_ postgres: main: archiver   last was 00000001000000000
+system_u:system_r:postgresql_t:s0 1183 ?       Ss     0:00  \_ postgres: main: stats collector
+system_u:system_r:postgresql_t:s0 1184 ?       Ss     0:00  \_ postgres: main: logical replication launcher
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Enfin, la sauvegarde, du fait que l&amp;rsquo;archivage soit exécuté par
+l&amp;rsquo;instance, est impactée par SELinux. En plus des droits unix
+classiques, le context &lt;code&gt;postgresql_t&lt;/code&gt; doit pouvoir écrire dans le
+répertoire d&amp;rsquo;archivage s&amp;rsquo;il est local. Il faut donc que ce répertoire
+ait le contexte &lt;code&gt;postgresql_db_t&lt;/code&gt;. Ce n&amp;rsquo;est pas forcément suffisant si
+le répertoire de stockage des WAL archivés est dans un point de
+montage réseau. Il existe pour cela les booléens :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;postgresql_pgdg_use_nfs&lt;/code&gt; pour les montages NFS&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;postgresql_pgdg_use_fusefs&lt;/code&gt; pour les montages plus exotiques utilisant FUSE&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le paquet RPM pour RHEL/CentOS est disponible dans le dépot
+&lt;a href=&#34;https://yum.dalibo.org/labs/&#34;&gt;https://yum.dalibo.org/labs/&lt;/a&gt;, sous le nom
+&lt;code&gt;selinux-policy-pgsql-pgdg&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Confiner PostgreSQL avec SELinux</title>
@@ -19,7 +102,8 @@
       <guid>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</guid>
       <description>&lt;style type=&#34;text/css&#34;&gt;.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:#444;background:#e7f2fa}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:#fff;background:#6ab0de}.notice.warning .notice-title{background:rgba(217,83,79,.9)}.notice.warning{background:#fae2e2}.notice.info .notice-title{background:#f0b37e}.notice.info{background:#fff2db}.notice.note .notice-title{background:#6ab0de}.notice.note{background:#e7f2fA}.notice.tip .notice-title{background:rgba(92,184,92,.8)}.notice.tip{background:#e6f9e6}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:0.125em;position:relative}&lt;/style&gt;
 &lt;svg width=&#34;0&#34; height=&#34;0&#34; display=&#34;none&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;&lt;symbol id=&#34;tip-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;note-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;warning-notice&#34; viewBox=&#34;0 0 576 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z&#34;/&gt;&lt;/symbol&gt;&lt;symbol id=&#34;info-notice&#34; viewBox=&#34;0 0 512 512&#34; preserveAspectRatio=&#34;xMidYMid meet&#34;&gt;&lt;path d=&#34;M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z&#34;/&gt;&lt;/symbol&gt;&lt;/svg&gt;&lt;div class=&#34;notice note&#34; &gt;
-&lt;p class=&#34;first notice-title&#34;&gt;&lt;span class=&#34;icon-notice baseline&#34;&gt;&lt;svg&gt;&lt;use href=&#34;#note-notice&#34;&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/span&gt;Remarque&lt;/p&gt;&lt;p&gt;Ce post est partiellement obsolète, avec le passage à systemd.&lt;/p&gt;&lt;/div&gt;
+&lt;p class=&#34;first notice-title&#34;&gt;&lt;span class=&#34;icon-notice baseline&#34;&gt;&lt;svg&gt;&lt;use href=&#34;#note-notice&#34;&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/span&gt;Remarque&lt;/p&gt;&lt;p&gt;Ce post est partiellement obsolète, avec le passage
+à systemd. Voir la &lt;a href=&#34;https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/&#34;&gt;mise à jour&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;
 
 &lt;p&gt;J&amp;rsquo;avais déjà expérimenté un peu avec SELinux il y a deux ans sans
 aller trop loin, parce que j&amp;rsquo;entendais souvent la phrase &amp;ldquo;Si on veut
