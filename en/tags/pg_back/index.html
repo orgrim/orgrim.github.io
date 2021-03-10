@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 
-<html lang="fr" data-theme="">
+<html lang="en" data-theme="">
 <head>
     
         
@@ -10,9 +10,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer-when-downgrade">
 
-<title>pkgin adventures - bien générer son pkg_summary - code. grind. sleep.</title>
+<title>pg_back - code. grind. sleep.</title>
 <meta name="description" content="">
 
+<link rel="alternate" type="application/rss+xml" href="https://www.orgrim.net/en/tags/pg_back/index.xml" title="code. grind. sleep." />
 <link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
 <link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
 
@@ -60,21 +61,15 @@
 
 
 
-<meta property="og:title" content="pkgin adventures - bien générer son pkg_summary" />
-<meta property="og:description" content="Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots pkg_comp pour
-tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
-pkgin pour la gestion de mes paquets une fois préparés dans le chroot." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2011-03-12T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2011-03-12T00:00:00&#43;00:00" />
+<meta property="og:title" content="pg_back" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.orgrim.net/en/tags/pg_back/" />
 
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="pkgin adventures - bien générer son pkg_summary"/>
-<meta name="twitter:description" content="Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots pkg_comp pour
-tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
-pkgin pour la gestion de mes paquets une fois préparés dans le chroot."/>
+<meta name="twitter:title" content="pg_back"/>
+<meta name="twitter:description" content=""/>
 
 
 
@@ -87,22 +82,22 @@ pkgin pour la gestion de mes paquets une fois préparés dans le chroot."/>
     
 </head>
 <body>
-    <a class="skip-main" href="#main">Aller au contenu</a>
+    <a class="skip-main" href="#main">Skip to main content</a>
     <div class="container">
         <header class="common-header"> 
             
                 <h1 class="site-title">
-    <a href="/">code. grind. sleep.</a>
+    <a href="/en">code. grind. sleep.</a>
 </h1>
 
     <nav>
         
         
-        <a class="" href="https://www.orgrim.net/post" title="">Blog</a>
+        <a class="" href="https://www.orgrim.net/en/post" title="">Blog</a>
         
-        <a class="" href="https://www.orgrim.net/categories" title="">Categories</a>
+        <a class="" href="https://www.orgrim.net/en/categories" title="">Categories</a>
         
-        <a class="" href="https://www.orgrim.net/tags" title="">Tags</a>
+        <a class="" href="https://www.orgrim.net/en/tags" title="">Tags</a>
         
     </nav>
 
@@ -111,77 +106,64 @@ pkgin pour la gestion de mes paquets une fois préparés dans le chroot."/>
         </header>
         <main id="main" tabindex="-1"> 
             
+    <h1>Tag: pg_back</h1>
+    <div class="post-info">
+        <a href="https://www.orgrim.net/en/tags">To all tags</a>
+    </div>
+    
+        <article class="post-list">
+    <header class="post-header">
+        <h1 class="post-title"><a href="/en/post/2021-03-10-how-go-helped-for-the-rewrite-of-pg_back/">How Go helped for the rewrite of pg_back</a></h1>
+    </header>
+
+    <div class="content post-summary">
+        <p>When I started developping <a href="https://github.com/orgrim/pg_back">pg_back</a>, I
+wanted to keep it a simple as possible, by limiting its features. It also
+limited contributions, and at some point by accepting some useful
+contributions, the script grew and became not so simple. We could go on with
+the shell script and try to carefully control its growth, but it will sooner or
+later reach some limits of shell scripting.</p>
+<p>After some time without making it evolve, I got interested in the Go
+programming language. It appeared that pg_back could be a good candidate projet
+to let me learn Go. This is why pg_back version 2 is written in Go.</p>
+    </div>
     
     
-    <article class="post">
-        <header class="post-header">
-            <h1 class="post-title">pkgin adventures - bien générer son pkg_summary</h1>
-        </header>
-        <div class="content">
-            <p>Comme indiqué dans d&rsquo;autres posts, j&rsquo;abuse des chroots <code>pkg_comp</code> pour
-tenir mes paquets à jour. Je suis récemment passé à l&rsquo;utilisation de
-<code>pkgin</code> pour la gestion de mes paquets une fois préparés dans le chroot.</p>
-<p><code>pkgin</code> se base sur <code>pkg_summary</code> pour connaître toutes les informations
-des paquets, nécessaires à sa popotte. Il y a plusieurs façons de créer
-un fichier <code>pkg_summary</code> à donner à <code>pkgin</code>, mais seule une façon
-fonctionne correctement :</p>
-<p>​1. On génère le fichier à partir des paquets déjà installés :</p>
-<pre><code># pkg_info -a -X | bzip2 &gt; pkg_summary.bz2
-</code></pre>
-<p>​2. On génère le fichier à partir des tarballs présentes dans
-<code>/usr/pkgsrc/packages/All</code> :</p>
-<pre><code># cd /usr/pkgsrc/packages/All
-# pkg_info -X *.tgz | bzip2 &gt; pkg_summary.bz2
-</code></pre>
-<p>La méthode 1 n&rsquo;est pas valable car l&rsquo;information sur les tarballs
-manque. Ainsi, <code>pkgin</code> considère les tailles de tarball à 0 comme
-valables, ce qui arrive lorsqu&rsquo;un dépôt est injoignable : le fetch
-laisse un fichier vide dans le cache que <code>pkgin</code> considère comme
-correct.</p>
-<p>Il faut donc utiliser la méthode 2 pour fournir l&rsquo;information correcte à
-<code>pkgin</code>.</p>
-<p>Pour conclure, l&rsquo;investigation autour de ce souci, a permis aux
-développeurs du projet d&rsquo;ajouter :</p>
-<ul>
-<li>Un mode verbose pour avoir plein d&rsquo;informations utiles</li>
-<li>Un message d&rsquo;avertissement lorsque <code>pkgin</code> rencontre un paquet à
-avec une taille à 0</li>
-</ul>
-        </div>
-        
+    
 
     
 
 
 <div class="post-info">
     
-        <div class="post-date">2011-03-12</div>
+        <div class="post-date">2021-03-10</div>
     
     <div class="post-taxonomies">
         
             <ul class="post-categories">
                 
-                    <li><a href="https://www.orgrim.net/categories/">NetBSD</a></li>
+                    <li><a href="https://www.orgrim.net/en/categories/">Code</a></li>
                 
             </ul>
             
             
                 <ul class="post-tags">
                     
-                        <li><a href="https://www.orgrim.net/tags/netbsd">#netbsd</a></li>
+                        <li><a href="https://www.orgrim.net/en/tags/go">#go</a></li>
                     
-                        <li><a href="https://www.orgrim.net/tags/pkgin">#pkgin</a></li>
+                        <li><a href="https://www.orgrim.net/en/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/en/tags/pg_back">#pg_back</a></li>
                     
                 </ul>
         
     </div>
 </div>
 
-    </article>
-
+</article>
+    
     
 
-    
 
 
         </main>
@@ -211,7 +193,7 @@ avec une taille à 0</li>
         
         <div class="copyright">
             <p>© Nicolas Thauvin, 2021<br>
-            Propulsé par <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, thème <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            Powered by <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, theme <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
             </p>  
         </div> 
 
@@ -222,7 +204,7 @@ avec une taille à 0</li>
 
 
     <button class="theme-switcher">
-        Thème sombre
+        Dark theme
     </button>
 
     <script>
@@ -271,7 +253,7 @@ avec une taille à 0</li>
 
     function changeButtonText()
     {   
-        switchButton.textContent = currentTheme == 'dark' ?  "Thème clair" : "Thème sombre"
+        switchButton.textContent = currentTheme == 'dark' ?  "Light theme" : "Dark theme"
     }
 
     function switchTheme(e) {

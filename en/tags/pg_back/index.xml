@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>code. grind. sleep.</title>
-    <link>https://www.orgrim.net/en/</link>
-    <description>code. grind. sleep.</description>
+    <title>pg_back on code. grind. sleep.</title>
+    <link>https://www.orgrim.net/en/tags/pg_back/</link>
+    <description>code. grind. sleep. (pg_back)</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Wed, 10 Mar 2021 22:00:00 +0100</lastBuildDate>
     
-    <atom:link href="https://www.orgrim.net/en/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://www.orgrim.net/en/tags/pg_back/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -176,127 +176,6 @@ code without &lt;code&gt;embed&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;In conclusion, rewriting pg_back in a proper programming language with a rich
 standard library and ecosystem was great. I enjoyed doing it with Go and it
 convinced me that Go is programming language worth learning.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Install Go</title>
-      <link>https://www.orgrim.net/en/post/2021-01-20-install-go/</link>
-      <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
-      
-      <guid>https://www.orgrim.net/en/post/2021-01-20-install-go/</guid>
-      <description>&lt;p&gt;The Go language has been around for quite some time and one finds
-more and more programs written in Go. The Go compiler and tools can be
-installed using the packages of the Linux distribution, but the
-easiest way to have the latest version is to use the official compiled
-tools.&lt;/p&gt;
-&lt;p&gt;The version of the &lt;code&gt;golang-go&lt;/code&gt; package in Debian stable, 1.11, is too
-old, so I installed the official binaries this way.&lt;/p&gt;
-&lt;p&gt;Go to &lt;a href=&#34;https://golang.org/dl/&#34;&gt;https://golang.org/dl/&lt;/a&gt; to find out what is the lastest
-version. Here, we&amp;rsquo;ll be using 1.15.7.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/install
-$ cd ~/install
-$ wget https://golang.org/dl/go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Copy the checksum in &lt;code&gt;go1.15.7.linux-amd64.tar.gz.sha256&lt;/code&gt; as
-&lt;code&gt;sha256sum&lt;/code&gt; excepts it for checking:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;0d142143794721bb63ce6c8a6180c4062bcf8ef4715e7d6d6609f3a8282629b3  go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Check the sum:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sha256sum -c go1.15.7.linux-amd64.tar.gz.sha256
-go1.15.7.linux-amd64.tar.gz: OK
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Prepare the installation directory:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ cd /usr/local/
-$ sudo rm -f go
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Extract the tarball:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sudo tar xf ~/install/go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Rename the directory to add the version number and create a symbolic
-link:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sudo mv go go1.15.7
-$ sudo ln -s go1.15.7 go
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Update the PATH in &lt;code&gt;~/.bashrc&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
-export PATH
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Source it and check the version:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ . ~/.bashrc
-$ go version
-go version go1.15.7 linux/amd64
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The older versions can be purged from &lt;code&gt;/usr/local&lt;/code&gt; or we can go back to
-a previous version by updating the symbolic link.&lt;/p&gt;
-&lt;p&gt;The defaut environment configuration of Go is used to let &lt;code&gt;go get&lt;/code&gt; and
-others install binaires and modules into &lt;code&gt;~/go&lt;/code&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Development environment for Patroni</title>
-      <link>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</link>
-      <pubDate>Fri, 04 Dec 2020 21:23:32 +0100</pubDate>
-      
-      <guid>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</guid>
-      <description>&lt;p&gt;Recently I found a missing feature in Patroni, a high availability
-solution for PostgreSQL written in Python.&lt;/p&gt;
-&lt;p&gt;Since I am doing more Python at work these days, I quickly made a
-patch. Before jumping on git push, I thought it would be nice to test
-if is really solves the issue. I needed a Patroni cluster, some
-configuration is provided and commands in the README, which is great
-but the instruction are not targetted toward development.&lt;/p&gt;
-&lt;p&gt;So let&amp;rsquo;s use what we learnt from developing some Python at work.&lt;/p&gt;
-&lt;p&gt;First, we need a clone of the git repository, obviously:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev
-git clone https://github.com/zalando/patroni.git
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then we need some virtualenv, Python 3 comes with it built in (package
-&lt;code&gt;python3-venv&lt;/code&gt; in Debian):&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd patroni
-python3 -m venv .venv
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;It can be excluded from the sight of git by editing &lt;code&gt;.git/info/exclude&lt;/code&gt; along with our local data:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;echo .venv/ &amp;gt;&amp;gt; .git/info/exclude
-echo data/ &amp;gt;&amp;gt; .git/info/exclude
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The easiest way to avoid mistakes is the activate the virtualenv:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;source .venv/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then install patroni inside:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pip3 install -r requirements.txt
-pip3 install -r requirements.dev.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If it failed, you may lack a compiler or some development headers. It
-looks like it needs the usual packages for Python and PostgreSQL :
-&lt;code&gt;build-essential&lt;/code&gt;, &lt;code&gt;postgresql-server-dev-13&lt;/code&gt;, and &lt;code&gt;python3-dev&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;requirements.dev.txt&lt;/code&gt; file contains a &lt;code&gt;pytest&lt;/code&gt; line, are there
-tests? Yes! in the &lt;code&gt;tests/&lt;/code&gt; subdirectory. Let&amp;rsquo;s run them:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pytest tests
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If it work, thing looks good. Let&amp;rsquo;s install patroni inside the virtualenv:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pip3 install -e .
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Finally, we need etcd, the packages from Debian do the job:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;sudo apt-get install etcd-client etcd-server
-systemctl disable --now etcd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now we can run the cluster provided.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Console 1:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-etcd --data-dir=data/etcd --enable-v2=true
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;Console 2, ensure no other Postgres instance is using TCP port 5432:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-export PATH=/usr/lib/postgresql/13/bin:$PATH
-patroni postgres0.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;Console 3:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-export PATH=/usr/lib/postgresql/13/bin:$PATH
-patroni postgres1.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Patroni bootstrap Postgres instances and creates a replica. We can use
-&lt;code&gt;patronictl&lt;/code&gt; in the virtualenv to have a look:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-patronictl -c postgres0.yml list
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Which should output something like that:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;+ Cluster: batman (6902504757986008432) -+---------+----+-----------+
-| Member      | Host           | Role    | State   | TL | Lag in MB |
-+-------------+----------------+---------+---------+----+-----------+
-| postgresql0 | 127.0.0.1:5432 | Leader  | running |  1 |           |
-| postgresql1 | 127.0.0.1:5433 | Replica | running |  1 |         0 |
-+-------------+----------------+---------+---------+----+-----------+
-&lt;/code&gt;&lt;/pre&gt;</description>
     </item>
     
   </channel>

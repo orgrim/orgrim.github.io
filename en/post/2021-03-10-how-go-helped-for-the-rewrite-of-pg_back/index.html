@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>How Go helped for the rewrite of pg_back - code. grind. sleep.</title>
+<meta name="description" content="">
+
+<link rel="icon" type="image/x-icon" href="https://www.orgrim.net/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://www.orgrim.net/favicon.png">
+
+
+
+    
+
+
+
+
+
+    
+    
+    
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/style.6155b6d8eded05b985178f56a637943b3e7fcfccc913d9c656bbebce7c91cc6b.css" integrity="sha256-YVW22O3tBbmFF49WpjeUOz5/z8zJE9nGVrvrznyRzGs=">
+    
+
+
+
+
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/custom.css?rnd=1615410971">
+    
+
+
+    
+
+
+
+
+
+    
+        <link rel="stylesheet" href="https://www.orgrim.net/css/syntax.css?rnd=1615410971">
+    
+
+
+
+
+<meta property="og:title" content="How Go helped for the rewrite of pg_back" />
+<meta property="og:description" content="When I started developping pg_back, I
+wanted to keep it a simple as possible, by limiting its features. It also
+limited contributions, and at some point by accepting some useful
+contributions, the script grew and became not so simple. We could go on with
+the shell script and try to carefully control its growth, but it will sooner or
+later reach some limits of shell scripting.
+After some time without making it evolve, I got interested in the Go
+programming language. It appeared that pg_back could be a good candidate projet
+to let me learn Go. This is why pg_back version 2 is written in Go." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.orgrim.net/en/post/2021-03-10-how-go-helped-for-the-rewrite-of-pg_back/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-03-10T22:00:00&#43;01:00" />
+<meta property="article:modified_time" content="2021-03-10T22:00:00&#43;01:00" />
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How Go helped for the rewrite of pg_back"/>
+<meta name="twitter:description" content="When I started developping pg_back, I
+wanted to keep it a simple as possible, by limiting its features. It also
+limited contributions, and at some point by accepting some useful
+contributions, the script grew and became not so simple. We could go on with
+the shell script and try to carefully control its growth, but it will sooner or
+later reach some limits of shell scripting.
+After some time without making it evolve, I got interested in the Go
+programming language. It appeared that pg_back could be a good candidate projet
+to let me learn Go. This is why pg_back version 2 is written in Go."/>
+
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Skip to main content</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/en">code. grind. sleep.</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://www.orgrim.net/en/post" title="">Blog</a>
+        
+        <a class="" href="https://www.orgrim.net/en/categories" title="">Categories</a>
+        
+        <a class="" href="https://www.orgrim.net/en/tags" title="">Tags</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">How Go helped for the rewrite of pg_back</h1>
+        </header>
+        <div class="content">
+            <p>When I started developping <a href="https://github.com/orgrim/pg_back">pg_back</a>, I
+wanted to keep it a simple as possible, by limiting its features. It also
+limited contributions, and at some point by accepting some useful
+contributions, the script grew and became not so simple. We could go on with
+the shell script and try to carefully control its growth, but it will sooner or
+later reach some limits of shell scripting.</p>
+<p>After some time without making it evolve, I got interested in the Go
+programming language. It appeared that pg_back could be a good candidate projet
+to let me learn Go. This is why pg_back version 2 is written in Go.</p>
+<p>Go can do better than shell scripting, like many languages, but one helpful
+feature of Go is that it produces static binaries. This make it even easier to
+install than the shell script, because <code>pg_back</code> no longer has any external
+dependencies, apart from <code>pg_dump</code> and <code>pg_dumpall</code>. When one does not have
+root privileges, it make it possible be deploy the binary file by dropping it
+somewhere like one would do for a shell script.</p>
+<p>About the rewrite, getting rid of dependencies on external command is
+great. For example, the syntax of Go being close to C, it was quite easy to
+port <code>pg_dumpacl</code> and integrate it directly in pg_back. It is now just two
+function <code>dumpCreateDBAndACL()</code> and <code>makeACLCommands()</code> in
+<a href="https://github.com/orgrim/pg_back/blob/master/sql.go">sql.go</a>.</p>
+<p>Continuing on external commands, pg_back now connects to PostgreSQL without
+using <code>psql</code>, with the native <code>database/sql</code> API. The standard library is
+pretty rich, it allowed the use standard Go APIs for checksums, file locking,
+logging, etc. Only 4 external modules are required, plus one for unit tests:</p>
+<ul>
+<li><code>gopkg.in/ini.v1</code> for the configuration file</li>
+<li><code>github.com/spf13/pflag</code> for POSIX command line options</li>
+<li><code>github.com/lib/pq</code> to access PostgreSQL</li>
+<li><code>github.com/anmitsu/go-shlex</code> to parse shell commands (mostly hooks)</li>
+</ul>
+<p>The other module is <code>github.com/google/go-cmp</code>, with is useful to compare
+structs in unit tests. Speaking of which, unit tests are native to Go, and it
+was easy to add tests while developping. The difficult part of unit testing is
+related to the replication control functions. Unit testing the replication
+control fonctions is difficult because it requires a more complex setup. We
+need a PostgreSQL instance with a replica.</p>
+<p>This feature is interesting, because I could use some features of Go to
+implement pausing the replication.</p>
+<p>When dumping from a replica, we need to ensure pg_dump won&rsquo;t be stuck on an
+exclusive lock, we must pause the replication replay to avoid pg_dump being
+cancelled and there must not be any exclusive lock granted on an object when
+the replication is paused. Otherwise the exclusive lock is only released when
+replication replay is resumed, making the dump of the object impossible.</p>
+<p>I used a go routine with a <code>time.Ticker</code> to try to pause the replication every
+10 seconds:</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">pauseReplicationWithTimeout</span><span class="p">(</span><span class="nx">db</span> <span class="o">*</span><span class="nx">pg</span><span class="p">,</span> <span class="nx">timeOut</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>    <span class="nx">ticker</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">NewTicker</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+    <span class="nx">done</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+    <span class="nx">stop</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+    <span class="nx">fail</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">error</span><span class="p">)</span>
+
+    <span class="nx">l</span><span class="p">.</span><span class="nf">Infoln</span><span class="p">(</span><span class="s">&#34;pausing replication&#34;</span><span class="p">)</span>
+
+    <span class="c1">// We want to retry pausing replication at a defined interval
+</span><span class="c1"></span>    <span class="c1">// but not forever. We cannot put the timeout in the same
+</span><span class="c1"></span>    <span class="c1">// select as the ticker since the ticker would always win
+</span><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">rerr</span> <span class="o">*</span><span class="nx">pgReplicaHasLocks</span>
+        <span class="k">defer</span> <span class="nx">ticker</span><span class="p">.</span><span class="nf">Stop</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">pauseReplication</span><span class="p">(</span><span class="nx">db</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">As</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">rerr</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">l</span><span class="p">.</span><span class="nf">Warnln</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="nx">fail</span> <span class="o">&lt;-</span> <span class="nx">err</span>
+                    <span class="k">return</span>
+                <span class="p">}</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="nx">done</span> <span class="o">&lt;-</span> <span class="kc">true</span>
+                <span class="k">return</span>
+            <span class="p">}</span>
+
+            <span class="k">select</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">stop</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">C</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}()</span>
+
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>When there is an exclusive lock, a custom error is used to inform the goroutine
+that it must retry:</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">pgReplicaHasLocks</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">pgReplicaHasLocks</span><span class="p">)</span> <span class="nf">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s">&#34;replication not paused because of AccessExclusiveLock&#34;</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">pauseReplication</span><span class="p">(</span><span class="nx">db</span> <span class="o">*</span><span class="nx">pg</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="c1">// ..
+</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">void</span> <span class="o">==</span> <span class="s">&#34;failed&#34;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">pgReplicaHasLocks</span><span class="p">{}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div><p>The main goroutine just wait on some channel until there is a timeout using
+<code>time.After()</code>, replication has been paused or an error occured:</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">    <span class="c1">// ... (After lauching the goroutine)
+</span><span class="c1"></span>
+    <span class="c1">// Return as soon as the replication is paused or stop the
+</span><span class="c1"></span>    <span class="c1">// goroutine if we hit the timeout
+</span><span class="c1"></span>    <span class="k">select</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">done</span><span class="p">:</span>
+        <span class="nx">l</span><span class="p">.</span><span class="nf">Infoln</span><span class="p">(</span><span class="s">&#34;replication paused&#34;</span><span class="p">)</span>
+    <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">timeOut</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">):</span>
+        <span class="nx">stop</span> <span class="o">&lt;-</span> <span class="kc">true</span>
+        <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;replication not paused after %v&#34;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">timeOut</span><span class="p">)</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+    <span class="k">case</span> <span class="nx">err</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">fail</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;%s&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// ...
+</span></code></pre></div><p>See the complete function in <a href="https://github.com/orgrim/pg_back/blob/master/sql.go#L509-L629">sql.go#L509-L629</a>.</p>
+<p>Another use of goroutines was to run <code>pg_dump</code> commands concurrently, in order to dump many
+database at the same time. It uses the worker example from
+<a href="https://gobyexample.com/worker-pools">gobyexample.com</a>, a great ressource for
+beginners, by the way!</p>
+<p>The other problems with shell scripting were about parsing strings, like
+<code>keyword=value</code> connection strings of PostgreSQL
+(<a href="https://github.com/orgrim/pg_back/blob/master/connstring.go">connstring.go</a>). Shell
+scripting is notoriously difficult when it comes to handling strings properly,
+and Go helped a lot. It was happily surprised that the Go implementation of pg_back
+could dump databases with weird characters in their names, like the equal sign,
+spaces, quotes, etc. without a lot of extra work.</p>
+<p>Finally, the embed feature of Go 1.16 is so easy to use that embeding the
+default configuration file, including examples and comments, and adding a
+command line option to print it took a just few lines of code:</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>    <span class="nx">_</span> <span class="s">&#34;embed&#34;</span>
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">)</span>
+
+<span class="c1">//go:embed pg_back.conf
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">defaultCfg</span> <span class="kt">string</span>
+
+<span class="kd">func</span> <span class="nf">parseCli</span><span class="p">(</span><span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>    
+    <span class="nx">pflag</span><span class="p">.</span><span class="nf">BoolVar</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">pce</span><span class="p">.</span><span class="nx">ShowConfig</span><span class="p">,</span> <span class="s">&#34;print-default-config&#34;</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&#34;print the default configuration\n&#34;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nx">pce</span><span class="p">.</span><span class="nx">ShowConfig</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Print</span><span class="p">(</span><span class="nx">defaultCfg</span><span class="p">)</span>
+        <span class="c1">// ...
+</span><span class="c1"></span>    <span class="p">}</span>
+    
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>This will make the feature easier to maintain in the future because it avoids
+duplication, as I would have had to copy the file in a string in the source
+code without <code>embed</code>.</p>
+<p>In conclusion, rewriting pg_back in a proper programming language with a rich
+standard library and ecosystem was great. I enjoyed doing it with Go and it
+convinced me that Go is programming language worth learning.</p>
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2021-03-10</div>
+    
+    <div class="post-taxonomies">
+        
+            <ul class="post-categories">
+                
+                    <li><a href="https://www.orgrim.net/en/categories/">Code</a></li>
+                
+            </ul>
+            
+            
+                <ul class="post-tags">
+                    
+                        <li><a href="https://www.orgrim.net/en/tags/go">#go</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/en/tags/postgresql">#postgresql</a></li>
+                    
+                        <li><a href="https://www.orgrim.net/en/tags/pg_back">#pg_back</a></li>
+                    
+                </ul>
+        
+    </div>
+</div>
+
+    </article>
+
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+        <ul class="language-select">
+
+<li><a href="https://www.orgrim.net/en/">English</a></li>
+
+<li><a href="https://www.orgrim.net/">Français</a></li>
+
+</ul>
+    
+
+    <div class="common-footer-bottom">
+        
+            
+            <ul class="footer-menu">
+            
+            <li><a class="" href="https://twitter.com/orgrim" title="Twitter">@orgrim</a></li>
+            
+            <li><a class="" href="https://github.com/orgrim" title="">github</a></li>
+            
+            </ul>
+        
+        <div class="copyright">
+            <p>© Nicolas Thauvin, 2021<br>
+            Powered by <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, theme <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+
+    <button class="theme-switcher">
+        Dark theme
+    </button>
+
+    <script>
+    const STORAGE_KEY = 'user-color-scheme'
+    const defaultTheme = "dark"
+
+    let currentTheme
+    let switchButton
+    let autoDefinedScheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const autoChangeScheme = e => {
+        currentTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', currentTheme)
+        changeButtonText()
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchButton = document.querySelector('.theme-switcher')
+        currentTheme = detectCurrentScheme()
+        if (currentTheme == 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark')
+        }
+        if (currentTheme == 'auto') {
+            autoChangeScheme(autoDefinedScheme);
+            autoDefinedScheme.addListener(autoChangeScheme);
+        }
+        changeButtonText()
+        switchButton.addEventListener('click', switchTheme, false)
+    })
+
+    function detectCurrentScheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY)
+        } 
+        if (defaultTheme) {
+            return defaultTheme
+        } 
+        if (!window.matchMedia) {
+            return 'light'
+        } 
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+        return 'light'
+    }
+
+    function changeButtonText()
+    {   
+        switchButton.textContent = currentTheme == 'dark' ?  "Light theme" : "Dark theme"
+    }
+
+    function switchTheme(e) {
+        if (currentTheme == 'dark') {
+            localStorage.setItem(STORAGE_KEY, 'light')
+            document.documentElement.setAttribute('data-theme', 'light')
+            currentTheme = 'light'
+        } else {
+            localStorage.setItem(STORAGE_KEY, 'dark')
+            document.documentElement.setAttribute('data-theme', 'dark')
+            currentTheme = 'dark'
+        }
+        changeButtonText()
+    }
+    </script>
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>

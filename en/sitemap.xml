@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://www.orgrim.net/en/categories/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -15,11 +14,9 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/categories/"
                 />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/categories/code/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -30,11 +27,9 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/categories/code/"
                 />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -45,11 +40,9 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/"
                 />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/tags/go/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="fr"
@@ -60,9 +53,62 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/tags/go/"
                 />
-  </url>
-  
-  <url>
+  </url><url>
+    <loc>https://www.orgrim.net/en/post/2021-03-10-how-go-helped-for-the-rewrite-of-pg_back/</loc>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/en/tags/pg_back/</loc>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/pg_back/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/pg_back/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/en/tags/postgresql/</loc>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/postgresql/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/postgresql/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/en/post/</loc>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/post/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/post/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/en/tags/</loc>
+    <lastmod>2021-03-10T22:00:00+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/"
+                />
+  </url><url>
     <loc>https://www.orgrim.net/en/tags/install/</loc>
     <lastmod>2021-01-20T21:58:54+01:00</lastmod>
     <xhtml:link
@@ -75,54 +121,16 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/tags/install/"
                 />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/post/2021-01-20-install-go/</loc>
     <lastmod>2021-01-20T21:58:54+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.orgrim.net/en/post/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/post/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/post/"
-                />
-  </url>
-  
-  <url>
-    <loc>https://www.orgrim.net/en/tags/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/"
-                />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/tags/patroni/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/categories/postgresql/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
     <xhtml:link
@@ -135,26 +143,8 @@
                 hreflang="en"
                 href="https://www.orgrim.net/en/categories/postgresql/"
                 />
-  </url>
-  
-  <url>
-    <loc>https://www.orgrim.net/en/tags/postgresql/</loc>
-    <lastmod>2020-12-04T21:23:32+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/postgresql/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/postgresql/"
-                />
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://www.orgrim.net/en/tags/python/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
   </url>
-  
 </urlset>
