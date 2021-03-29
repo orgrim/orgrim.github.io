@@ -3,117 +3,21 @@
   <channel>
     <title>configuration on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/configuration/</link>
-    <description>code. grind. sleep. (configuration)</description>
+    <description>Recent content in configuration on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Wed, 25 Jan 2012 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/configuration/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Wed, 25 Jan 2012 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/configuration/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Got GUC?</title>
       <link>https://www.orgrim.net/post/2012-01-25-got-guc/</link>
       <pubDate>Wed, 25 Jan 2012 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2012-01-25-got-guc/</guid>
-      <description>&lt;p&gt;Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui
-signifie Grand Unified Configuration, c&amp;rsquo;est le nom de la partie du code
-qui gère les paramètres de configuration. En gros, ce sont tous les
-paramètres du fichier &lt;code&gt;postgresql.conf&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Ce qui est moins connu et utilisé, c&amp;rsquo;est la possibilité de configurer
-ces paramètres à différents niveaux :&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Fichier &lt;code&gt;postgresql.conf&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Ligne de commande du postmaster, le processus principal du serveur&lt;/li&gt;
-&lt;li&gt;Base de données&lt;/li&gt;
-&lt;li&gt;Rôle&lt;/li&gt;
-&lt;li&gt;Rôle sur une base de données&lt;/li&gt;
-&lt;li&gt;Session&lt;/li&gt;
-&lt;li&gt;Transaction&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;La précédence des valeurs va en descendant dans la liste, par exemple la
-valeur d&amp;rsquo;un paramètre au niveau d&amp;rsquo;un rôle écrase celle positionnée au
-niveau de la base de donnée ou la ligne de commande. Ce comportement est
-très intéressant pour définir une valeur d&amp;rsquo;un paramètre dépendante du
-contexte d&amp;rsquo;exécution d&amp;rsquo;un traitement. Par exemple on peut placer un
-timeout des requêtes au niveau de la base pour éviter qu&amp;rsquo;une application
-ne jette l&amp;rsquo;éponge avant PostgreSQL, et configurer l&amp;rsquo;absence de timeout
-pour un rôle dédié aux opérations de VACUUM et ANALYSE, on limite ainsi
-l&amp;rsquo;effet de bord du timeout :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;c1&#34;&gt;-- timeout à 30 secondes sur la base de données
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DATABASE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mabase&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;statement_timeout&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;30000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;-- pas de timeout pour le role maintenance chargé du vacuum
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;maintenance&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;statement_timeout&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Selon l&amp;rsquo;endroit où doit être positionné la valeur on utilise :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;postgresql.conf&lt;/code&gt; : directement dans le fichier&lt;/li&gt;
-&lt;li&gt;ligne de commande : dans le script d&amp;rsquo;init avec l&amp;rsquo;option &lt;code&gt;-c&lt;/code&gt; et à
-l&amp;rsquo;exécution de &lt;code&gt;pg_ctl&lt;/code&gt; avec l&amp;rsquo;option &lt;code&gt;-o&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;base de données : &lt;code&gt;ALTER DATABASE nom_base SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;rôle : &lt;code&gt;ALTER ROLE nom_role SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;rôle dans une base de données : &lt;code&gt;ALTER ROLE nom_role IN DATABASE nom_base SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;session : &lt;code&gt;SET [ SESSION ] param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;transaction : &lt;code&gt;SET LOCAL param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Pour le passage des valeurs au niveau SQL, on peut utiliser
-&lt;code&gt;RESET param&lt;/code&gt; à la place de &lt;code&gt;SET param TO&lt;/code&gt; pour réinitialiser la
-valeur à son défaut pour le contexte choisi.&lt;/p&gt;
-&lt;p&gt;Pour les paramètres au niveau des bases de données et des rôle, ces
-informations sont stockées dans la table du catalogue système
-&lt;code&gt;pg_catalog.pg_db_role_setting&lt;/code&gt;. La commande psql &lt;code&gt;\drds&lt;/code&gt;permet de
-facilement afficher son contenu.&lt;/p&gt;
-&lt;p&gt;On peut également définir des paramètres personnalisés, comme le font
-certaines extensions. Pour cela il faut définir une classe de variables
-personnalisée, en déclarant un préfixe (on en sépare plusieurs par des
-virgules) dans le paramètre de configuration &lt;code&gt;custom_variable_classes&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;custom_variable_classes = &#39;nico&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, on peut directement ajouter nos variables personnalisées en les
-préfixant par &lt;code&gt;nico.&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;nico.test_guc = 1000
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut alors manipuler ces variables comme ceci :&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc&#34;&gt;{% highlight psql %}
-mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;1000
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc-1&#34;&gt;mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;1000
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc-2&#34;&gt;mydb=# SET nico.test_guc = 3;
-SET
-mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;3
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicoreguc&#34;&gt;mydb=# SET nico.reguc = on;
-SET
-mydb=# SHOW nico.reguc;
-nico.reguc&lt;/h2&gt;
-&lt;p&gt;on
-(1 row)&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-Enfin, on peut utiliser les fonctions `current_setting()` et
-`set_config()` pour manipuler ces variables dans des fonctions :
-
-{% highlight psql %}
-mydb=# SELECT set_config(&#39;nico.test_guc&#39;, &#39;100&#39;, false);
- set_config 
-------------
- 100
-(1 row)
-
-mydb=# SELECT current_setting(&#39;nico.test_guc&#39;);
- current_setting 
------------------
- 100
-(1 row)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;PS: merci à &lt;a href=&#34;http://momjian.us/main/blogs/pgblog/2011.html#December_1_2011&#34;&gt;ce post&lt;/a&gt; pour l&amp;rsquo;idée de creuser le sujet.&lt;/p&gt;
-</description>
+      <description>Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&amp;rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&amp;rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&amp;rsquo;un paramètre au niveau d&amp;rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande.</description>
     </item>
     
   </channel>

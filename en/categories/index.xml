@@ -3,13 +3,30 @@
   <channel>
     <title>Categories on code. grind. sleep.</title>
     <link>https://www.orgrim.net/en/categories/</link>
-    <description>code. grind. sleep. (Categories)</description>
+    <description>Recent content in Categories on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 10 Mar 2021 22:00:00 +0100</lastBuildDate>
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Wed, 10 Mar 2021 22:00:00 +0100</lastBuildDate><atom:link href="https://www.orgrim.net/en/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Code</title>
+      <link>https://www.orgrim.net/en/categories/code/</link>
+      <pubDate>Wed, 10 Mar 2021 22:00:00 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/en/categories/code/</guid>
+      <description></description>
+    </item>
     
-    <atom:link href="https://www.orgrim.net/en/categories/index.xml" rel="self" type="application/rss+xml" />
-    
+    <item>
+      <title>PostgreSQL</title>
+      <link>https://www.orgrim.net/en/categories/postgresql/</link>
+      <pubDate>Fri, 04 Dec 2020 21:23:32 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/en/categories/postgresql/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

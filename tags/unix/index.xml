@@ -3,269 +3,65 @@
   <channel>
     <title>unix on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/unix/</link>
-    <description>code. grind. sleep. (unix)</description>
+    <description>Recent content in unix on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Tue, 28 Jul 2020 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/unix/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Tue, 28 Jul 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/unix/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Memento Cloud Init</title>
       <link>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</link>
       <pubDate>Tue, 28 Jul 2020 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</guid>
-      <description>&lt;p&gt;Cloud Init permet de configurer des machines virtuelles au boot, en utilissant des méta données provenant de la plateforme ou tourne la VM (AWS, Azure, GCP, KVM Local, etc). Pour une installation sur KVM avec libvirt, il faut utiliser le module NoCloud :&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Installer le système dans un KVM, avec &lt;code&gt;virt-manager&lt;/code&gt; et une image ISO&lt;/li&gt;
-&lt;li&gt;Installer le paquet &lt;code&gt;cloud-init&lt;/code&gt; (et le paquet &lt;code&gt;sudo&lt;/code&gt; pour que le reste fonctionne)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# yum install cloud-init sudo
-&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;3&#34;&gt;
-&lt;li&gt;Eteindre la VM&lt;/li&gt;
-&lt;li&gt;Créer un répertoire de travail et s&amp;rsquo;y déplacer&lt;/li&gt;
-&lt;li&gt;Créer les 3 fichiers :&lt;/li&gt;
-&lt;/ol&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;user-data&lt;/code&gt; : contient la configuration pour ajouter son user, sa clé SSH, configurer sudo, configurer le mot de passe &lt;code&gt;root&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;meta-data&lt;/code&gt; : contient la configuration de la machine, le hostname, etc&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;network-config&lt;/code&gt; : contient la configuration du réseau&lt;/li&gt;
-&lt;/ul&gt;
-&lt;ol start=&#34;6&#34;&gt;
-&lt;li&gt;Créer l&amp;rsquo;image ISO :&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;$ genisoimage -output cloudinit_la_vm.iso -volid cidata -joliet -rock user-data meta-data network-config
-&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;7&#34;&gt;
-&lt;li&gt;Attacher l&amp;rsquo;image ISO&lt;/li&gt;
-&lt;li&gt;Démarrer la VM&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Voici les fichiers à placer dans l&amp;rsquo;image ISO pour avoir le minimum pour finir la configuration de la VM avec Ansible ou autre par la suite :&lt;/p&gt;
-&lt;p&gt;Fichier &lt;code&gt;user-data&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;c&#34;&gt;#cloud-config&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# vim: syntax=yaml&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# https://cloudinit.readthedocs.io/en/latest/topics/examples.html&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;chpasswd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;&lt;span class=&#34;sd&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;sd&#34;&gt;     &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;     &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;root&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Un mot de passe complexe&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# Change me&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;expire&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;False&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;users&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;- &lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;orgrim&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# Change me&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;ssh_authorized_keys&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;ssh-rsa AA...= orgrim@hw&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;sudo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;ALL=(ALL) NOPASSWD:ALL&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;shell&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;/bin/bash&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;groups&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;users&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Fichier &lt;code&gt;meta-data&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;nt&#34;&gt;local-hostname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;centos77.vz.lo&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Fichier &lt;code&gt;network-config&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;nt&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;ethernets&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;eth0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;match&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;eth0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;addresses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;m&#34;&gt;10.100.0.59&lt;/span&gt;&lt;span class=&#34;l&#34;&gt;/24&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;gateway4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10.100.0.1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;nameservers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;search&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;l&#34;&gt;vz.lo]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;addresses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10.100.0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;La machine est configurée avec le hostname &lt;code&gt;centos77.vz.lo&lt;/code&gt;, son IP, la gateway, le DNS qui vont bien et un user avec accès root et sa clé SSH pour pouvoir utiliser Ansible pour la suite de la configuration.&lt;/p&gt;
-&lt;p&gt;La configuration placée dans l&amp;rsquo;image ISO est appliquée à chaque boot.&lt;/p&gt;
-&lt;p&gt;La documentation : &lt;a href=&#34;https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html&#34;&gt;https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html&lt;/a&gt;&lt;/p&gt;</description>
+      <description>Utiliser simplemant Cloud Init avec libvirt</description>
     </item>
     
     <item>
       <title>Configuration réseau pour virtualiser chez OVH</title>
       <link>https://www.orgrim.net/post/2011-07-04-configuration-reseau-pour-virtualiser-chez-ovh/</link>
       <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-07-04-configuration-reseau-pour-virtualiser-chez-ovh/</guid>
-      <description>&lt;p&gt;Sur mon serveur chez OVH, j&amp;rsquo;ai un ensemble de machines virtuelles KVM et
-(bientôt) de conteneurs LXC. Pour fournir du réseau à tout ce petit
-monde, j&amp;rsquo;utilise de l&amp;rsquo;IPv4 et de l&amp;rsquo;IPv6, voici comment c&amp;rsquo;est configuré.&lt;/p&gt;
-&lt;p&gt;Pour l&amp;rsquo;IPv4, on a un nombre limité d&amp;rsquo;IP publiques parce que ça vaut de
-la thune et que ça va être de plus en tendu de multiplier les adresses,
-il nous faut un réseau privé (beurk), du NAT (rebeurk) et des
-redirections à base d&amp;rsquo;iptables (re-rebeurk). Il nous faut surtout un
-bridge, c&amp;rsquo;est une Debian donc ça se passe dans
-&lt;code&gt;/etc/network/interfaces&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;auto lo
-iface lo inet loopback
-
-auto eth0
-iface eth0 inet manual
-
-auto br0
-iface br0 inet static
-        bridge_ports eth0
-        bridge_fd 0
-        bridge_maxwait 0
-        address 188.165.205.xxx
-        netmask 255.255.255.0
-        network 188.165.205.0
-        broadcast 188.165.205.255
-        gateway 188.165.205.254
-        post-up iptables -t nat -A POSTROUTING -s 10.42.0.0/24 -o br0 -j SNAT --to 188.165.205.xxx
-        pre-down iptables -t nat -D POSTROUTING -s 10.42.0.0/24 -o br0 -j SNAT --to 188.165.205.xxx
-
-iface br0 inet6 static
-        address 2001:41D0:xxxx:96ce::1
-        netmask 64
-
-auto br0:0
-iface br0:0 inet static
-        address 10.42.0.1
-        netmask 255.255.255.0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour le bridge, on met l&amp;rsquo;IPv4 publique et une règle iptable pour NAT-er
-ce qui sort. Le réseau privé est 10.42.0.0/24, on peut bien sûr choisir
-ce qu&amp;rsquo;on veut dans ce que fourni la RFC 1918.&lt;/p&gt;
-&lt;p&gt;Pour l&amp;rsquo;IPv6, chez OVH c&amp;rsquo;est bizarre : il fournissent un prefix 64 bit et
-avec une route accessible sur le /56 incluant, mais pas à partir du /64.
-Il faut donc ruser de la façon suivante niveau routage.&lt;/p&gt;
-&lt;p&gt;On assigne l&amp;rsquo;IPv6 avec le prefix /64, c&amp;rsquo;est plus propre, sinon le kernel se plaint avec /56 :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ip -6 addr add 2001:41D0:xxxx:96ce::1/64 dev br0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On met une route pour atteindre la gateway dans le /56 :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ip -6 route add 2001:41d0:xxxx:96ce::/56 dev br0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On met la route par défaut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ip -6 route add default via 2001:41d0:xxxx:96ff:ff:ff:ff:ff
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour avoir cette configuration appliquée automatiquement, il faut créer
-&lt;code&gt;/etc/network/if-up.d/ovh-ipv6-route&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#!/bin/sh
-
-if [ &amp;quot;$IFACE&amp;quot; = &amp;quot;br0&amp;quot; ]; then
-    ip -6 route add 2001:41d0:2:96ce::/56 dev br0
-    ip -6 route add default via 2001:41d0:2:96ff:ff:ff:ff:ff
-fi
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et pour l&amp;rsquo;arrêt, &lt;code&gt;/etc/network/if-down.d/ovh-ipv6-route&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#!/bin/sh
-
-if [ &amp;quot;$IFACE&amp;quot; = &amp;quot;br0&amp;quot; ]; then
-    ip -6 route del default via 2001:41d0:2:96ff:ff:ff:ff:ff
-    ip -6 route del 2001:41d0:2:96ce::/56 dev br0
-fi
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il faut ensuite activer le forward entre interfaces, sinon pas de
-routage vers les VM, dans &lt;code&gt;/etc/sysctl.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;net.ipv6.conf.all.forwarding=1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Enfin, le routage chez OVH ne permet pas d&amp;rsquo;intercaler un routeur pour
-découper le /64, il faut donc ruser avec du proxy NDP (Neighbor
-Discovery Protocol).&lt;/p&gt;
-&lt;p&gt;On active le proxy NDP, dans &lt;code&gt;/etc/sysctl.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;net.ipv6.conf.all.proxy_ndp=1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On ajoute les IP à proxiser, celle de la gateway et chacune des IP
-fournies aux VM :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ip neigh add proxy 2001:41d0:xxxx:96ff:ff:ff:ff:ff dev br0
-# ip neigh add proxy 2001:41d0:xxxx:96ce::2 dev br0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;En cas de reboot d&amp;rsquo;une VM, il faut d&amp;rsquo;abord virer ses IP du proxy, puis
-les remettre, sinon le kernel de la VM se plein d&amp;rsquo;une duplication
-d&amp;rsquo;adresse :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ip neigh del proxy 2001:41d0:xxxx:96ce::2 dev br0
--&amp;gt; reboot de la VM
-# ip neigh add proxy 2001:41d0:xxxx:96ce::2 dev br0
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <description>Sur mon serveur chez OVH, j&amp;rsquo;ai un ensemble de machines virtuelles KVM et (bientôt) de conteneurs LXC. Pour fournir du réseau à tout ce petit monde, j&amp;rsquo;utilise de l&amp;rsquo;IPv4 et de l&amp;rsquo;IPv6, voici comment c&amp;rsquo;est configuré.
+Pour l&amp;rsquo;IPv4, on a un nombre limité d&amp;rsquo;IP publiques parce que ça vaut de la thune et que ça va être de plus en tendu de multiplier les adresses, il nous faut un réseau privé (beurk), du NAT (rebeurk) et des redirections à base d&amp;rsquo;iptables (re-rebeurk).</description>
     </item>
     
     <item>
       <title>Rediriger stdout/stderr depuis un script avec du pipe</title>
       <link>https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/</link>
       <pubDate>Wed, 29 Jun 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/</guid>
-      <description>&lt;p&gt;Pour rediriger stdout/stderr à l&amp;rsquo;interieur vers l&amp;rsquo;entrée standard d&amp;rsquo;un
-commande, il faut utiliser exec et du sous-shell. Cette astuce est un
-bashisme a priori.&lt;/p&gt;
-&lt;p&gt;L&amp;rsquo;objectif est de renvoyer tous les messages du script dans syslog sans
-mettre de redirection sur la ligne de commande. Le principe général
-est :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;exec FD&amp;gt; &amp;gt;(COMMAND)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;ul&gt;
-&lt;li&gt;FD est le numéro du file descriptor, 1 pour stdout, 2 pour stderr&lt;/li&gt;
-&lt;li&gt;COMMAND est la commande a exécuter, elle doit bien sûr lire les
-données en entrée.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Un plus gros exemple :&lt;/p&gt;
-&lt;p&gt;{% highlight bash %}
-SYSLOG=&amp;ldquo;no&amp;rdquo;&lt;/p&gt;
-&lt;h1 id=&#34;load-configuration-file&#34;&gt;Load configuration file&lt;/h1&gt;
-&lt;p&gt;CONFIG=/etc/myconfig.conf
-if [ -f &amp;ldquo;$CONFIG&amp;rdquo; ]; then
-. $CONFIG
-fi&lt;/p&gt;
-&lt;h1 id=&#34;redirect-output-to-syslog-if-configured&#34;&gt;Redirect output to syslog if configured&lt;/h1&gt;
-&lt;p&gt;if [ &amp;ldquo;$SYSLOG&amp;rdquo; = &amp;ldquo;yes&amp;rdquo; ]; then
-SYSLOG_FACILITY=${SYSLOG_FACILITY:-local0}
-SYSLOG_IDENT=${SYSLOG_IDENT:-postgres}&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;exec 1&amp;gt; &amp;gt;(logger -t ${SYSLOG_IDENT} -p ${SYSLOG_FACILITY}.info)
-exec 2&amp;gt; &amp;gt;(logger -t ${SYSLOG_IDENT} -p ${SYSLOG_FACILITY}.err)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;fi&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-avec dans la configuration :
-
--   `SYSLOG` : mettre à yes ou no pour activer
--   `SYSLOG_FACILITY` : ou envoyer
--   `SYSLOG_IDENT` : avec quel tag
-
-L&#39;exemple est pris d&#39;un de mes scripts d&#39;archivage pour PostgreSQL, ce
-qui permet de logguer dans syslog sans mettre de pipe dans
-`archive_command` (ce qu&#39;il ne faut pas faire parce que ça casse : le
-code retour donné à PostgreSQL est celui de la dernière commande de la
-chaîne de pipe).
-&lt;/code&gt;&lt;/pre&gt;</description>
+      <description>Pour rediriger stdout/stderr à l&amp;rsquo;interieur vers l&amp;rsquo;entrée standard d&amp;rsquo;un commande, il faut utiliser exec et du sous-shell. Cette astuce est un bashisme a priori.
+L&amp;rsquo;objectif est de renvoyer tous les messages du script dans syslog sans mettre de redirection sur la ligne de commande. Le principe général est :
+exec FD&amp;gt; &amp;gt;(COMMAND)   FD est le numéro du file descriptor, 1 pour stdout, 2 pour stderr COMMAND est la commande a exécuter, elle doit bien sûr lire les données en entrée.</description>
     </item>
     
     <item>
       <title>Combiner des PDF en un seul</title>
       <link>https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/</link>
       <pubDate>Tue, 21 Jun 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/</guid>
-      <description>&lt;p&gt;Pour combiner des pdf en un seul, on peut essayer &lt;code&gt;pdfjoin&lt;/code&gt; fournit par
-le projet &lt;a href=&#34;http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam/&#34; title=&#34;pdfjam&#34;&gt;pdfjam&lt;/a&gt;. En attendant que les 250 Mo de dépendances (Latex
-principalement) s&amp;rsquo;installent, on peut utiliser ghostscript :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=../combined_doc.pdf *.pdf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Merci à &lt;a href=&#34;http://www.perlmonks.org/?node_id=470323&#34;&gt;perlmonks.org&lt;/a&gt;.&lt;/p&gt;
-</description>
+      <description>Pour combiner des pdf en un seul, on peut essayer pdfjoin fournit par le projet pdfjam. En attendant que les 250 Mo de dépendances (Latex principalement) s&amp;rsquo;installent, on peut utiliser ghostscript :
+gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=../combined_doc.pdf *.pdf  Merci à perlmonks.org.</description>
     </item>
     
     <item>
       <title>Insérer des tabulations dans sa ligne de commande bash</title>
       <link>https://www.orgrim.net/post/2011-03-24-inserer-des-tabulations-dans-sa-ligne-de-commande-bash/</link>
       <pubDate>Thu, 24 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-24-inserer-des-tabulations-dans-sa-ligne-de-commande-bash/</guid>
-      <description>&lt;p&gt;Il y a longtemps que je me demandais comment faire ça, sans prendre la
-peine de rechercher ou lire le man. C&amp;rsquo;est chose faite, pour insérer une
-tabulation, il faut contourner la complétion de commandes avec le combo
-suivant :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;C-v TAB
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;C&amp;rsquo;est simple, mais ça ne s&amp;rsquo;invente pas.&lt;/p&gt;
-&lt;p&gt;Pour le coup, c&amp;rsquo;est utile quand on veut voir un fichier de configuration
-sans les commentaires, par exemple&lt;code&gt; postgresql.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;grep -Ev &#39;^(( |        )*#|$)&#39; postgresql.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On doit donc taper une tabulation dans l&amp;rsquo;expression régulière : on
-affiche toutes les lignes qui ne satisfont pas la condition « tout ce
-qui commence par 0 ou plusieurs espaces ou tabulations suivi d&amp;rsquo;un dièse,
-ou une ligne vide ».&lt;/p&gt;
-</description>
+      <description>Il y a longtemps que je me demandais comment faire ça, sans prendre la peine de rechercher ou lire le man. C&amp;rsquo;est chose faite, pour insérer une tabulation, il faut contourner la complétion de commandes avec le combo suivant :
+C-v TAB  C&amp;rsquo;est simple, mais ça ne s&amp;rsquo;invente pas.
+Pour le coup, c&amp;rsquo;est utile quand on veut voir un fichier de configuration sans les commentaires, par exemple postgresql.conf :</description>
     </item>
     
   </channel>

@@ -3,18 +3,16 @@
   <channel>
     <title>Code on code. grind. sleep.</title>
     <link>https://www.orgrim.net/en/categories/code/</link>
-    <description>code. grind. sleep. (Code)</description>
+    <description>Recent content in Code on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 10 Mar 2021 22:00:00 +0100</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/en/categories/code/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Wed, 10 Mar 2021 22:00:00 +0100</lastBuildDate><atom:link href="https://www.orgrim.net/en/categories/code/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How Go helped for the rewrite of pg_back</title>
       <link>https://www.orgrim.net/en/post/2021-03-10-how-go-helped-for-the-rewrite-of-pg_back/</link>
       <pubDate>Wed, 10 Mar 2021 22:00:00 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/en/post/2021-03-10-how-go-helped-for-the-rewrite-of-pg_back/</guid>
       <description>&lt;p&gt;When I started developping &lt;a href=&#34;https://github.com/orgrim/pg_back&#34;&gt;pg_back&lt;/a&gt;, I
@@ -25,163 +23,14 @@ the shell script and try to carefully control its growth, but it will sooner or
 later reach some limits of shell scripting.&lt;/p&gt;
 &lt;p&gt;After some time without making it evolve, I got interested in the Go
 programming language. It appeared that pg_back could be a good candidate projet
-to let me learn Go. This is why pg_back version 2 is written in Go.&lt;/p&gt;
-&lt;p&gt;Go can do better than shell scripting, like many languages, but one helpful
-feature of Go is that it produces static binaries. This make it even easier to
-install than the shell script, because &lt;code&gt;pg_back&lt;/code&gt; no longer has any external
-dependencies, apart from &lt;code&gt;pg_dump&lt;/code&gt; and &lt;code&gt;pg_dumpall&lt;/code&gt;. When one does not have
-root privileges, it make it possible be deploy the binary file by dropping it
-somewhere like one would do for a shell script.&lt;/p&gt;
-&lt;p&gt;About the rewrite, getting rid of dependencies on external command is
-great. For example, the syntax of Go being close to C, it was quite easy to
-port &lt;code&gt;pg_dumpacl&lt;/code&gt; and integrate it directly in pg_back. It is now just two
-function &lt;code&gt;dumpCreateDBAndACL()&lt;/code&gt; and &lt;code&gt;makeACLCommands()&lt;/code&gt; in
-&lt;a href=&#34;https://github.com/orgrim/pg_back/blob/master/sql.go&#34;&gt;sql.go&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Continuing on external commands, pg_back now connects to PostgreSQL without
-using &lt;code&gt;psql&lt;/code&gt;, with the native &lt;code&gt;database/sql&lt;/code&gt; API. The standard library is
-pretty rich, it allowed the use standard Go APIs for checksums, file locking,
-logging, etc. Only 4 external modules are required, plus one for unit tests:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;gopkg.in/ini.v1&lt;/code&gt; for the configuration file&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;github.com/spf13/pflag&lt;/code&gt; for POSIX command line options&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;github.com/lib/pq&lt;/code&gt; to access PostgreSQL&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;github.com/anmitsu/go-shlex&lt;/code&gt; to parse shell commands (mostly hooks)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The other module is &lt;code&gt;github.com/google/go-cmp&lt;/code&gt;, with is useful to compare
-structs in unit tests. Speaking of which, unit tests are native to Go, and it
-was easy to add tests while developping. The difficult part of unit testing is
-related to the replication control functions. Unit testing the replication
-control fonctions is difficult because it requires a more complex setup. We
-need a PostgreSQL instance with a replica.&lt;/p&gt;
-&lt;p&gt;This feature is interesting, because I could use some features of Go to
-implement pausing the replication.&lt;/p&gt;
-&lt;p&gt;When dumping from a replica, we need to ensure pg_dump won&amp;rsquo;t be stuck on an
-exclusive lock, we must pause the replication replay to avoid pg_dump being
-cancelled and there must not be any exclusive lock granted on an object when
-the replication is paused. Otherwise the exclusive lock is only released when
-replication replay is resumed, making the dump of the object impossible.&lt;/p&gt;
-&lt;p&gt;I used a go routine with a &lt;code&gt;time.Ticker&lt;/code&gt; to try to pause the replication every
-10 seconds:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;pauseReplicationWithTimeout&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;db&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;timeOut&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;error&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;ticker&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;NewTicker&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Duration&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Second&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;done&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;make&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;chan&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;stop&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;make&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;chan&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;fail&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;make&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;chan&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-    &lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Infoln&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;pausing replication&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-    &lt;span class=&#34;c1&#34;&gt;// We want to retry pausing replication at a defined interval
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// but not forever. We cannot put the timeout in the same
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// select as the ticker since the ticker would always win
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;go&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;kd&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;rerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pgReplicaHasLocks&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;defer&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;ticker&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Stop&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-
-        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;pauseReplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;db&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;nil&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;errors&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;As&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;rerr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-                    &lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Warnln&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-                &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-                    &lt;span class=&#34;nx&#34;&gt;fail&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;
-                    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;
-                &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-            &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-                &lt;span class=&#34;nx&#34;&gt;done&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;
-            &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-            &lt;span class=&#34;k&#34;&gt;select&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-            &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;stop&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;
-            &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ticker&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
-                &lt;span class=&#34;k&#34;&gt;break&lt;/span&gt;
-            &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;}()&lt;/span&gt;
-
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When there is an exclusive lock, a custom error is used to inform the goroutine
-that it must retry:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;pgReplicaHasLocks&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{}&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pgReplicaHasLocks&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;Error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;replication not paused because of AccessExclusiveLock&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;pauseReplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;db&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;error&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// ..
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;failed&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pgReplicaHasLocks&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{}&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;nil&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The main goroutine just wait on some channel until there is a timeout using
-&lt;code&gt;time.After()&lt;/code&gt;, replication has been paused or an error occured:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;// ... (After lauching the goroutine)
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// Return as soon as the replication is paused or stop the
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// goroutine if we hit the timeout
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;select&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;done&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
-        &lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Infoln&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;replication paused&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;After&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Duration&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;timeOut&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Second&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
-        &lt;span class=&#34;nx&#34;&gt;stop&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Errorf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;replication not paused after %v&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Duration&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;timeOut&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Second&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;fail&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
-        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Errorf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%s&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-    
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;See the complete function in &lt;a href=&#34;https://github.com/orgrim/pg_back/blob/master/sql.go#L509-L629&#34;&gt;sql.go#L509-L629&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Another use of goroutines was to run &lt;code&gt;pg_dump&lt;/code&gt; commands concurrently, in order to dump many
-database at the same time. It uses the worker example from
-&lt;a href=&#34;https://gobyexample.com/worker-pools&#34;&gt;gobyexample.com&lt;/a&gt;, a great ressource for
-beginners, by the way!&lt;/p&gt;
-&lt;p&gt;The other problems with shell scripting were about parsing strings, like
-&lt;code&gt;keyword=value&lt;/code&gt; connection strings of PostgreSQL
-(&lt;a href=&#34;https://github.com/orgrim/pg_back/blob/master/connstring.go&#34;&gt;connstring.go&lt;/a&gt;). Shell
-scripting is notoriously difficult when it comes to handling strings properly,
-and Go helped a lot. It was happily surprised that the Go implementation of pg_back
-could dump databases with weird characters in their names, like the equal sign,
-spaces, quotes, etc. without a lot of extra work.&lt;/p&gt;
-&lt;p&gt;Finally, the embed feature of Go 1.16 is so easy to use that embeding the
-default configuration file, including examples and comments, and adding a
-command line option to print it took a just few lines of code:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;embed&amp;#34;&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;//go:embed pg_back.conf
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;defaultCfg&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;parseCli&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;args&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;options&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    
-    &lt;span class=&#34;nx&#34;&gt;pflag&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;BoolVar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pce&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ShowConfig&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;print-default-config&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;print the default configuration\n&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    
-    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;pce&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ShowConfig&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;defaultCfg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-        &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-    
-    &lt;span class=&#34;c1&#34;&gt;// ...
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will make the feature easier to maintain in the future because it avoids
-duplication, as I would have had to copy the file in a string in the source
-code without &lt;code&gt;embed&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;In conclusion, rewriting pg_back in a proper programming language with a rich
-standard library and ecosystem was great. I enjoyed doing it with Go and it
-convinced me that Go is programming language worth learning.&lt;/p&gt;</description>
+to let me learn Go. This is why pg_back version 2 is written in Go.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Install Go</title>
       <link>https://www.orgrim.net/en/post/2021-01-20-install-go/</link>
       <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/en/post/2021-01-20-install-go/</guid>
       <description>&lt;p&gt;The Go language has been around for quite some time and one finds
@@ -190,113 +39,18 @@ installed using the packages of the Linux distribution, but the
 easiest way to have the latest version is to use the official compiled
 tools.&lt;/p&gt;
 &lt;p&gt;The version of the &lt;code&gt;golang-go&lt;/code&gt; package in Debian stable, 1.11, is too
-old, so I installed the official binaries this way.&lt;/p&gt;
-&lt;p&gt;Go to &lt;a href=&#34;https://golang.org/dl/&#34;&gt;https://golang.org/dl/&lt;/a&gt; to find out what is the lastest
-version. Here, we&amp;rsquo;ll be using 1.15.7.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/install
-$ cd ~/install
-$ wget https://golang.org/dl/go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Copy the checksum in &lt;code&gt;go1.15.7.linux-amd64.tar.gz.sha256&lt;/code&gt; as
-&lt;code&gt;sha256sum&lt;/code&gt; excepts it for checking:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;0d142143794721bb63ce6c8a6180c4062bcf8ef4715e7d6d6609f3a8282629b3  go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Check the sum:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sha256sum -c go1.15.7.linux-amd64.tar.gz.sha256
-go1.15.7.linux-amd64.tar.gz: OK
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Prepare the installation directory:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ cd /usr/local/
-$ sudo rm -f go
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Extract the tarball:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sudo tar xf ~/install/go1.15.7.linux-amd64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Rename the directory to add the version number and create a symbolic
-link:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ sudo mv go go1.15.7
-$ sudo ln -s go1.15.7 go
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Update the PATH in &lt;code&gt;~/.bashrc&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
-export PATH
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Source it and check the version:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ . ~/.bashrc
-$ go version
-go version go1.15.7 linux/amd64
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The older versions can be purged from &lt;code&gt;/usr/local&lt;/code&gt; or we can go back to
-a previous version by updating the symbolic link.&lt;/p&gt;
-&lt;p&gt;The defaut environment configuration of Go is used to let &lt;code&gt;go get&lt;/code&gt; and
-others install binaires and modules into &lt;code&gt;~/go&lt;/code&gt;.&lt;/p&gt;</description>
+old, so I installed the official binaries this way.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Development environment for Patroni</title>
       <link>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</link>
       <pubDate>Fri, 04 Dec 2020 21:23:32 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/en/post/2020-12-04-patroni-development-environment/</guid>
-      <description>&lt;p&gt;Recently I found a missing feature in Patroni, a high availability
-solution for PostgreSQL written in Python.&lt;/p&gt;
-&lt;p&gt;Since I am doing more Python at work these days, I quickly made a
-patch. Before jumping on git push, I thought it would be nice to test
-if is really solves the issue. I needed a Patroni cluster, some
-configuration is provided and commands in the README, which is great
-but the instruction are not targetted toward development.&lt;/p&gt;
-&lt;p&gt;So let&amp;rsquo;s use what we learnt from developing some Python at work.&lt;/p&gt;
-&lt;p&gt;First, we need a clone of the git repository, obviously:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev
-git clone https://github.com/zalando/patroni.git
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then we need some virtualenv, Python 3 comes with it built in (package
-&lt;code&gt;python3-venv&lt;/code&gt; in Debian):&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd patroni
-python3 -m venv .venv
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;It can be excluded from the sight of git by editing &lt;code&gt;.git/info/exclude&lt;/code&gt; along with our local data:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;echo .venv/ &amp;gt;&amp;gt; .git/info/exclude
-echo data/ &amp;gt;&amp;gt; .git/info/exclude
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The easiest way to avoid mistakes is the activate the virtualenv:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;source .venv/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then install patroni inside:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pip3 install -r requirements.txt
-pip3 install -r requirements.dev.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If it failed, you may lack a compiler or some development headers. It
-looks like it needs the usual packages for Python and PostgreSQL :
-&lt;code&gt;build-essential&lt;/code&gt;, &lt;code&gt;postgresql-server-dev-13&lt;/code&gt;, and &lt;code&gt;python3-dev&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;requirements.dev.txt&lt;/code&gt; file contains a &lt;code&gt;pytest&lt;/code&gt; line, are there
-tests? Yes! in the &lt;code&gt;tests/&lt;/code&gt; subdirectory. Let&amp;rsquo;s run them:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pytest tests
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If it work, thing looks good. Let&amp;rsquo;s install patroni inside the virtualenv:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pip3 install -e .
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Finally, we need etcd, the packages from Debian do the job:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;sudo apt-get install etcd-client etcd-server
-systemctl disable --now etcd
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now we can run the cluster provided.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Console 1:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-etcd --data-dir=data/etcd --enable-v2=true
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;Console 2, ensure no other Postgres instance is using TCP port 5432:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-export PATH=/usr/lib/postgresql/13/bin:$PATH
-patroni postgres0.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;Console 3:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-export PATH=/usr/lib/postgresql/13/bin:$PATH
-patroni postgres1.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Patroni bootstrap Postgres instances and creates a replica. We can use
-&lt;code&gt;patronictl&lt;/code&gt; in the virtualenv to have a look:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cd ~/dev/patroni
-. .venv/bin/activate
-patronictl -c postgres0.yml list
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Which should output something like that:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;+ Cluster: batman (6902504757986008432) -+---------+----+-----------+
-| Member      | Host           | Role    | State   | TL | Lag in MB |
-+-------------+----------------+---------+---------+----+-----------+
-| postgresql0 | 127.0.0.1:5432 | Leader  | running |  1 |           |
-| postgresql1 | 127.0.0.1:5433 | Replica | running |  1 |         0 |
-+-------------+----------------+---------+---------+----+-----------+
-&lt;/code&gt;&lt;/pre&gt;</description>
+      <description>Recently I found a missing feature in Patroni, a high availability solution for PostgreSQL written in Python.
+Since I am doing more Python at work these days, I quickly made a patch. Before jumping on git push, I thought it would be nice to test if is really solves the issue. I needed a Patroni cluster, some configuration is provided and commands in the README, which is great but the instruction are not targetted toward development.</description>
     </item>
     
   </channel>

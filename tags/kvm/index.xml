@@ -3,86 +3,20 @@
   <channel>
     <title>kvm on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/kvm/</link>
-    <description>code. grind. sleep. (kvm)</description>
+    <description>Recent content in kvm on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Mon, 04 Jul 2011 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/kvm/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Mon, 04 Jul 2011 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/kvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>NetBSD en KVM</title>
       <link>https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/</link>
       <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-07-04-netbsd-en-kvm/</guid>
       <description>&lt;p&gt;Comme je viens d&amp;rsquo;investir dans un &lt;a href=&#34;http://www.kimsufi.com/fr/&#34;&gt;serveur kimsufi&lt;/a&gt; (le 16G), je me suis dis qu&amp;rsquo;avoir
-quelques machines NetBSD pour servir la bonne cause ça serait bien cool.&lt;/p&gt;
-&lt;p&gt;En fait, j&amp;rsquo;ai deux besoins :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Avoir un dépôt de paquet et de quoi fait des bulk build réduits de
-pkgsrc pour me permettre de n&amp;rsquo;utiliser uniquement l&amp;rsquo;excellent pkgin&lt;/li&gt;
-&lt;li&gt;Fournir des machines à la Build Farm de PostgreSQL, parce qu&amp;rsquo;il n&amp;rsquo;y
-a même pas de machine NetBSD en i386 et en amd64 (seulement powerpc
-et mips)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;J&amp;rsquo;ai donc décidé de monter 2 machines NetBSD en KVM sur ma grosse box
-Debian, qui fait tourner ça grâce à KVM.&lt;/p&gt;
-&lt;p&gt;Pour l&amp;rsquo;installation, il y a 2 possibilités, soit on fait du VNC, soit on
-redirige la sortie VGA dans du curses. Pour le disque j&amp;rsquo;ai choisi de
-poser directement les données sur des volumes logiques, dans ce cas, il
-faut désactiver le cache ce qui permet une infime perte de puissance en
-I/O.&lt;/p&gt;
-&lt;p&gt;Il faut commencer par récupérer l&amp;rsquo;ISO d&amp;rsquo;installation :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;wget ftp://ftp.fr.netbsd.org/pub/NetBSD/iso/5.1/amd64cd-5.1.iso
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, créer le volume logique (on a choisi de donner 50 Go) et lancer
-l&amp;rsquo;installation, en curses ça passe nickel, il faut choisir d&amp;rsquo;utiliser la
-console serie :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;kvm -drive file=/dev/system/kvm-nb64-d1,cache=none \\
-    -m 1024 \\
-    -net nic,model=e1000 -net tap \\
-    -name nb64 \\
-    -curses \\
-    -cdrom /home/orgrim/netbsd/amd64cd-5.1.iso \\
-    -boot d \\
-    -k fr
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Une fois installé, on lance la commande suivante dans un screen, on
-demande à KVM de fournir l&amp;rsquo;accès console en série dans un fichier, ce
-qui permet d&amp;rsquo;avoir la console QEMU disponible directement dans le
-screen :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;kvm -nographic \\
-    -drive file=/dev/system/kvm-nb64-d1,cache=none \\
-    -m 1024 \\
-    -net nic,model=e1000,macaddr=DE:AD:BE:EF:37:D1 -net tap \\
-    -name nb64 \\
-    -boot c \\
-    -serial unix:/tmp/nb64.sock,server,nowait
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Note: merci de changer la MAC de l&amp;rsquo;interface réseau, c&amp;rsquo;est utilisé en
-prod chez moi :)&lt;/p&gt;
-&lt;p&gt;Enfin, il est important de démarrer le noyau NetBSD sans ACPI ni SMP (en
-mettant le defaut à 4 dans &lt;code&gt;/boot.cfg&lt;/code&gt;)&lt;/p&gt;
-&lt;p&gt;Pour accéder à la machine en console série :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;minicom -D unix#/tmp/nd64.sock
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on a oublié de choisir la console série, on peut l&amp;rsquo;activer de cette
-façon :&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Booter avec &lt;code&gt;-curses -k fr&lt;/code&gt; à la place de &lt;code&gt;-nographic&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Lancer la commande suivante pour activer la console série :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; # installboot -v -o console=com0,speed=19200 /dev/rwd0a /usr/mdec/bootxx_ffsv1
- File system:         /dev/rwd0a
- Primary bootstrap:   /usr/mdec/bootxx_ffsv1
- Boot options:        timeout 5, flags 0, speed 19200, ioaddr 0, console com0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;</description>
+quelques machines NetBSD pour servir la bonne cause ça serait bien cool.&lt;/p&gt;</description>
     </item>
     
   </channel>

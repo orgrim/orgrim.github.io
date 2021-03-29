@@ -3,72 +3,20 @@
   <channel>
     <title>rndctl on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/rndctl/</link>
-    <description>code. grind. sleep. (rndctl)</description>
+    <description>Recent content in rndctl on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Thu, 30 Dec 2010 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/rndctl/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Thu, 30 Dec 2010 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/rndctl/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Choisir des sources d&#39;entropie pour /dev/[u]random</title>
       <link>https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/</link>
       <pubDate>Thu, 30 Dec 2010 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-02-22-choisir-des-sources-dentropie-pour-devurandom/</guid>
       <description>&lt;p&gt;Pour monter un service DNS on a besoin de &lt;code&gt;/dev/random&lt;/code&gt; pour générer la
-clé rndc. Sans collecte d&amp;rsquo;entropie, &lt;code&gt;/dev/random&lt;/code&gt; ne crache rien.&lt;/p&gt;
-&lt;p&gt;La preuve sur un domU Xen en NetBSD 5.1 (le dom0 suit 5-stable), donnée par
-&lt;code&gt;ktruss&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fourche ~ # ktruss rndc-confgen -a -t /var/chroot/named
-[...]
-   519      1 rndc-confgen open(&amp;quot;/dev/random&amp;quot;, 0x4, 0) = 3
-[...]
-   519      1 rndc-confgen read(0x3, 0xbf7fe4a8, 0x10) Err#35 EAGAIN
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le &lt;code&gt;read()&lt;/code&gt; attend gentiment que &lt;code&gt;/dev/random&lt;/code&gt; lui fournisse du nombre
-aléatoire pendant que celui-ci dit de revenir plus tard. La raison est
-simple, aucune source d&amp;rsquo;entropie n&amp;rsquo;est configurée pour la collecte sur
-le domU, comme l&amp;rsquo;indique &lt;code&gt;rndctl&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -l
-Source                 Bits Type      Flags
-xennet1                   0 net  
-xennet0                   0 net  
-xbd0                      0 disk
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et les stats ne sont pas glorieuses :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -s    
-               51 bits mixed into pool
-                0 bits currently stored in pool (max 4096)
-                0 bits of entropy discarded due to full pool
-               51 hard-random bits generated
-            16749 pseudo-random bits generated
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Après une lecture du man de rndctl, on active tout :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -ce -d xennet1
-fourche ~ # rndctl -ce -d xennet0
-fourche ~ # rndctl -ce -d xbd0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ça va tout de suite mieux, &lt;code&gt;rndc-confgen&lt;/code&gt; termine, et on a des « bits »
-qui commencent à remplir le « pool » :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fourche ~ # rndctl -ls
-Source                 Bits Type      Flags
-xennet1                   0 net  estimate, collect
-xennet0                  80 net  estimate, collect
-xbd0                      0 disk estimate, collect
-              133 bits mixed into pool
-               80 bits currently stored in pool (max 4096)
-                0 bits of entropy discarded due to full pool
-               53 hard-random bits generated
-            17003 pseudo-random bits generated
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour avoir ça activé au boot, dans &lt;code&gt;/etc/rc.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;rndctl=YES
-rndctl_flags=&amp;quot;xbd0; -c -t net&amp;quot; # Voir les commentaires dans /etc/rc.d/rndctl
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Reste à découvrir pourquoi ce n&amp;rsquo;est pas activé par défaut en domU&amp;hellip;&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;</description>
+clé rndc. Sans collecte d&amp;rsquo;entropie, &lt;code&gt;/dev/random&lt;/code&gt; ne crache rien.&lt;/p&gt;</description>
     </item>
     
   </channel>

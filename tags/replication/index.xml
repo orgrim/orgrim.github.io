@@ -3,56 +3,21 @@
   <channel>
     <title>replication on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/replication/</link>
-    <description>code. grind. sleep. (replication)</description>
+    <description>Recent content in replication on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Wed, 30 Dec 2015 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/replication/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Wed, 30 Dec 2015 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/replication/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Réflexions sur l&#39;archivage des fichiers WAL</title>
       <link>https://www.orgrim.net/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/</link>
       <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/</guid>
       <description>&lt;p&gt;PostgreSQL faisant son bonhomme de chemin, on se retrouve désormais
 avec des configurations où il faut archiver plusieurs fois les WAL
-parce qu&amp;rsquo;on a de la sauvegarde PITR et de la réplication.&lt;/p&gt;
-&lt;p&gt;Le plus gros piège lorsqu&amp;rsquo;on a du PITR et de la réplication, ou
-plusieurs serveurs standby, c&amp;rsquo;est d&amp;rsquo;oublier que chaque élément de
-l&amp;rsquo;architecture qui consomme du WAL doit avoir son propre répertoire de
-WAL archivés, car chacun purge les fichiers différemment.&lt;/p&gt;
-&lt;p&gt;On tombe dans le piège facilement, en se disant, &amp;ldquo;pas de problème pour
-la purge des vieux fichiers, c&amp;rsquo;est le PITR ou le slave le plus éloigné
-qui purgera&amp;rdquo;. Si la purge du PITR passe alors que le standby était
-déconnecté du maitre, cette purge peut casser la réplication.&lt;/p&gt;
-&lt;p&gt;La solution est d&amp;rsquo;archiver plusieurs fois le même fichier WAL. Pour
-optimiser, le plus efficace à l&amp;rsquo;usage est d&amp;rsquo;utiliser des
-hardlinks. En gros, on archive une fois le fichier WAL et on crée
-autant de lien hard qu&amp;rsquo;il faut pour les autres consommateurs de WAL
-archivés. Rappelons, que la donnée n&amp;rsquo;est supprimée que lorsqu&amp;rsquo;il
-n&amp;rsquo;existe plus aucun lien et que plus aucun processus n&amp;rsquo;a le fichier
-ouvert, à ne pas confondre avec un lien symbolique.&lt;/p&gt;
-&lt;p&gt;Pour archiver vite, il vaut mieux éviter de compresser et stocker les
-archives soit en local, soit sur un partage NFS, l&amp;rsquo;archivage par SSH
-restant le plus lent. Tout est compromis entre chiffrage des
-communications sur le réseau et espace disque disponible, les liens
-hard restant rapides à créer et avec une consommation d&amp;rsquo;espace disque
-supplémentaire négligeable.&lt;/p&gt;
-&lt;p&gt;Enfin, PostgreSQL exécute la commande d&amp;rsquo;archivage avec l&amp;rsquo;appel
-&lt;code&gt;system()&lt;/code&gt; qui fork un shell : toutes les possibilités du shell sont
-alors disponibles, par exemple :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;archive_command = &#39;rsync -a %p slave1:/archived_xlog/slave1/%f &amp;amp;&amp;amp; ssh slave1 &amp;quot;for h in slave2 pitr; do ln /archived_xlog/slave1/%f /archived_xlog/$h/%f; done&amp;quot;&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Oui, une boucle et une seule copie avec rsync par SSH pour 3
-utilisations. On préfèrera surement faire un script pour rendre les
-choses plus lisibles. Ça marche aussi pour &lt;code&gt;restore_command&lt;/code&gt; et
-&lt;code&gt;archive_cleanup_command&lt;/code&gt; dans &lt;code&gt;recovery.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;restore_command = &#39;cp /archived_xlog/$(hostname)/%f %p&#39;
-archive_cleanup_command = &#39;pg_archivecleanup /archived_xlog/$(hostname) %r&#39;
-&lt;/code&gt;&lt;/pre&gt;</description>
+parce qu&amp;rsquo;on a de la sauvegarde PITR et de la réplication.&lt;/p&gt;</description>
     </item>
     
   </channel>

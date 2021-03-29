@@ -3,55 +3,28 @@
   <channel>
     <title>pkgin on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/pkgin/</link>
-    <description>code. grind. sleep. (pkgin)</description>
+    <description>Recent content in pkgin on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Sat, 12 Mar 2011 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/pkgin/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Sat, 12 Mar 2011 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/pkgin/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>pkgin adventures - bien générer son pkg_summary</title>
       <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/</link>
       <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/</guid>
       <description>&lt;p&gt;Comme indiqué dans d&amp;rsquo;autres posts, j&amp;rsquo;abuse des chroots &lt;code&gt;pkg_comp&lt;/code&gt; pour
 tenir mes paquets à jour. Je suis récemment passé à l&amp;rsquo;utilisation de
-&lt;code&gt;pkgin&lt;/code&gt; pour la gestion de mes paquets une fois préparés dans le chroot.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;pkgin&lt;/code&gt; se base sur &lt;code&gt;pkg_summary&lt;/code&gt; pour connaître toutes les informations
-des paquets, nécessaires à sa popotte. Il y a plusieurs façons de créer
-un fichier &lt;code&gt;pkg_summary&lt;/code&gt; à donner à &lt;code&gt;pkgin&lt;/code&gt;, mais seule une façon
-fonctionne correctement :&lt;/p&gt;
-&lt;p&gt;​1. On génère le fichier à partir des paquets déjà installés :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_info -a -X | bzip2 &amp;gt; pkg_summary.bz2
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​2. On génère le fichier à partir des tarballs présentes dans
-&lt;code&gt;/usr/pkgsrc/packages/All&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/All
-# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;La méthode 1 n&amp;rsquo;est pas valable car l&amp;rsquo;information sur les tarballs
-manque. Ainsi, &lt;code&gt;pkgin&lt;/code&gt; considère les tailles de tarball à 0 comme
-valables, ce qui arrive lorsqu&amp;rsquo;un dépôt est injoignable : le fetch
-laisse un fichier vide dans le cache que &lt;code&gt;pkgin&lt;/code&gt; considère comme
-correct.&lt;/p&gt;
-&lt;p&gt;Il faut donc utiliser la méthode 2 pour fournir l&amp;rsquo;information correcte à
-&lt;code&gt;pkgin&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Pour conclure, l&amp;rsquo;investigation autour de ce souci, a permis aux
-développeurs du projet d&amp;rsquo;ajouter :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Un mode verbose pour avoir plein d&amp;rsquo;informations utiles&lt;/li&gt;
-&lt;li&gt;Un message d&amp;rsquo;avertissement lorsque &lt;code&gt;pkgin&lt;/code&gt; rencontre un paquet à
-avec une taille à 0&lt;/li&gt;
-&lt;/ul&gt;</description>
+&lt;code&gt;pkgin&lt;/code&gt; pour la gestion de mes paquets une fois préparés dans le chroot.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pkgin adventures - conflit résolu</title>
       <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-conflit-resolu/</link>
       <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-conflit-resolu/</guid>
       <description>&lt;p&gt;Il y a quelques jours, il a été décidé de remplacer &lt;code&gt;libungif&lt;/code&gt; par
@@ -60,90 +33,14 @@ problèmes, les deux paquets se déclarent mutuellement en conflit. A
 partir de maintenant la dépendance par défaut est sur &lt;code&gt;giflib&lt;/code&gt;, ce qui a
 donc fait que ma mise à jour (&lt;code&gt;pkg_chk&lt;/code&gt; dans un &lt;code&gt;pkg_comp&lt;/code&gt;) a tellement
 buté dessus que j&amp;rsquo;ai décidé qu&amp;rsquo;il serait plus simple de repartir d&amp;rsquo;un
-chroot &lt;code&gt;pkg_comp&lt;/code&gt; tout neuf&amp;hellip;&lt;/p&gt;
-&lt;p&gt;Même si j&amp;rsquo;avais oublié de retirer &lt;code&gt;libungif&lt;/code&gt; de mon
-&lt;code&gt;/usr/pkgsrc/pkgchk.conf&lt;/code&gt; au début, j&amp;rsquo;ai bien obtenu un dépôt tout neuf
-pour &lt;code&gt;pkgin&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Et là, la magie de &lt;code&gt;pkgin&lt;/code&gt; a opéré :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkgin up
-processing local summary...
-updating database: 100%
-downloading pkg_summary.bz2:    0Bbps 100%
-processing remote summary (file:///usr/pkgsrc/packages/amd64/All)...
-updating database: 100%
-
-# pkgin fug
-calculating dependencies... done.
-giflib-4.1.6 (to be installed) conflicts with installed package libungif-4.1.4nb1.
-proceed ? [y/N] n
-
-# pkgin srd libungif
-local reverse dependency tree for libungif
-        feh-1.3.4nb8
-        giblib-1.2.4nb9
-        python-mode-1.0nb1
-        php-mode-1.4.0nb1
-        mplayer-1.0rc20100913nb5
-        emacs-23.2nb4
-        imlib2-1.4.2nb6
-
-# pkgin rm libungif
-8 packages to delete: mplayer-1.0rc20100913nb5 php-mode-1.4.0nb1 python-mode-1.0nb1
- feh-1.3.4nb8 emacs-23.2nb4 giblib-1.2.4nb9 imlib2-1.4.2nb6 libungif-4.1.4nb1
-proceed ? [y/N] y
-....
-
-# pkgin in feh emacs php-mode python-mode mplayer
-...
-
-# pkgin fug
-calculating dependencies... done.
-
-21 packages to be upgraded: epdfview-0.1.7nb10 mercurial-1.8 scmgit-base-1.7.3.5
-scmgit-docs-1.7.3.5 poppler-glib-0.16.2 libgnome-2.32.0nb2 libgnomeui-2.24.4nb2
-poppler-glib-0.16.2 poppler-utils-0.16.2 t1lib-5.1.2nb1 gtk2+-2.22.1nb1
-tex-dvipdfm-0.13.2dnb3 curl-7.21.3 glib2-2.26.1nb2 gnutls-2.10.4 libksba-1.1.0
-dialog-1.1.20110118 libidn-1.19 luatex-0.65.0nb1 web2c-2010nb6 poppler-0.16.2
-
-21 packages to be installed: poppler-0.16.3 dialog-1.1.20110302 libidn-1.20
-luatex-0.65.0nb2 web2c-2010nb7 curl-7.21.4 glib2-2.28.2 gnutls-2.10.5nb1 libksba-1.2.0
-gtk2+-2.24.1 tex-dvipdfm-0.13.2dnb4 poppler-glib-0.16.3 libgnome-2.32.1
-libgnomeui-2.24.5 poppler-glib-0.16.3 poppler-utils-0.16.3 t1lib-5.1.2nb2
-epdfview-0.1.7nb11 mercurial-1.8.1 scmgit-base-1.7.4.1 scmgit-docs-1.7.4.1
-(40M to download, 292M to install)
-
-proceed ? [y/N] y
-...
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et hop, résolution du conflit à la main, certes, mais &lt;!-- raw HTML omitted --&gt;très
-facilement&lt;!-- raw HTML omitted --&gt; et avec &lt;!-- raw HTML omitted --&gt;un seul outil&lt;!-- raw HTML omitted --&gt;. Sans &lt;code&gt;pkgin&lt;/code&gt;,
-j&amp;rsquo;aurais du itérer à coup de &lt;code&gt;pkg_info -R&lt;/code&gt;, &lt;code&gt;pkg_delete&lt;/code&gt; et
-&lt;code&gt;pkg_chk -ub&lt;/code&gt;&amp;hellip; Parce &lt;code&gt;pkgin&lt;/code&gt; ressort tout l&amp;rsquo;arbre des dépendances :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; # pkg_info -R giflib
-Information for giflib-4.1.6:
-
-Required by:
-imlib2-1.4.2nb7
-emacs-23.2nb5
-mplayer-1.0rc20100913nb6
-
-
-# pkgin srd giflib
-local reverse dependency tree for giflib
-        feh-1.3.4nb8
-        giblib-1.2.4nb9
-        python-mode-1.0nb1
-        php-mode-1.4.0nb1
-        mplayer-1.0rc20100913nb6
-        emacs-23.2nb5
-        imlib2-1.4.2nb7
-&lt;/code&gt;&lt;/pre&gt;</description>
+chroot &lt;code&gt;pkg_comp&lt;/code&gt; tout neuf&amp;hellip;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pkgin adventures - utiliser pkgin avec pkgsrc-current</title>
       <link>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/</link>
       <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-12-pkgin-adventures-utiliser-pkgin-avec-pkgsrc-current/</guid>
       <description>&lt;p&gt;&lt;strong&gt;pkgin&lt;/strong&gt; est un outil de gestion de paquets binaires pour pkgsrc, le
@@ -151,50 +48,7 @@ système de paquets de NetBSD. Pour pouvoir l&amp;rsquo;utiliser il faut donc de
 paquets binaires, sauf que les binaires ne sont officiellement
 disponibles que pour les releases trimestrielles de pkgsrc. Quand on
 suit pkgsrc-current, il faut donc compiler les paquets et fabriquer un
-dépôt.&lt;/p&gt;
-&lt;p&gt;La solution consiste donc à utiliser l&amp;rsquo;équipe habituelle pour compiler
-les paquets sans gêner le système : &lt;code&gt;pkg_comp&lt;/code&gt; et &lt;code&gt;pkg_chk&lt;/code&gt;. Pour le
-dépôt on a simplement besoin d&amp;rsquo;un serveur web pour les mettre à
-disposition.&lt;/p&gt;
-&lt;p&gt;Voici un petit résumé de la procédure :&lt;/p&gt;
-&lt;p&gt;​1. A partir d&amp;rsquo;une machine ayant l&amp;rsquo;ensemble de ses paquets déjà
-installés, on met en place un chroot &lt;code&gt;pkg_comp&lt;/code&gt; comme indiqué &lt;a href=&#34;http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp&#34;&gt;sur le
-wiki&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;​2. On génère la liste des paquets à construire à partir des paquets
-installé avec &lt;code&gt;pkg_chk&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_chk -g
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​3. On les compile dans le chroot :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_comp build pkgtools/pkg_chk
-# pkg_comp chroot pkg_chk -ua
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​4. On génère le fichier &lt;code&gt;pkg_summary&lt;/code&gt; qui va bien :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/All
-# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​5. On ajoute le définition du dépôt local dans la configuration de
-&lt;code&gt;pkgin&lt;/code&gt;, en éditant &lt;code&gt;/usr/pkg/etc/pkgin/repositories.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;file:///usr/pkgsrc/packages/All
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut enfin utiliser &lt;code&gt;pkgin&lt;/code&gt; pour ajouter et supprimer des paquets. Il
-suffit de regénérer le &lt;code&gt;pkg_summary&lt;/code&gt; à chaque nouvelle compilation de
-paquet dans le chroot.&lt;/p&gt;
-&lt;p&gt;Pour l&amp;rsquo;upgrade, il faut pouvoir ne garder que les paquets les plus à
-jour dans le dépôt, pour cela l&amp;rsquo;outil &lt;code&gt;pkg_tarup&lt;/code&gt; entre en jeu, il
-permet de générer les paquets binaires à partir de l&amp;rsquo;installation
-courante.&lt;/p&gt;
-&lt;p&gt;Après une upgrade avec &lt;code&gt;pkg_chk&lt;/code&gt; dans le chroot, on peut mettre à jour
-le dépôt :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_comp build pkgtools/pkg_tarup
-# rm /usr/pkgsrc/packages/All/*
-# pkg_comp chroot pkg_tarup -a -d /usr/pkgsrc/packages/All \\&#39;*\\&#39;
-# cd /usr/pkgsrc/packages/All
-# pkg_info -X *.tgz | bzip2 &amp;gt; pkg_summary.bz2
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Enfin, pour mettre à jour avec &lt;code&gt;pkgin&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkgin up
-# pkgin fug
-&lt;/code&gt;&lt;/pre&gt;</description>
+dépôt.&lt;/p&gt;</description>
     </item>
     
   </channel>

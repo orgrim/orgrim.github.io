@@ -3,18 +3,16 @@
   <channel>
     <title>pgbouncer on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/pgbouncer/</link>
-    <description>code. grind. sleep. (pgbouncer)</description>
+    <description>Recent content in pgbouncer on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Mon, 30 Oct 2017 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/pgbouncer/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Mon, 30 Oct 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/pgbouncer/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Gestion des utilisateurs pgBouncer avec auth_query</title>
       <link>https://www.orgrim.net/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/</link>
       <pubDate>Mon, 30 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/</guid>
       <description>&lt;p&gt;Avec pgBouncer 1.6 sont arrivés deux nouveaux paramètres, &lt;code&gt;auth_user&lt;/code&gt; et
@@ -25,220 +23,17 @@ l&amp;rsquo;utilisateur final sur le serveur PostgreSQL. Il y a deux problèmes
 majeurs avec ce fichier utilisateur : son maintien fastidieux et le
 risque de collision entre noms de roles identiques mais avec des mots
 de passe différents si le même pgBoucner accède à plusieurs instances
-PostgreSQL.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;auth_query&lt;/code&gt; permet de définir une requête à exécuter pour obtenir le
-couple utilisateur / mot de passe de l&amp;rsquo;instance lorsqu&amp;rsquo;ils sont
-introuvables dans le fichier.&lt;/p&gt;
-&lt;p&gt;Pour se connecter à l&amp;rsquo;instance PostgreSQL et exécuter la requête,
-pgBouncer utilise la valeur de &lt;code&gt;auth_user&lt;/code&gt; comme nom d&amp;rsquo;utilisateur. Si
-PostgreSQL demande un mot de passe, pgBouncer utilise celui défini
-dans le fichier des utilisateurs. On peut utiliser un utilisateur
-commun à toutes les instances, qu&amp;rsquo;il faut alors créer sur chaque
-instance, ou ajouter le paramètre &lt;code&gt;auth_user&lt;/code&gt; au niveau de la définir
-de l&amp;rsquo;accès à la base de données dans la section [databases].&lt;/p&gt;
-&lt;p&gt;Enfin, l&amp;rsquo;utilisateur &lt;code&gt;auth_user&lt;/code&gt; doit pouvoir lire le contenu de
-&lt;code&gt;pg_shadow&lt;/code&gt; pour obtenir les mots de passe hashés, il est alors
-recommandé de créer une fonction dans chaque base de données accédée
-par pgBouncer sur l&amp;rsquo;instance cible. Sinon, il faut donner accès à
-&lt;code&gt;pg_shadow&lt;/code&gt; par un &lt;code&gt;GRANT&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Concrètement cela donne, dans &lt;code&gt;/etc/pgbouncer/pgbouncer.ini&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;k&#34;&gt;[pgbouncer]&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;; ...&lt;/span&gt;
-
-&lt;span class=&#34;na&#34;&gt;auth_type&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;md5&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_file&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/etc/pgbouncer/userlist.txt&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;;; si on choisit de faire un GRANT sur pg_shadow&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_query&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;SELECT usename, passwd FROM pg_shadow WHERE usename=$1&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;;; si on choisit de créer la fonction donnée dans la doc de pgBouncer&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_query&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;SELECT pgbouncer.user_lookup($1)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Sur l&amp;rsquo;instance PostgreSQL, pour créer l&amp;rsquo;utilisateur pgbouncer chargé
-d&amp;rsquo;exécuter l&amp;rsquo;auth_query :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;WITH&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;PASSWORD&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;le mot de passe&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;passwd&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;username&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pgbouncer&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Créer le fichier &lt;code&gt;/etc/pgbouncer/userlist.txt&lt;/code&gt; et mettre le résultat du SELECT sous cette forme :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;quot;pgbouncer&amp;quot; &amp;quot;md5ac0b6e3b0d0904c0b602607e36c256eb&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on choisit de faire un GRANT sur &lt;code&gt;pg_shadow&lt;/code&gt;, faire cette opération
-dans toutes les bases de données accédées via pgBouncer :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Sinon exécuter le script SQL suivant dans toutes les bases de données
-accédées via pgBouncer, c&amp;rsquo;est la fonction donnée dans la doc avec la
-création du schéma en plus :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;REVOKE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALL&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;USAGE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-
-&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;OR&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;REPLACE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_username&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;out&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;uname&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;out&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;phash&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;RETURNS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;record&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;$$&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;passwd&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_username&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;INTO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;uname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;phash&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;RETURN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;END&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LANGUAGE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;plpgsql&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SECURITY&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DEFINER&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;REVOKE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALL&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;EXECUTE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On peut ajouter la fonction ou le &lt;code&gt;GRANT&lt;/code&gt; à &lt;code&gt;template1&lt;/code&gt; pour les futures bases de données.&lt;/p&gt;</description>
+PostgreSQL.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Configuration de pgBouncer avec des connexions TLS</title>
       <link>https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/</link>
       <pubDate>Fri, 27 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/</guid>
-      <description>&lt;p&gt;Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.&lt;/p&gt;
-&lt;h2 id=&#34;autorité-de-certification-avec-easyrsa&#34;&gt;Autorité de certification avec EasyRSA&lt;/h2&gt;
-&lt;h3 id=&#34;installation&#34;&gt;Installation&lt;/h3&gt;
-&lt;p&gt;Télécharger et installer la dernière version de EasyRSA. La version 3
-est différente de la version 2, fournie dans Debain Stretch.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;wget https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.3/EasyRSA-3.0.3.tgz
-tar xzf EasyRSA-3.0.3.tgz
-cd EasyRSA-3.0.3
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;création-de-lautorité-de-certification&#34;&gt;Création de l&amp;rsquo;autorité de certification&lt;/h3&gt;
-&lt;p&gt;Créer un fichier de configuration :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cp vars.example vars
-vi vars
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Changer quelques informations :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;set_var EASYRSA_REQ_COUNTRY	&amp;quot;FR&amp;quot;
-set_var EASYRSA_REQ_PROVINCE	&amp;quot;Ile-de-France&amp;quot;
-set_var EASYRSA_REQ_CITY	&amp;quot;Paris&amp;quot;
-set_var EASYRSA_REQ_ORG		&amp;quot;MyOrg&amp;quot;
-set_var EASYRSA_REQ_EMAIL	&amp;quot;admin@myorg.lo&amp;quot;
-set_var EASYRSA_REQ_OU		&amp;quot;Clients&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Créer l&amp;rsquo;autorité :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa init-pki
-./easyrsa build-ca
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il faut lui donner un nom, par exemple CA Clients ou PostgreSQL ou un
-truc significatif. Il faut aussi saisir un mot de passe pour la clé du
-certificat racine, celui qui permet de signer tout le reste.&lt;/p&gt;
-&lt;h3 id=&#34;création-des-certificats&#34;&gt;Création des certificats&lt;/h3&gt;
-&lt;p&gt;Pour créer un bi-clé pour un serveur :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa build-server-full postgresql nopass
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si la clé et le certificat du serveur doivent être transmis pas un moyen
-peu sécurisé, comme le mail, créer un fichier PKCS#12 plutot qu&amp;rsquo;un tar :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa export-p12 postgresql
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut mettre un mot de passe au fichier.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa build-server-full pgbouncer nopass
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Générer aussi la liste de révocation, qui permet rendre des
-certificats invalides.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa gen-crl
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;extraction-des-éléments-du-p12&#34;&gt;Extraction des éléments du p12&lt;/h3&gt;
-&lt;p&gt;La clé privée :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -nocerts -nodes -out postgresql.key
-chmod 600 postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le certificat :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -clcerts -out postgresql.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le certificat de l&amp;rsquo;AC :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -cacerts -out ca.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;configurer-postgresql-pour-le-tls&#34;&gt;Configurer PostgreSQL pour le TLS&lt;/h2&gt;
-&lt;p&gt;il faut les fichiers suivants :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/ca.crt
-pki/crl.pem
-pki/issued/postgresql.crt
-pki/private/postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;ou&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/crl.pem
-pki/private/postgresql.p12
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;et extraire le contenu du fichier PKCS#12 (voir plus haut).&lt;/p&gt;
-&lt;p&gt;Le plus simple est de placer ces fichiers dans le répertoire $PGDATA,
-les chemins dans la configuration sont relatifs à ce répertoire.&lt;/p&gt;
-&lt;p&gt;Dans $PGDATA/postgresql.conf, configurer au minimum :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ssl = on
-ssl_cert_file = &#39;postgresql.crt&#39;
-ssl_key_file = &#39;postgresql.key&#39;
-ssl_ca_file = &#39;ca.crt&#39;
-ssl_crl_file = &#39;crl.pem&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Un reload de la configuration suffit pour prendre en compte les
-modifications. Ce paramétrage permet à l&amp;rsquo;instance de chiffrer les
-connexions. On définit si la connexion TLS est imposé au clients et
-l&amp;rsquo;authentification par certificat dans le fichier pg_hba.conf&lt;/p&gt;
-&lt;p&gt;Le TLS ne concerne pas les connections locales par socket unix, géré
-par le type &amp;lsquo;local&amp;rsquo;.&lt;/p&gt;
-&lt;p&gt;Le type &amp;lsquo;host&amp;rsquo;, concerne les connexions en clair ou TLS, utiliser
-&amp;lsquo;hostssl&amp;rsquo; ou &amp;lsquo;hostnossl&amp;rsquo; pour distinguer le TLS dans les
-autorisations.&lt;/p&gt;
-&lt;p&gt;On peut interdire les connexions en clair avec ces deux lignes :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;hostnossl   all   all   0.0.0.0/0   reject
-hostnossl   all   all   ::/0        reject
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Toutes les lignes &amp;lsquo;host&amp;rsquo; suivantes ne concerneront que les connexions
-TLS, du fait de l&amp;rsquo;interdiction précédente.&lt;/p&gt;
-&lt;h2 id=&#34;configurer-pgbouncer-pour-le-tls&#34;&gt;Configurer pgBouncer pour le TLS&lt;/h2&gt;
-&lt;h3 id=&#34;clients&#34;&gt;Clients&lt;/h3&gt;
-&lt;p&gt;il faut les fichiers suivants :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/ca.crt
-pki/crl.pem
-pki/issued/postgresql.crt
-pki/private/postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;ou&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/crl.pem
-pki/private/postgresql.p12
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;et extraire le contenu du fichier PKCS#12 (voir plus haut).&lt;/p&gt;
-&lt;p&gt;Dans /etc/pgbouncer/pgbouncer.ini, il faut configurer &amp;lsquo;client_tls_sslmode&amp;rsquo; :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;disable : n&amp;rsquo;accepte pas les connexions TLS, le paramétrage par défaut&lt;/li&gt;
-&lt;li&gt;allow : accepte les connexions TLS et les connexions en clair&lt;/li&gt;
-&lt;li&gt;require : n&amp;rsquo;accepte que les connexions TLS&lt;/li&gt;
-&lt;li&gt;verify-ca, verify-full : n&amp;rsquo;accepte que les connexions TLS, et demande un certificat au client issue de la même AC&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Pour les chemins vers les fichiers :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;client_tls_ca_file = /etc/pgbouncer/ca.crt
-client_tls_key_file = /etc/pgbouncer/pgbouncer.key
-client_tls_cert_file = /etc/pgbouncer/pgbouncer.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour authentifier les clients avec un certificat, il faut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;auth_type = cert
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le CN du certificat doit alors être identique au nom d&amp;rsquo;utilisateur de
-connexion.&lt;/p&gt;
-&lt;p&gt;Cela ne dispense pas de la configuration de l&amp;rsquo;authenfication entre
-pgBouncer et PostgreSQL, avec &amp;lsquo;auth_file&amp;rsquo;, voire &amp;lsquo;auth_user&amp;rsquo; et &amp;lsquo;auth_query&amp;rsquo;.&lt;/p&gt;
-&lt;h3 id=&#34;backends-postgresql&#34;&gt;Backends PostgreSQL&lt;/h3&gt;
-&lt;p&gt;Pour que pgBouncer se connecte aux serveurs PostgreSQL en TLS, dans
-/etc/pgbouncer/pgbouncer.ini, il faut configurer :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = require
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on souhaite que pgBouncer vérifie le certificat de l&amp;rsquo;AC du serveur
-PostgreSQL :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = verify-ca
-server_tls_ca_file = /etc/pgbouncer/ca.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut enfin configurer pgBouncer et PostgreSQL pour que pgBouncer
-s&amp;rsquo;authentifie avec un certificat client, dans /etc/pgbouncer.ini :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = verify-ca
-server_tls_ca_file = /etc/pgbouncer/ca.crt
-server_tls_key_file = /etc/pgbouncer/pgbouncer_back.key
-server_tls_cert_file = /etc/pgbouncer/pgbouncer_back.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le fichier pg_hba.conf devra alors demander un certificat avec
-l&amp;rsquo;option clientcert=1 :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;hostssl all all ip_pgbouncer/32 md5 clientcert=1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On ne peut utiliser la méthode cert uniquement si le CN du certificat
-client de pgBouncer est identique au nom de l&amp;rsquo;utilisateur qui se
-connecte. Ainsi, on ne peut plus utiliser qu&amp;rsquo;un seul nom d&amp;rsquo;utilisateur
-pour les accès à PostgreSQL, dans ce cas là il vaut mieux forcer le
-nom d&amp;rsquo;utilisateur dans la section [database].&lt;/p&gt;</description>
+      <description>&lt;p&gt;Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.&lt;/p&gt;</description>
     </item>
     
   </channel>

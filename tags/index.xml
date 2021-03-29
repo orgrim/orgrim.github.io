@@ -3,13 +3,430 @@
   <channel>
     <title>Tags on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/</link>
-    <description>code. grind. sleep. (Tags)</description>
+    <description>Recent content in Tags on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Thu, 11 Feb 2021 10:00:00 +0100</lastBuildDate>
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Thu, 11 Feb 2021 10:00:00 +0100</lastBuildDate><atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>postgresql</title>
+      <link>https://www.orgrim.net/tags/postgresql/</link>
+      <pubDate>Thu, 11 Feb 2021 10:00:00 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/postgresql/</guid>
+      <description></description>
+    </item>
     
-    <atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>selinux</title>
+      <link>https://www.orgrim.net/tags/selinux/</link>
+      <pubDate>Thu, 11 Feb 2021 10:00:00 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/selinux/</guid>
+      <description></description>
+    </item>
     
+    <item>
+      <title>go</title>
+      <link>https://www.orgrim.net/tags/go/</link>
+      <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>install</title>
+      <link>https://www.orgrim.net/tags/install/</link>
+      <pubDate>Wed, 20 Jan 2021 21:58:54 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/install/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cloud-init</title>
+      <link>https://www.orgrim.net/tags/cloud-init/</link>
+      <pubDate>Tue, 28 Jul 2020 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/cloud-init/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>libvirt</title>
+      <link>https://www.orgrim.net/tags/libvirt/</link>
+      <pubDate>Tue, 28 Jul 2020 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/libvirt/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>unix</title>
+      <link>https://www.orgrim.net/tags/unix/</link>
+      <pubDate>Tue, 28 Jul 2020 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/unix/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>auth</title>
+      <link>https://www.orgrim.net/tags/auth/</link>
+      <pubDate>Mon, 30 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/auth/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pgbouncer</title>
+      <link>https://www.orgrim.net/tags/pgbouncer/</link>
+      <pubDate>Mon, 30 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pgbouncer/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>archiving</title>
+      <link>https://www.orgrim.net/tags/archiving/</link>
+      <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/archiving/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>replication</title>
+      <link>https://www.orgrim.net/tags/replication/</link>
+      <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/replication/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>wal</title>
+      <link>https://www.orgrim.net/tags/wal/</link>
+      <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/wal/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>backup</title>
+      <link>https://www.orgrim.net/tags/backup/</link>
+      <pubDate>Thu, 12 Mar 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/backup/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dump</title>
+      <link>https://www.orgrim.net/tags/dump/</link>
+      <pubDate>Thu, 12 Mar 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/dump/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pg_back</title>
+      <link>https://www.orgrim.net/tags/pg_back/</link>
+      <pubDate>Thu, 12 Mar 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pg_back/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>blog</title>
+      <link>https://www.orgrim.net/tags/blog/</link>
+      <pubDate>Wed, 28 May 2014 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/blog/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pandoc</title>
+      <link>https://www.orgrim.net/tags/pandoc/</link>
+      <pubDate>Wed, 28 May 2014 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pandoc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>netbsd</title>
+      <link>https://www.orgrim.net/tags/netbsd/</link>
+      <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/netbsd/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pkgsrc</title>
+      <link>https://www.orgrim.net/tags/pkgsrc/</link>
+      <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pkgsrc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>X11</title>
+      <link>https://www.orgrim.net/tags/x11/</link>
+      <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/x11/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pg_catalog</title>
+      <link>https://www.orgrim.net/tags/pg_catalog/</link>
+      <pubDate>Sat, 06 Apr 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pg_catalog/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>configuration</title>
+      <link>https://www.orgrim.net/tags/configuration/</link>
+      <pubDate>Wed, 25 Jan 2012 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/configuration/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>build</title>
+      <link>https://www.orgrim.net/tags/build/</link>
+      <pubDate>Tue, 24 Jan 2012 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/build/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ssh</title>
+      <link>https://www.orgrim.net/tags/ssh/</link>
+      <pubDate>Fri, 21 Oct 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/ssh/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>lock</title>
+      <link>https://www.orgrim.net/tags/lock/</link>
+      <pubDate>Thu, 04 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/lock/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>debian</title>
+      <link>https://www.orgrim.net/tags/debian/</link>
+      <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/debian/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ipv6</title>
+      <link>https://www.orgrim.net/tags/ipv6/</link>
+      <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/ipv6/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>kvm</title>
+      <link>https://www.orgrim.net/tags/kvm/</link>
+      <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/kvm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>lxc</title>
+      <link>https://www.orgrim.net/tags/lxc/</link>
+      <pubDate>Mon, 04 Jul 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/lxc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>bash</title>
+      <link>https://www.orgrim.net/tags/bash/</link>
+      <pubDate>Wed, 29 Jun 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/bash/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ghostscript</title>
+      <link>https://www.orgrim.net/tags/ghostscript/</link>
+      <pubDate>Tue, 21 Jun 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/ghostscript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pdf</title>
+      <link>https://www.orgrim.net/tags/pdf/</link>
+      <pubDate>Tue, 21 Jun 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pdf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pkgin</title>
+      <link>https://www.orgrim.net/tags/pkgin/</link>
+      <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pkgin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ccache</title>
+      <link>https://www.orgrim.net/tags/ccache/</link>
+      <pubDate>Fri, 04 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/ccache/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pkg_comp</title>
+      <link>https://www.orgrim.net/tags/pkg_comp/</link>
+      <pubDate>Fri, 04 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pkg_comp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>bind</title>
+      <link>https://www.orgrim.net/tags/bind/</link>
+      <pubDate>Thu, 03 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/bind/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dnssec</title>
+      <link>https://www.orgrim.net/tags/dnssec/</link>
+      <pubDate>Thu, 03 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/dnssec/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pf</title>
+      <link>https://www.orgrim.net/tags/pf/</link>
+      <pubDate>Sat, 26 Feb 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/pf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>sequence</title>
+      <link>https://www.orgrim.net/tags/sequence/</link>
+      <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/sequence/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>random</title>
+      <link>https://www.orgrim.net/tags/random/</link>
+      <pubDate>Thu, 30 Dec 2010 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/random/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rndctl</title>
+      <link>https://www.orgrim.net/tags/rndctl/</link>
+      <pubDate>Thu, 30 Dec 2010 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/rndctl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dual-boot</title>
+      <link>https://www.orgrim.net/tags/dual-boot/</link>
+      <pubDate>Mon, 29 Nov 2010 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/dual-boot/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

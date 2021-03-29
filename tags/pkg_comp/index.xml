@@ -3,62 +3,22 @@
   <channel>
     <title>pkg_comp on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/pkg_comp/</link>
-    <description>code. grind. sleep. (pkg_comp)</description>
+    <description>Recent content in pkg_comp on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Fri, 04 Mar 2011 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/pkg_comp/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Fri, 04 Mar 2011 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/pkg_comp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>pkgsrc, pkg_comp et ccache</title>
       <link>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</link>
       <pubDate>Fri, 04 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</guid>
-      <description>&lt;p&gt;Pour utiliser ccache dans un chroot &lt;code&gt;pkg_comp&lt;/code&gt;, on commence par installer
-ccache :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_comp build devel/ccache
-# pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;En utilisant la cible &lt;code&gt;package-install&lt;/code&gt; dans le chroot, ccache s&amp;rsquo;y
-trouve installé. On l&amp;rsquo;installe aussi sur le système pour surveiller les
-statistiques plus tard.&lt;/p&gt;
-&lt;p&gt;Ensuite, on édite le &lt;code&gt;etc/mk.conf&lt;/code&gt; du chroot, par exemple
-&lt;code&gt;/local/pkg_comp/default/etc/mk.conf&lt;/code&gt;, pour y définir les variables
-suivantes :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ...
-# fin de la conf speciale pkg_comp
-
-CCACHE_DIR=${WRKOBJDIR}/.ccache
-PKGSRC_COMPILER = ccache gcc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On créé ensuite le répertoire du cache, si le chemin du chroot est
-&lt;code&gt;/local/pkg_comp/default&lt;/code&gt;, avec la variable &lt;code&gt;WRKOBJDIR&lt;/code&gt; laissée par
-défaut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, il suffit de compiler ses packages comme d&amp;rsquo;habitude.&lt;/p&gt;
-&lt;p&gt;Enfin, on peut suivre les statistiques du cache avec la commande
-suivante :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# CCACHE_DIR=/local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache ccache -s
-cache directory                     /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
-cache hit                            133
-cache miss                          3053
-called for link                      383
-compile failed                        43
-preprocessor error                    34
-autoconf compile/link                388
-unsupported compiler option          216
-no input file                         55
-files in cache                      6201
-cache size                          58.7 Mbytes
-max cache size                    1024.0 Mbytes
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;P.S. : Une doc pour mettre en place un chroot &lt;code&gt;pkg_comp&lt;/code&gt; est disponible
-&lt;a href=&#34;http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp&#34;&gt;sur le wiki&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>Pour utiliser ccache dans un chroot pkg_comp, on commence par installer ccache :
+# pkg_comp build devel/ccache # pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz  En utilisant la cible package-install dans le chroot, ccache s&amp;rsquo;y trouve installé. On l&amp;rsquo;installe aussi sur le système pour surveiller les statistiques plus tard.
+Ensuite, on édite le etc/mk.conf du chroot, par exemple /local/pkg_comp/default/etc/mk.conf, pour y définir les variables suivantes :
+# ... # fin de la conf speciale pkg_comp CCACHE_DIR=${WRKOBJDIR}/.</description>
     </item>
     
   </channel>

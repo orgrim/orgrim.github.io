@@ -3,101 +3,28 @@
   <channel>
     <title>PostgreSQL on code. grind. sleep.</title>
     <link>https://www.orgrim.net/categories/postgresql/</link>
-    <description>code. grind. sleep. (PostgreSQL)</description>
+    <description>Recent content in PostgreSQL on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Thu, 11 Feb 2021 10:00:00 +0100</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/categories/postgresql/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Thu, 11 Feb 2021 10:00:00 +0100</lastBuildDate><atom:link href="https://www.orgrim.net/categories/postgresql/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>PostgreSQL et SELinux à l&#39;ère de systemd</title>
       <link>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</link>
       <pubDate>Thu, 11 Feb 2021 10:00:00 +0100</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</guid>
       <description>&lt;p&gt;Ce post se veut une mise à jour du &lt;a href=&#34;https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/&#34;&gt;post précédent&lt;/a&gt; sur le sujet. En
 effet, le module SELinux, les commandes utilisées ont évolué avec
-l&amp;rsquo;adoption de systemd. Les principes restent les mêmes.&lt;/p&gt;
-&lt;p&gt;Pour confiner une instance PostgreSQL avec SELinux, il faut configurer
-plusieurs éléments :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Les « file contexts » : les binaires et les données doivent avoir le
-bon type dans la famille des contexts PostgreSQL. Cela se fait avec
-des regexp et la commande &lt;code&gt;semanage fcontext&lt;/code&gt; en local ou par un
-module SELinux.&lt;/p&gt;
-&lt;p&gt;Par exemple pour créer une instance dans &lt;code&gt;/srv/pgsql&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage fcontext -a -t postgresql_db_t /srv/pgsql(/.*)?
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;On ajoutera des règles similaires pour les tablespaces.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;le port TCP : dans la politique par défaut du système le port 5432
-est bien taggué, pour faire écouter PostgreSQL sur un autre port, il
-ne doit pas être taggué avec un autre type SElinux et explicitement
-taggué avec le type &lt;code&gt;postgresql_port_t&lt;/code&gt; avec la commande &lt;code&gt;semanage port&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Par exemple pour faire écouter l&amp;rsquo;instance sur le port 5433 :&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage port -a -p tcp -t postgresql_port_t 5433
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;activer des « boolean » SELinux : par exemple pour autoriser
-l&amp;rsquo;utilisation de &lt;code&gt;rsync&lt;/code&gt; par un processus PostgreSQL confiné, utile
-pour l&amp;rsquo;archivage des WAL.&lt;/p&gt;
-&lt;p&gt;Par exemple :&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;# semanage boolean -m --on postgresql_can_rsync
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Le module &lt;code&gt;postgresql-pgdg&lt;/code&gt; disponible ici :
-&lt;a href=&#34;https://github.com/dalibo/selinux-pgsql-pgdg&#34;&gt;https://github.com/dalibo/selinux-pgsql-pgdg&lt;/a&gt; fournit des file
-contexts et boolean pour cela.&lt;/p&gt;
-&lt;p&gt;Ensuite, il y a deux moyens pour confiner &lt;em&gt;vraiment&lt;/em&gt; l&amp;rsquo;instance :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Lancer le postmaster avec systemd&lt;/li&gt;
-&lt;li&gt;Lancer &lt;code&gt;pg_ctl&lt;/code&gt; avec &lt;code&gt;runcon&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Avec systemd, c&amp;rsquo;est automatique, mais il faut être root ou avoir
-l&amp;rsquo;autorisation de le faire avec sudo.&lt;/p&gt;
-&lt;p&gt;Avec &lt;code&gt;pg_ctl&lt;/code&gt;, c&amp;rsquo;est un peu plus délicat. Avec la politique par
-défaut, on a le plus souvent un shell de l&amp;rsquo;utilisateur &lt;code&gt;postgres&lt;/code&gt; non
-confiné, donc avec l&amp;rsquo;user SELinux &lt;code&gt;unconfiend_u&lt;/code&gt;. Cet user SELinux a
-les roles &lt;code&gt;system_r&lt;/code&gt; et &lt;code&gt;unconfined_r&lt;/code&gt;, il peut donc exécuter des
-process avec le role &lt;code&gt;system_r&lt;/code&gt; (voir la sortie &lt;code&gt;semanage user -l&lt;/code&gt;). Cela permet d&amp;rsquo;utiliser &lt;code&gt;runcon&lt;/code&gt; pour exécuter &lt;code&gt;pg_ctl&lt;/code&gt; dans le
-même context que celui utilisé par systemd pour confiner PostgreSQL :&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-console&#34; data-lang=&#34;console&#34;&gt;$ runcon system_u:system_r:postgresql_t:s0 pg_ctl -D /srv/pgsql/12/main start
-$ ps xfZ
-LABEL                             PID TTY      STAT   TIME COMMAND
-unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 1317 pts/0 S   0:00 -bash
-unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 1334 pts/0 R+   0:00  \_ ps xfZ
-system_u:system_r:postgresql_t:s0 1144 ?       Ss     0:00 /usr/pgsql-12/bin/postgres -D /srv/pgsql/12/main
-system_u:system_r:postgresql_t:s0 1176 ?       Ss     0:00  \_ postgres: main: logger
-system_u:system_r:postgresql_t:s0 1178 ?       Ss     0:00  \_ postgres: main: checkpointer
-system_u:system_r:postgresql_t:s0 1179 ?       Ss     0:00  \_ postgres: main: background writer
-system_u:system_r:postgresql_t:s0 1180 ?       Ss     0:00  \_ postgres: main: walwriter
-system_u:system_r:postgresql_t:s0 1181 ?       Ss     0:00  \_ postgres: main: autovacuum launcher
-system_u:system_r:postgresql_t:s0 1182 ?       Ss     0:00  \_ postgres: main: archiver   last was 00000001000000000
-system_u:system_r:postgresql_t:s0 1183 ?       Ss     0:00  \_ postgres: main: stats collector
-system_u:system_r:postgresql_t:s0 1184 ?       Ss     0:00  \_ postgres: main: logical replication launcher
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Enfin, la sauvegarde, du fait que l&amp;rsquo;archivage soit exécuté par
-l&amp;rsquo;instance, est impactée par SELinux. En plus des droits unix
-classiques, le context &lt;code&gt;postgresql_t&lt;/code&gt; doit pouvoir écrire dans le
-répertoire d&amp;rsquo;archivage s&amp;rsquo;il est local. Il faut donc que ce répertoire
-ait le contexte &lt;code&gt;postgresql_db_t&lt;/code&gt;. Ce n&amp;rsquo;est pas forcément suffisant si
-le répertoire de stockage des WAL archivés est dans un point de
-montage réseau. Il existe pour cela les booléens :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;postgresql_pgdg_use_nfs&lt;/code&gt; pour les montages NFS&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;postgresql_pgdg_use_fusefs&lt;/code&gt; pour les montages plus exotiques utilisant FUSE&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Le paquet RPM pour RHEL/CentOS est disponible dans le dépot
-&lt;a href=&#34;https://yum.dalibo.org/labs/&#34;&gt;https://yum.dalibo.org/labs/&lt;/a&gt;, sous le nom
-&lt;code&gt;selinux-policy-pgsql-pgdg&lt;/code&gt;.&lt;/p&gt;</description>
+l&amp;rsquo;adoption de systemd. Les principes restent les mêmes.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Gestion des utilisateurs pgBouncer avec auth_query</title>
       <link>https://www.orgrim.net/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/</link>
       <pubDate>Mon, 30 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2017-10-30-gestion-des-utilisateurs-pgbouncer-avec-auth-query/</guid>
       <description>&lt;p&gt;Avec pgBouncer 1.6 sont arrivés deux nouveaux paramètres, &lt;code&gt;auth_user&lt;/code&gt; et
@@ -108,297 +35,48 @@ l&amp;rsquo;utilisateur final sur le serveur PostgreSQL. Il y a deux problèmes
 majeurs avec ce fichier utilisateur : son maintien fastidieux et le
 risque de collision entre noms de roles identiques mais avec des mots
 de passe différents si le même pgBoucner accède à plusieurs instances
-PostgreSQL.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;auth_query&lt;/code&gt; permet de définir une requête à exécuter pour obtenir le
-couple utilisateur / mot de passe de l&amp;rsquo;instance lorsqu&amp;rsquo;ils sont
-introuvables dans le fichier.&lt;/p&gt;
-&lt;p&gt;Pour se connecter à l&amp;rsquo;instance PostgreSQL et exécuter la requête,
-pgBouncer utilise la valeur de &lt;code&gt;auth_user&lt;/code&gt; comme nom d&amp;rsquo;utilisateur. Si
-PostgreSQL demande un mot de passe, pgBouncer utilise celui défini
-dans le fichier des utilisateurs. On peut utiliser un utilisateur
-commun à toutes les instances, qu&amp;rsquo;il faut alors créer sur chaque
-instance, ou ajouter le paramètre &lt;code&gt;auth_user&lt;/code&gt; au niveau de la définir
-de l&amp;rsquo;accès à la base de données dans la section [databases].&lt;/p&gt;
-&lt;p&gt;Enfin, l&amp;rsquo;utilisateur &lt;code&gt;auth_user&lt;/code&gt; doit pouvoir lire le contenu de
-&lt;code&gt;pg_shadow&lt;/code&gt; pour obtenir les mots de passe hashés, il est alors
-recommandé de créer une fonction dans chaque base de données accédée
-par pgBouncer sur l&amp;rsquo;instance cible. Sinon, il faut donner accès à
-&lt;code&gt;pg_shadow&lt;/code&gt; par un &lt;code&gt;GRANT&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Concrètement cela donne, dans &lt;code&gt;/etc/pgbouncer/pgbouncer.ini&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;k&#34;&gt;[pgbouncer]&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;; ...&lt;/span&gt;
-
-&lt;span class=&#34;na&#34;&gt;auth_type&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;md5&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_file&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/etc/pgbouncer/userlist.txt&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;;; si on choisit de faire un GRANT sur pg_shadow&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_query&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;SELECT usename, passwd FROM pg_shadow WHERE usename=$1&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;;; si on choisit de créer la fonction donnée dans la doc de pgBouncer&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;auth_query&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;SELECT pgbouncer.user_lookup($1)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Sur l&amp;rsquo;instance PostgreSQL, pour créer l&amp;rsquo;utilisateur pgbouncer chargé
-d&amp;rsquo;exécuter l&amp;rsquo;auth_query :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;WITH&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;PASSWORD&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;le mot de passe&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;passwd&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;username&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pgbouncer&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Créer le fichier &lt;code&gt;/etc/pgbouncer/userlist.txt&lt;/code&gt; et mettre le résultat du SELECT sous cette forme :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;quot;pgbouncer&amp;quot; &amp;quot;md5ac0b6e3b0d0904c0b602607e36c256eb&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on choisit de faire un GRANT sur &lt;code&gt;pg_shadow&lt;/code&gt;, faire cette opération
-dans toutes les bases de données accédées via pgBouncer :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Sinon exécuter le script SQL suivant dans toutes les bases de données
-accédées via pgBouncer, c&amp;rsquo;est la fonction donnée dans la doc avec la
-création du schéma en plus :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;REVOKE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALL&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;USAGE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SCHEMA&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-
-&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;OR&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;REPLACE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_username&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;out&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;uname&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;out&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;phash&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;RETURNS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;record&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;$$&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;passwd&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_catalog&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_shadow&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;usename&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_username&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;INTO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;uname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;phash&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;RETURN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;END&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LANGUAGE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;plpgsql&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SECURITY&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DEFINER&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;REVOKE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALL&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;GRANT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;EXECUTE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FUNCTION&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user_lookup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pgbouncer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On peut ajouter la fonction ou le &lt;code&gt;GRANT&lt;/code&gt; à &lt;code&gt;template1&lt;/code&gt; pour les futures bases de données.&lt;/p&gt;</description>
+PostgreSQL.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Configuration de pgBouncer avec des connexions TLS</title>
       <link>https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/</link>
       <pubDate>Fri, 27 Oct 2017 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2017-10-27-configuration-de-pgbouncer-avec-des-connexions-tls/</guid>
-      <description>&lt;p&gt;Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.&lt;/p&gt;
-&lt;h2 id=&#34;autorité-de-certification-avec-easyrsa&#34;&gt;Autorité de certification avec EasyRSA&lt;/h2&gt;
-&lt;h3 id=&#34;installation&#34;&gt;Installation&lt;/h3&gt;
-&lt;p&gt;Télécharger et installer la dernière version de EasyRSA. La version 3
-est différente de la version 2, fournie dans Debain Stretch.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;wget https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.3/EasyRSA-3.0.3.tgz
-tar xzf EasyRSA-3.0.3.tgz
-cd EasyRSA-3.0.3
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;création-de-lautorité-de-certification&#34;&gt;Création de l&amp;rsquo;autorité de certification&lt;/h3&gt;
-&lt;p&gt;Créer un fichier de configuration :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;cp vars.example vars
-vi vars
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Changer quelques informations :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;set_var EASYRSA_REQ_COUNTRY	&amp;quot;FR&amp;quot;
-set_var EASYRSA_REQ_PROVINCE	&amp;quot;Ile-de-France&amp;quot;
-set_var EASYRSA_REQ_CITY	&amp;quot;Paris&amp;quot;
-set_var EASYRSA_REQ_ORG		&amp;quot;MyOrg&amp;quot;
-set_var EASYRSA_REQ_EMAIL	&amp;quot;admin@myorg.lo&amp;quot;
-set_var EASYRSA_REQ_OU		&amp;quot;Clients&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Créer l&amp;rsquo;autorité :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa init-pki
-./easyrsa build-ca
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il faut lui donner un nom, par exemple CA Clients ou PostgreSQL ou un
-truc significatif. Il faut aussi saisir un mot de passe pour la clé du
-certificat racine, celui qui permet de signer tout le reste.&lt;/p&gt;
-&lt;h3 id=&#34;création-des-certificats&#34;&gt;Création des certificats&lt;/h3&gt;
-&lt;p&gt;Pour créer un bi-clé pour un serveur :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa build-server-full postgresql nopass
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si la clé et le certificat du serveur doivent être transmis pas un moyen
-peu sécurisé, comme le mail, créer un fichier PKCS#12 plutot qu&amp;rsquo;un tar :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa export-p12 postgresql
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut mettre un mot de passe au fichier.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa build-server-full pgbouncer nopass
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Générer aussi la liste de révocation, qui permet rendre des
-certificats invalides.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;./easyrsa gen-crl
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;extraction-des-éléments-du-p12&#34;&gt;Extraction des éléments du p12&lt;/h3&gt;
-&lt;p&gt;La clé privée :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -nocerts -nodes -out postgresql.key
-chmod 600 postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le certificat :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -clcerts -out postgresql.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le certificat de l&amp;rsquo;AC :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;openssl pkcs12 -in postgresql.p12 -cacerts -out ca.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;configurer-postgresql-pour-le-tls&#34;&gt;Configurer PostgreSQL pour le TLS&lt;/h2&gt;
-&lt;p&gt;il faut les fichiers suivants :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/ca.crt
-pki/crl.pem
-pki/issued/postgresql.crt
-pki/private/postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;ou&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/crl.pem
-pki/private/postgresql.p12
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;et extraire le contenu du fichier PKCS#12 (voir plus haut).&lt;/p&gt;
-&lt;p&gt;Le plus simple est de placer ces fichiers dans le répertoire $PGDATA,
-les chemins dans la configuration sont relatifs à ce répertoire.&lt;/p&gt;
-&lt;p&gt;Dans $PGDATA/postgresql.conf, configurer au minimum :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ssl = on
-ssl_cert_file = &#39;postgresql.crt&#39;
-ssl_key_file = &#39;postgresql.key&#39;
-ssl_ca_file = &#39;ca.crt&#39;
-ssl_crl_file = &#39;crl.pem&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Un reload de la configuration suffit pour prendre en compte les
-modifications. Ce paramétrage permet à l&amp;rsquo;instance de chiffrer les
-connexions. On définit si la connexion TLS est imposé au clients et
-l&amp;rsquo;authentification par certificat dans le fichier pg_hba.conf&lt;/p&gt;
-&lt;p&gt;Le TLS ne concerne pas les connections locales par socket unix, géré
-par le type &amp;lsquo;local&amp;rsquo;.&lt;/p&gt;
-&lt;p&gt;Le type &amp;lsquo;host&amp;rsquo;, concerne les connexions en clair ou TLS, utiliser
-&amp;lsquo;hostssl&amp;rsquo; ou &amp;lsquo;hostnossl&amp;rsquo; pour distinguer le TLS dans les
-autorisations.&lt;/p&gt;
-&lt;p&gt;On peut interdire les connexions en clair avec ces deux lignes :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;hostnossl   all   all   0.0.0.0/0   reject
-hostnossl   all   all   ::/0        reject
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Toutes les lignes &amp;lsquo;host&amp;rsquo; suivantes ne concerneront que les connexions
-TLS, du fait de l&amp;rsquo;interdiction précédente.&lt;/p&gt;
-&lt;h2 id=&#34;configurer-pgbouncer-pour-le-tls&#34;&gt;Configurer pgBouncer pour le TLS&lt;/h2&gt;
-&lt;h3 id=&#34;clients&#34;&gt;Clients&lt;/h3&gt;
-&lt;p&gt;il faut les fichiers suivants :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/ca.crt
-pki/crl.pem
-pki/issued/postgresql.crt
-pki/private/postgresql.key
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;ou&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;pki/crl.pem
-pki/private/postgresql.p12
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;et extraire le contenu du fichier PKCS#12 (voir plus haut).&lt;/p&gt;
-&lt;p&gt;Dans /etc/pgbouncer/pgbouncer.ini, il faut configurer &amp;lsquo;client_tls_sslmode&amp;rsquo; :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;disable : n&amp;rsquo;accepte pas les connexions TLS, le paramétrage par défaut&lt;/li&gt;
-&lt;li&gt;allow : accepte les connexions TLS et les connexions en clair&lt;/li&gt;
-&lt;li&gt;require : n&amp;rsquo;accepte que les connexions TLS&lt;/li&gt;
-&lt;li&gt;verify-ca, verify-full : n&amp;rsquo;accepte que les connexions TLS, et demande un certificat au client issue de la même AC&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Pour les chemins vers les fichiers :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;client_tls_ca_file = /etc/pgbouncer/ca.crt
-client_tls_key_file = /etc/pgbouncer/pgbouncer.key
-client_tls_cert_file = /etc/pgbouncer/pgbouncer.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour authentifier les clients avec un certificat, il faut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;auth_type = cert
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le CN du certificat doit alors être identique au nom d&amp;rsquo;utilisateur de
-connexion.&lt;/p&gt;
-&lt;p&gt;Cela ne dispense pas de la configuration de l&amp;rsquo;authenfication entre
-pgBouncer et PostgreSQL, avec &amp;lsquo;auth_file&amp;rsquo;, voire &amp;lsquo;auth_user&amp;rsquo; et &amp;lsquo;auth_query&amp;rsquo;.&lt;/p&gt;
-&lt;h3 id=&#34;backends-postgresql&#34;&gt;Backends PostgreSQL&lt;/h3&gt;
-&lt;p&gt;Pour que pgBouncer se connecte aux serveurs PostgreSQL en TLS, dans
-/etc/pgbouncer/pgbouncer.ini, il faut configurer :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = require
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on souhaite que pgBouncer vérifie le certificat de l&amp;rsquo;AC du serveur
-PostgreSQL :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = verify-ca
-server_tls_ca_file = /etc/pgbouncer/ca.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut enfin configurer pgBouncer et PostgreSQL pour que pgBouncer
-s&amp;rsquo;authentifie avec un certificat client, dans /etc/pgbouncer.ini :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;server_tls_sslmode = verify-ca
-server_tls_ca_file = /etc/pgbouncer/ca.crt
-server_tls_key_file = /etc/pgbouncer/pgbouncer_back.key
-server_tls_cert_file = /etc/pgbouncer/pgbouncer_back.crt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le fichier pg_hba.conf devra alors demander un certificat avec
-l&amp;rsquo;option clientcert=1 :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;hostssl all all ip_pgbouncer/32 md5 clientcert=1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On ne peut utiliser la méthode cert uniquement si le CN du certificat
-client de pgBouncer est identique au nom de l&amp;rsquo;utilisateur qui se
-connecte. Ainsi, on ne peut plus utiliser qu&amp;rsquo;un seul nom d&amp;rsquo;utilisateur
-pour les accès à PostgreSQL, dans ce cas là il vaut mieux forcer le
-nom d&amp;rsquo;utilisateur dans la section [database].&lt;/p&gt;</description>
+      <description>&lt;p&gt;Un petit howto pour créer des certificats et les utiliser avec PostgreSQL et pgBouncer.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Réflexions sur l&#39;archivage des fichiers WAL</title>
       <link>https://www.orgrim.net/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/</link>
       <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2015-12-30-reflexions-sur-larchivage-des-fichiers-wal/</guid>
       <description>&lt;p&gt;PostgreSQL faisant son bonhomme de chemin, on se retrouve désormais
 avec des configurations où il faut archiver plusieurs fois les WAL
-parce qu&amp;rsquo;on a de la sauvegarde PITR et de la réplication.&lt;/p&gt;
-&lt;p&gt;Le plus gros piège lorsqu&amp;rsquo;on a du PITR et de la réplication, ou
-plusieurs serveurs standby, c&amp;rsquo;est d&amp;rsquo;oublier que chaque élément de
-l&amp;rsquo;architecture qui consomme du WAL doit avoir son propre répertoire de
-WAL archivés, car chacun purge les fichiers différemment.&lt;/p&gt;
-&lt;p&gt;On tombe dans le piège facilement, en se disant, &amp;ldquo;pas de problème pour
-la purge des vieux fichiers, c&amp;rsquo;est le PITR ou le slave le plus éloigné
-qui purgera&amp;rdquo;. Si la purge du PITR passe alors que le standby était
-déconnecté du maitre, cette purge peut casser la réplication.&lt;/p&gt;
-&lt;p&gt;La solution est d&amp;rsquo;archiver plusieurs fois le même fichier WAL. Pour
-optimiser, le plus efficace à l&amp;rsquo;usage est d&amp;rsquo;utiliser des
-hardlinks. En gros, on archive une fois le fichier WAL et on crée
-autant de lien hard qu&amp;rsquo;il faut pour les autres consommateurs de WAL
-archivés. Rappelons, que la donnée n&amp;rsquo;est supprimée que lorsqu&amp;rsquo;il
-n&amp;rsquo;existe plus aucun lien et que plus aucun processus n&amp;rsquo;a le fichier
-ouvert, à ne pas confondre avec un lien symbolique.&lt;/p&gt;
-&lt;p&gt;Pour archiver vite, il vaut mieux éviter de compresser et stocker les
-archives soit en local, soit sur un partage NFS, l&amp;rsquo;archivage par SSH
-restant le plus lent. Tout est compromis entre chiffrage des
-communications sur le réseau et espace disque disponible, les liens
-hard restant rapides à créer et avec une consommation d&amp;rsquo;espace disque
-supplémentaire négligeable.&lt;/p&gt;
-&lt;p&gt;Enfin, PostgreSQL exécute la commande d&amp;rsquo;archivage avec l&amp;rsquo;appel
-&lt;code&gt;system()&lt;/code&gt; qui fork un shell : toutes les possibilités du shell sont
-alors disponibles, par exemple :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;archive_command = &#39;rsync -a %p slave1:/archived_xlog/slave1/%f &amp;amp;&amp;amp; ssh slave1 &amp;quot;for h in slave2 pitr; do ln /archived_xlog/slave1/%f /archived_xlog/$h/%f; done&amp;quot;&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Oui, une boucle et une seule copie avec rsync par SSH pour 3
-utilisations. On préfèrera surement faire un script pour rendre les
-choses plus lisibles. Ça marche aussi pour &lt;code&gt;restore_command&lt;/code&gt; et
-&lt;code&gt;archive_cleanup_command&lt;/code&gt; dans &lt;code&gt;recovery.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;restore_command = &#39;cp /archived_xlog/$(hostname)/%f %p&#39;
-archive_cleanup_command = &#39;pg_archivecleanup /archived_xlog/$(hostname) %r&#39;
-&lt;/code&gt;&lt;/pre&gt;</description>
+parce qu&amp;rsquo;on a de la sauvegarde PITR et de la réplication.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pg_back le script de base pour sauvegarder PostgreSQL</title>
       <link>https://www.orgrim.net/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/</link>
       <pubDate>Thu, 12 Mar 2015 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2015-03-12-pg-back-le-script-de-base-pour-sauvegarder-postgresql/</guid>
       <description>&lt;p&gt;Il y a fort longtemps, et c&amp;rsquo;est ma première contribution relative à
 PostgreSQL, j&amp;rsquo;ai écrit un script de backup qui dump tout un serveur
-PostgreSQL avec &lt;code&gt;pg_dump&lt;/code&gt; et &lt;code&gt;pg_dumpall&lt;/code&gt;. Il s&amp;rsquo;agit de pg_back.&lt;/p&gt;
-&lt;p&gt;Cela peut paraître curieux de publier un simple script de sauvegarde
-que tout DBA PostgreSQL a écrit dans sa vie et sait écrire par
-cœur. Surtout qu&amp;rsquo;on le réécrit en permanence ce script, pour ajuster
-des chemins, des cas particuliers du serveur à sauvegarder et de
-l&amp;rsquo;environnement où l&amp;rsquo;on sauvegarde&amp;hellip;&lt;/p&gt;
-&lt;p&gt;En bien justement, c&amp;rsquo;est parce qu&amp;rsquo;on le réécrit tout le temps que
-pg_back fait gagner du temps. Il est simple et court, facilement
-lisible, c&amp;rsquo;est du shell : tout ce qu&amp;rsquo;il faut pour en faire une bonne
-base pour créer un script de sauvegarde adapté. Quand on l&amp;rsquo;utilise
-comme patron pour en faire un outil plus évolué, on gagne du temps.&lt;/p&gt;
-&lt;p&gt;Justement rajouter du code pour l&amp;rsquo;adapter peut se faire au début. Si
-on n&amp;rsquo;a pas envie d&amp;rsquo;utiliser le fichier de configuration, on adapte la
-liste de variables au début du script, quitte à en rajouter.&lt;/p&gt;
-&lt;p&gt;L&amp;rsquo;autre endroit intéressant c&amp;rsquo;est tout à la fin, avant le &lt;code&gt;exit&lt;/code&gt;, on
-peut rajouter tout ce qu&amp;rsquo;il faut pour externaliser ses sauvegardes.&lt;/p&gt;
-&lt;p&gt;C&amp;rsquo;est par &lt;a href=&#34;https://github.com/orgrim/pg_back&#34;&gt;ici&lt;/a&gt;.&lt;/p&gt;</description>
+PostgreSQL avec &lt;code&gt;pg_dump&lt;/code&gt; et &lt;code&gt;pg_dumpall&lt;/code&gt;. Il s&amp;rsquo;agit de pg_back.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Confiner PostgreSQL avec SELinux</title>
       <link>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</link>
       <pubDate>Mon, 22 Sep 2014 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2014-09-22-confiner-postgresql-avec-selinux/</guid>
       <description>&lt;style type=&#34;text/css&#34;&gt;.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:#444;background:#e7f2fa}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:#fff;background:#6ab0de}.notice.warning .notice-title{background:rgba(217,83,79,.9)}.notice.warning{background:#fae2e2}.notice.info .notice-title{background:#f0b37e}.notice.info{background:#fff2db}.notice.note .notice-title{background:#6ab0de}.notice.note{background:#e7f2fA}.notice.tip .notice-title{background:rgba(92,184,92,.8)}.notice.tip{background:#e6f9e6}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:0.125em;position:relative}&lt;/style&gt;
@@ -411,537 +89,74 @@ aller trop loin, parce que j&amp;rsquo;entendais souvent la phrase &amp;ldquo;Si
 de la sécurité, il faut SELinux&amp;rdquo; et surtout à cause de l&amp;rsquo;arrivée de
 l&amp;rsquo;extension &lt;code&gt;sepgsql&lt;/code&gt; dans les modules contrib de PostgreSQL. Ça avait
 donné une conf pour le Fosdem où finalement, j&amp;rsquo;ai plus parlé des
-privilèges classiques que de SELinux.&lt;/p&gt;
-&lt;p&gt;Suite à une demande au ${BOULOT}, je me suis replongé dedans, et les
-choses ont peu évolué. Dans la majorité des recherches que j&amp;rsquo;ai pu
-faire, SELinux reste tout de même un truc qui se met en travers la
-route, c&amp;rsquo;est-à-dire, qu&amp;rsquo;il y a toujours plus de résultats sur comment
-le désactiver plutôt que configurer les choses correctement. Ensuite,
-certains proposent de faire aveuglement confiance à &lt;code&gt;setroubleshoot&lt;/code&gt;
-et &lt;code&gt;audit2allow&lt;/code&gt; pour faire taire la bête. Enfin, j&amp;rsquo;ai dû trouver une
-page ou deux après en deux semaines à temps plein sur le sujet qui
-parlent de comment confiner un utilisateur dans le but d&amp;rsquo;implémenter ce
-que promet SELinux et que toutes les entreprises demandent : le RBAC,
-Role Based Access Control, ou comment donner le moins de droits
-possibles aux sous-traitants qui hébergent les serveurs.&lt;/p&gt;
-&lt;p&gt;Cette fois ci, je suis allé plus loin. Déjà, je suis parti sur une
-installation de CentOS 6, la famille de distribution
-RHEL/CentOS/Fedora semble être la plus en avance par rapport à
-SELinux : à peu près tous les services/daemons fournis dans l&amp;rsquo;install
-sont confinés par SELinux. Les utilisateurs ne le sont pas au login,
-il n&amp;rsquo;y a donc aucune configuration de RBAC. On verra peut-être ça plus
-tard, j&amp;rsquo;ai pas encore obtenu de résultat satisfaisant sur ce sujet, et
-il vaut mieux expliquer comment confiner correctement PostgreSQL avant
-de passer aux roles. Tout simplement, parce qu&amp;rsquo;il est très simple de
-casser ce confinement avec la configuration par défaut de RHEL, grâce
-à &lt;code&gt;pg_ctl&lt;/code&gt;. Enfin, l&amp;rsquo;installation des paquets du PGDG n&amp;rsquo;est pas
-confinée par défaut, il manque les file contexts adaptés aux chemins
-particuliers de ces paquets, prévu pour faire cohabiter plusieurs
-versions majeures ; ce qui ne correspond pas ce qu&amp;rsquo;à prévu Red Hat
-pour PostgreSQL.&lt;/p&gt;
-&lt;p&gt;Après cette longue introduction, mais avant de commencer, il faut
-savoir administrer un minumum SELinux : si vous ne savez pas qu&amp;rsquo;il
-existe des options &lt;code&gt;-Z&lt;/code&gt;, ce que sont les contexts, les types et les
-domaines, mieux vaut d&amp;rsquo;abord se documenter, par exemple &lt;a href=&#34;https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security-Enhanced_Linux/index.html&#34;&gt;chez Red
-Hat&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Voici donc les file contexts à ajouter dans un fichier &lt;em&gt;module.te&lt;/em&gt; pour
-confiner l&amp;rsquo;installation PostgreSQL du PGDG :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;/etc/rc\.d/init\.d/(se)?postgresql(-.*)?    --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
-/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb        --  gen_context(system_u:object_r:postgresql_exec_t,s0)
-/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl        --  gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
-/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres      --  gen_context(system_u:object_r:postgresql_exec_t,s0)
-/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?	    gen_context(system_u:object_r:locale_t,s0)
-/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?        gen_context(system_u:object_r:man_t,s0)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Tout d&amp;rsquo;abord, pour l&amp;rsquo;init script et &lt;code&gt;pg_ctl&lt;/code&gt;, on utilise le type
-&lt;code&gt;postgresql_initrc_exec_t&lt;/code&gt;, c&amp;rsquo;est ce qui permet de lancer PostgreSQL
-dans le domaine confiné &lt;code&gt;postgresql_t&lt;/code&gt; au boot, via l&amp;rsquo;init script, et
-manuellement. La méthode la plus propre est de toujours utiliser
-l&amp;rsquo;init script, idéalement par l&amp;rsquo;intermédiaire de &lt;code&gt;run_init&lt;/code&gt; pour
-démarrer, arrêter ou redémarrer le postmaster. On évite alors de
-laisser trainer des choses dans &lt;code&gt;/var/{run,lock}&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Les programmes &lt;code&gt;postgres&lt;/code&gt; et &lt;code&gt;initdb&lt;/code&gt; doivent avoir le type
-&lt;code&gt;postgresql_exec_t&lt;/code&gt; car ils exécutent le serveur PostgreSQL ; cela
-doit se faire dans le domaine &lt;code&gt;postgresql_t&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Enfin, on a placé les labels corrects sur les fichiers de traduction
-et les pages de man, pour faire plus propre. Ce code source de module
-SELinux alors doit être compilé et chargé.&lt;/p&gt;
-&lt;p&gt;Cette configuration est reprise dans le module SELinux disponible sur
-&lt;a href=&#34;http://github.com/dalibo/selinux-pgsql-pgdg&#34;&gt;github&lt;/a&gt;. On peut aussi l&amp;rsquo;ajouter manuellement avec &lt;code&gt;semanage&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;semanage fcontext -a -t postgresql_initrc_exec_t &#39;/etc/rc\.d/init\.d/(se)?postgresql(-.*)?&#39;
-semanage fcontext -a -t postgresql_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/initdb&#39;
-semanage fcontext -a -t postgresql_initrc_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/pg_ctl&#39;
-semanage fcontext -a -t postgresql_exec_t &#39;/usr/pgsql-[0-9]+\.[0-9]+/bin/postgres&#39;
-semanage fcontext -a -t locale_t &#39;/usr/pgsql-[0-9]+.[0-9]+/share/locale(/.*)?&#39;
-semanage fcontext -a -t man_t &#39;/usr/pgsql-[0-9]+.[0-9]+/share/man(/.*)?&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il existe un certain nombre de booleans pour la configuration des
-droits SELinux de PostgreSQL, le plus important concerne &lt;code&gt;rsync&lt;/code&gt;,
-souvent nécessaire pour faire des base backups. Il s&amp;rsquo;agit de
-&lt;code&gt;postgresql_can_rsync&lt;/code&gt;, pour l&amp;rsquo;activer :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;semanage boolean -m --on postgresql_can_rsync
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on lance l&amp;rsquo;instance sur un port TCP différent de 5432, il faut
-l&amp;rsquo;autoriser dans la configuration locale de SELinux :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;semanage port -a -t postgresql_port_t -p tcp &amp;lt;port&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Enfin, il ne faut pas oublier d&amp;rsquo;appliquer les contexts aux fichiers
-soit avec &lt;code&gt;restorecon&lt;/code&gt;, un relabel complet au reboot ou &lt;code&gt;chcon&lt;/code&gt;.&lt;/p&gt;</description>
+privilèges classiques que de SELinux.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Oups... des tablespaces imbriqués</title>
       <link>https://www.orgrim.net/post/2013-04-06-oups-des-tablespaces-imbriques/</link>
       <pubDate>Sat, 06 Apr 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2013-04-06-oups-des-tablespaces-imbriques/</guid>
       <description>&lt;p&gt;Imbriquer des tablespaces n&amp;rsquo;a pas vraiment de sens dans PostgreSQL
 surtout si on veut se prendre la tête avec des montages dans tous les
 sens&amp;hellip; Mais bon c&amp;rsquo;est permis, car PostgreSQL utilise uniquement les
 liens symboliques dans &lt;code&gt;$PGDATA/pg_tblspc&lt;/code&gt; pour accéder au contenu des
-tablespaces.&lt;/p&gt;
-&lt;p&gt;Si on veut savoir ce qu&amp;rsquo;il en est voici une requête qui montre ça.&lt;/p&gt;
-&lt;p&gt;Pour PostgreSQL &amp;lt;= 9.1 :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;setting&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_settings&lt;/span&gt;
-                           &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;data_directory&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inside_pgdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-     &lt;span class=&#34;k&#34;&gt;AND&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;ORDER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DESC&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LIMIT&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;parent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt;   &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-     &lt;span class=&#34;k&#34;&gt;AND&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;ORDER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spclocation&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DESC&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LIMIT&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;parent_location&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Pour PostgreSQL &amp;gt;= 9.2, la colonne &lt;code&gt;spcname&lt;/code&gt; de &lt;code&gt;pg_tablespace&lt;/code&gt; a été
-remplacée par la fonction &lt;code&gt;pg_tablespace_location()&lt;/code&gt; :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;setting&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_settings&lt;/span&gt;
-                                    &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;data_directory&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inside_pgdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-     &lt;span class=&#34;k&#34;&gt;AND&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;ORDER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DESC&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LIMIT&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;parent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;~&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-     &lt;span class=&#34;k&#34;&gt;AND&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;k&#34;&gt;ORDER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace_location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DESC&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;LIMIT&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;parent_location&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_tablespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spcname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;NOT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;IN&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_default&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_global&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On obtient par exemple :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  oid  |   name   |                       location                       | inside_pgdata | parent  |                 parent_location                 
--------+----------+------------------------------------------------------+---------------+---------+-------------------------------------------------
- 16399 | inside   | /home/pgsql/postgresql-9.0.10/data/inside            | t             |         | 
- 16400 | outside  | /home/pgsql/postgresql-9.0.10/outside                | f             |         | 
- 16414 | imbrique | /home/pgsql/postgresql-9.0.10/outside/imbrique       | f             | outside | /home/pgsql/postgresql-9.0.10/outside
- 16415 | rimb     | /home/pgsql/postgresql-9.0.10/outside/rimb           | f             | outside | /home/pgsql/postgresql-9.0.10/outside
- 16416 | rimbimb  | /home/pgsql/postgresql-9.0.10/outside/rimb/imb       | f             | rimb    | /home/pgsql/postgresql-9.0.10/outside/rimb
- 16417 | deuimb   | /home/pgsql/postgresql-9.0.10/outside/rimb/truc/2imb | f             | truc    | /home/pgsql/postgresql-9.0.10/outside/rimb/truc
- 16418 | truc     | /home/pgsql/postgresql-9.0.10/outside/rimb/truc      | f             | rimb    | /home/pgsql/postgresql-9.0.10/outside/rimb
-(7 rows)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour bien gérer ses tablespaces, l&amp;rsquo;idéal est de faire un répertoire
-dédié au même niveau que &lt;code&gt;$PGDATA&lt;/code&gt;, et de créer les tablespaces dedans,
-avec un tablespace par répertoire sur un seul niveau :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; /home/pgsql/postgresql-9.2.4
-├── data
-└── tblspc
-    ├── tbs_1
-    ├── tbs_2
-    ├── ...
-    └── tbs_n
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;C&amp;rsquo;est plus propre et on voit tout de suite l&amp;rsquo;utilisation disque avec
-&lt;code&gt;df&lt;/code&gt; : parce qu&amp;rsquo;on met des disques différents derrière, bien entendu&amp;hellip;
-:)&lt;/p&gt;</description>
+tablespaces.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Got GUC?</title>
       <link>https://www.orgrim.net/post/2012-01-25-got-guc/</link>
       <pubDate>Wed, 25 Jan 2012 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2012-01-25-got-guc/</guid>
-      <description>&lt;p&gt;Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui
-signifie Grand Unified Configuration, c&amp;rsquo;est le nom de la partie du code
-qui gère les paramètres de configuration. En gros, ce sont tous les
-paramètres du fichier &lt;code&gt;postgresql.conf&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Ce qui est moins connu et utilisé, c&amp;rsquo;est la possibilité de configurer
-ces paramètres à différents niveaux :&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Fichier &lt;code&gt;postgresql.conf&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Ligne de commande du postmaster, le processus principal du serveur&lt;/li&gt;
-&lt;li&gt;Base de données&lt;/li&gt;
-&lt;li&gt;Rôle&lt;/li&gt;
-&lt;li&gt;Rôle sur une base de données&lt;/li&gt;
-&lt;li&gt;Session&lt;/li&gt;
-&lt;li&gt;Transaction&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;La précédence des valeurs va en descendant dans la liste, par exemple la
-valeur d&amp;rsquo;un paramètre au niveau d&amp;rsquo;un rôle écrase celle positionnée au
-niveau de la base de donnée ou la ligne de commande. Ce comportement est
-très intéressant pour définir une valeur d&amp;rsquo;un paramètre dépendante du
-contexte d&amp;rsquo;exécution d&amp;rsquo;un traitement. Par exemple on peut placer un
-timeout des requêtes au niveau de la base pour éviter qu&amp;rsquo;une application
-ne jette l&amp;rsquo;éponge avant PostgreSQL, et configurer l&amp;rsquo;absence de timeout
-pour un rôle dédié aux opérations de VACUUM et ANALYSE, on limite ainsi
-l&amp;rsquo;effet de bord du timeout :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;c1&#34;&gt;-- timeout à 30 secondes sur la base de données
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DATABASE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mabase&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;statement_timeout&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;30000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;-- pas de timeout pour le role maintenance chargé du vacuum
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;maintenance&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;statement_timeout&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TO&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Selon l&amp;rsquo;endroit où doit être positionné la valeur on utilise :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;postgresql.conf&lt;/code&gt; : directement dans le fichier&lt;/li&gt;
-&lt;li&gt;ligne de commande : dans le script d&amp;rsquo;init avec l&amp;rsquo;option &lt;code&gt;-c&lt;/code&gt; et à
-l&amp;rsquo;exécution de &lt;code&gt;pg_ctl&lt;/code&gt; avec l&amp;rsquo;option &lt;code&gt;-o&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;base de données : &lt;code&gt;ALTER DATABASE nom_base SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;rôle : &lt;code&gt;ALTER ROLE nom_role SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;rôle dans une base de données : &lt;code&gt;ALTER ROLE nom_role IN DATABASE nom_base SET param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;session : &lt;code&gt;SET [ SESSION ] param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;transaction : &lt;code&gt;SET LOCAL param TO valeur;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Pour le passage des valeurs au niveau SQL, on peut utiliser
-&lt;code&gt;RESET param&lt;/code&gt; à la place de &lt;code&gt;SET param TO&lt;/code&gt; pour réinitialiser la
-valeur à son défaut pour le contexte choisi.&lt;/p&gt;
-&lt;p&gt;Pour les paramètres au niveau des bases de données et des rôle, ces
-informations sont stockées dans la table du catalogue système
-&lt;code&gt;pg_catalog.pg_db_role_setting&lt;/code&gt;. La commande psql &lt;code&gt;\drds&lt;/code&gt;permet de
-facilement afficher son contenu.&lt;/p&gt;
-&lt;p&gt;On peut également définir des paramètres personnalisés, comme le font
-certaines extensions. Pour cela il faut définir une classe de variables
-personnalisée, en déclarant un préfixe (on en sépare plusieurs par des
-virgules) dans le paramètre de configuration &lt;code&gt;custom_variable_classes&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;custom_variable_classes = &#39;nico&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, on peut directement ajouter nos variables personnalisées en les
-préfixant par &lt;code&gt;nico.&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;nico.test_guc = 1000
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut alors manipuler ces variables comme ceci :&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc&#34;&gt;{% highlight psql %}
-mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;1000
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc-1&#34;&gt;mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;1000
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicotest_guc-2&#34;&gt;mydb=# SET nico.test_guc = 3;
-SET
-mydb=# SHOW nico.test_guc;
-nico.test_guc&lt;/h2&gt;
-&lt;p&gt;3
-(1 row)&lt;/p&gt;
-&lt;h2 id=&#34;nicoreguc&#34;&gt;mydb=# SET nico.reguc = on;
-SET
-mydb=# SHOW nico.reguc;
-nico.reguc&lt;/h2&gt;
-&lt;p&gt;on
-(1 row)&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-Enfin, on peut utiliser les fonctions `current_setting()` et
-`set_config()` pour manipuler ces variables dans des fonctions :
-
-{% highlight psql %}
-mydb=# SELECT set_config(&#39;nico.test_guc&#39;, &#39;100&#39;, false);
- set_config 
-------------
- 100
-(1 row)
-
-mydb=# SELECT current_setting(&#39;nico.test_guc&#39;);
- current_setting 
------------------
- 100
-(1 row)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;PS: merci à &lt;a href=&#34;http://momjian.us/main/blogs/pgblog/2011.html#December_1_2011&#34;&gt;ce post&lt;/a&gt; pour l&amp;rsquo;idée de creuser le sujet.&lt;/p&gt;
-</description>
+      <description>Les paramètres de configuration de PostgreSQL sont appelés GUC ce qui signifie Grand Unified Configuration, c&amp;rsquo;est le nom de la partie du code qui gère les paramètres de configuration. En gros, ce sont tous les paramètres du fichier postgresql.conf.
+Ce qui est moins connu et utilisé, c&amp;rsquo;est la possibilité de configurer ces paramètres à différents niveaux :
+ Fichier postgresql.conf Ligne de commande du postmaster, le processus principal du serveur Base de données Rôle Rôle sur une base de données Session Transaction  La précédence des valeurs va en descendant dans la liste, par exemple la valeur d&amp;rsquo;un paramètre au niveau d&amp;rsquo;un rôle écrase celle positionnée au niveau de la base de donnée ou la ligne de commande.</description>
     </item>
     
     <item>
       <title>Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger</title>
       <link>https://www.orgrim.net/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/</link>
       <pubDate>Fri, 14 Oct 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/</guid>
-      <description>&lt;p&gt;Voilà donc une question intéressante, comment se comporte PostgreSQL
-face à un système de fichier plein ? Un peu d&amp;rsquo;expérimentation est
-nécessaire pour se rassurer&amp;hellip;&lt;/p&gt;
-&lt;p&gt;On crée deux systèmes de fichiers de faible taille pour les tests. Le
-premier stockera &lt;code&gt;PGDATA&lt;/code&gt;, ainsi qu&amp;rsquo;une base de données nommée &lt;code&gt;db_data&lt;/code&gt;. Le
-second sera le tablesapce &lt;code&gt;ts1&lt;/code&gt;, dans lequel oncréera une base de données
-&lt;code&gt;db_ts1&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;L&amp;rsquo;objectif est de montrer que seules les transactions modifiant des
-objets stockés sur des systèmes de fichier plein sont affectées, c&amp;rsquo;est
-pourquoi on a besoin de plusieurs tablespaces.&lt;/p&gt;
-&lt;p&gt;Les binaires se trouvent dans &lt;code&gt;/home/pgsql/postgresql-9.0.4&lt;/code&gt;, &lt;code&gt;PGDATA&lt;/code&gt; dans
-&lt;code&gt;/home/pgsql/postgresql-9.0.4/data&lt;/code&gt;, et le tablespace dans
-&lt;code&gt;/home/pgsql/postgresql-9.0.4/ts1&lt;/code&gt;. On a donc monté et donné la propriété
-des deux filesystèmes à orgrim, que fera tourner PostgreSQL :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# df -h
-...
-/dev/mapper/sys-pg1   504M   54M  425M  12% /home/pgsql/postgresql-9.0.4/data
-/dev/mapper/sys-pg2   504M   17M  462M   4% /home/pgsql/postgresql-9.0.4/ts1
-...
-
-# cd /home/pgsql/postgresql-9.0.4/
-# chown orgrim: data ts1
-# chmod 700 data ts1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le cluster est préparé avec l&amp;rsquo;environnement suivant :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ env | grep PG
-PGPORT=5904
-PGDATABASE=postgres
-PGDATA=/home/pgsql/postgresql-9.0.4/data
-PATH=/home/pgsql/postgresql-9.0.4/bin:$PATH
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On lance donc &lt;code&gt;initdb&lt;/code&gt;, puis on crée les bases avec le tablespace :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ initdb
-$ psql
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-postgres=# CREATE DATABASE db_data;
-CREATE DATABASE
-postgres=# CREATE TABLESPACE ts1 LOCATION &#39;/home/pgsql/postgresql-9.0.4/ts1&#39;;
-CREATE TABLESPACE
-postgres=# CREATE DATABASE db_ts1 TABLESPACE ts1;
-CREATE DATABASE
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, on se connecte à la base de données &lt;code&gt;db_ts1&lt;/code&gt; et on y crée une
-base qui permettra de remplir le tablespace &lt;code&gt;ts1&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ while ((1)); do psql -c &amp;quot;INSERT INTO t SELECT generate_series(1, 1000) AS i;&amp;quot; db_ts1; done
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Au bout, d&amp;rsquo;un moment le système de fichier du tablespace est plein et
-tout requête générant des écritures sort en erreur avec un message de
-cette forme :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ERROR:  could not extend file &amp;quot;pg_tblspc/16385/PG_9.0_201008051/16386/16390&amp;quot;: wrote only 4096 of 8192 bytes at block 58438
-HINT:  Check free disk space.
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, on essaye avec le répertoire &lt;code&gt;PGDATA&lt;/code&gt;, on crée donc une table
-dans la base &lt;code&gt;db_data&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql db_data
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-db_data=# CREATE TABLE t (i int);
-CREATE TABLE
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;De la même façon, on remplit cette table jusqu&amp;rsquo;à épuisement de l&amp;rsquo;espace
-libre :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ while ((1)); do psql -c &amp;quot;INSERT INTO t SELECT generate_series(1, 1000) AS i;&amp;quot; db_data; done
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Résultat, les requêtes sortent en erreur de la même façon. On a
-peut-être de la chance ici, le filesystem contenant &lt;code&gt;pg_xlog&lt;/code&gt;, les
-problèmes pourraient être pis.&lt;/p&gt;
-&lt;p&gt;Il est également possible de remplir le système de fichiers de journaux
-de transactions, ce qui est problématique du fait que chaque transaction
-est écrite ici tout tablespace confondu. On vide donc les deux bases :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql db_ts1
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-db_ts1=# TRUNCATE t;
-TRUNCATE TABLE
-
-$ psql db_data
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-db_data=# TRUNCATE t;
-TRUNCATE TABLE
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et on place le paramètre &lt;code&gt;checkpoint_segments&lt;/code&gt; à 300, valeur démesurée
-par rapport à la place disponible dans &lt;code&gt;PGDATA&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Après un reload, on refait alors le test de remplissage de la base
-&lt;code&gt;db_ts1&lt;/code&gt;, qui assure que les journaux de transactions seuls remplissent
-&lt;code&gt;PGDATA&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Le serveur PostgreSQL s&amp;rsquo;arrête parce qu&amp;rsquo;il ne peut écrire le journal de
-transaction :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;PANIC:  could not write to file &amp;quot;pg_xlog/xlogtemp.8795&amp;quot;: No space left on device
-STATEMENT:  INSERT INTO t SELECT generate_series(1, 1000) AS i;
-LOG:  server process (PID 8795) was terminated by signal 6: Aborted
-LOG:  terminating any other active server processes
-WARNING:  terminating connection because of crash of another server process
-DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
-HINT:  In a moment you should be able to reconnect to the database and repeat your command.
-LOG:  all server processes terminated; reinitializing
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il redémarre illico, mais le problème persiste :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;FATAL:  the database system is in recovery mode
-LOG:  database system was interrupted; last known up at 2011-10-12 00:01:40 CEST
-LOG:  database system was not properly shut down; automatic recovery in progress
-LOG:  consistent recovery state reached at 0/5FDB7480
-LOG:  redo starts at 0/5AA57D68
-LOG:  could not open file &amp;quot;pg_xlog/000000010000000000000074&amp;quot; (log file 0, segment 116): No such file or directory
-LOG:  redo done at 0/73FFFF90
-LOG:  last completed transaction was at log time 2011-10-12 00:05:11.710639+02
-PANIC:  could not write to file &amp;quot;pg_xlog/xlogtemp.8797&amp;quot;: No space left on device
-LOG:  startup process (PID 8797) was terminated by signal 6: Aborted
-LOG:  aborting startup due to startup process failure
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le seul moyen de se sortir de cette situation est d&amp;rsquo;utiliser les 5%
-d&amp;rsquo;espace libre du filesystem réservés au super utilisateur, de baisser
-la valeur de &lt;code&gt;checkpoint_segments&lt;/code&gt; à une valeur évitant le filesystem
-full, les checkpoints successif supprimeront les fichiers en trop.&lt;/p&gt;
-&lt;p&gt;Lorsqu&amp;rsquo;on a plus besoin des 5% réservés, il ne faut pas oublier de
-remettre la réservation.&lt;/p&gt;
-&lt;p&gt;Enfin, ce cas le plus critique peut arriver assez facilement lorsqu&amp;rsquo;on a
-de l&amp;rsquo;archivage, si le serveur ne peut plus archiver les fichiers WAL,
-alors il les conserve, un filesystem full sur un espace d&amp;rsquo;archivage peut
-donc être transmis au serveur&amp;hellip;&lt;/p&gt;
-</description>
+      <description>Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d&amp;rsquo;expérimentation est nécessaire pour se rassurer&amp;hellip;
+On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu&amp;rsquo;une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
+L&amp;rsquo;objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c&amp;rsquo;est pourquoi on a besoin de plusieurs tablespaces.</description>
     </item>
     
     <item>
       <title>Could not open relation with oid N</title>
       <link>https://www.orgrim.net/post/2011-08-04-could-not-open-relation-with-oid-n/</link>
       <pubDate>Thu, 04 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-08-04-could-not-open-relation-with-oid-n/</guid>
-      <description>&lt;p&gt;On peut parfois trouver cet étrange message d&amp;rsquo;erreur dans les traces de
-PostgreSQL (N étant un nombre) ou lors de l&amp;rsquo;exécution d&amp;rsquo;une requête :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ERROR:  could not open relation with OID N
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on recherche ce message dans les mailing-lists du projet, on peut
-facilement conclure que la base de données est corrompue, qu&amp;rsquo;il y a des
-problèmes matériels et que la sécurité des données est en péril. Et
-bien, ce n&amp;rsquo;est pas forcément le cas : obtenir ce message peut être tout
-à fait normal.&lt;/p&gt;
-&lt;p&gt;Pour démontrer cela, on a besoin d&amp;rsquo;une table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ createdb test
-$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# CREATE TABLE truc AS SELECT generate_series(0, 5) AS i;
-SELECT 6
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On lance une session qui bloquerait un &lt;code&gt;DROP&lt;/code&gt; de cette table, pour cela
-on pose un verrou exclusif, le mode « ExclusiveLock » ne laisse passer
-que les lectures (c&amp;rsquo;est important pour la suite) :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# BEGIN;
-BEGIN
-test=# LOCK TABLE truc IN EXCLUSIVE MODE;
-LOCK TABLE
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On laisse cette transaction « ouverte », avec le verrou posé et on lance
-une session pour supprimer la table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# BEGIN;
-BEGIN
-test=# DROP TABLE truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;L&amp;rsquo;ordre SQL &lt;code&gt;DROP TABLE&lt;/code&gt; ne rend pas la main, cette deuxième session
-attend le verrou « AccessExclusiveLock », qui est le plus restrictif,
-sur la table pour pouvoir la supprimer. La page
-&lt;a href=&#34;http://wiki.postgresql.org/wiki/Lock_dependency_information&#34;&gt;http://wiki.postgresql.org/wiki/Lock_dependency_information&lt;/a&gt; fournie une requête montrant
-les dépendances entre requêtes du point de vue du verrouillage. Dans ce
-cas, elle donne le résultat suivant :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |  waiting_query   |    waiting_mode     | waiting_pid | other_locktype | other_table |      other_query      |  other_mode   | other_pid | other_granted 
-------------------+---------------+------------------+---------------------+-------------+----------------+-------------+-----------------------+---------------+-----------+---------------
- relation         | truc          | DROP TABLE truc; | AccessExclusiveLock |       25632 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock |     24217 | t
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On lance une troisième session, avec un &lt;code&gt;SELECT&lt;/code&gt; sur notre table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# SELECT * FROM truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;L&amp;rsquo;ordre &lt;code&gt;SELECT&lt;/code&gt; ne rend pas la main, cette troisième session se met à
-attendre le &lt;code&gt;DROP TABLE&lt;/code&gt; et la première session. C&amp;rsquo;est d&amp;rsquo;ailleurs le
-&lt;code&gt;DROP TABLE&lt;/code&gt; qui bloque réellement le &lt;code&gt;SELECT&lt;/code&gt;, car la première session
-à verrouillé la table en lecture seule :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |    waiting_query    |    waiting_mode     | waiting_pid | other_locktype | other_table |      other_query      |     other_mode      | other_pid | other_granted 
-------------------+---------------+---------------------+---------------------+-------------+----------------+-------------+-----------------------+---------------------+-----------+---------------
- relation         | truc          | SELECT * FROM truc; | AccessShareLock     |       28629 | relation       | truc        | DROP TABLE truc;      | AccessExclusiveLock |     25632 | f
- relation         | truc          | DROP TABLE truc;    | AccessExclusiveLock |       25632 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock       |     24217 | t
- relation         | truc          | SELECT * FROM truc; | AccessShareLock     |       28629 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock       |     24217 | t
- relation         | truc          | DROP TABLE truc;    | AccessExclusiveLock |       25632 | relation       | truc        | SELECT * FROM truc;   | AccessShareLock     |     28629 | f
-(4 rows)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On libère la première session :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;test=# ROLLBACK;
-ROLLBACK
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le &lt;code&gt;DROP TABLE&lt;/code&gt; passe, et le &lt;code&gt;SELECT&lt;/code&gt; continue d&amp;rsquo;attendre :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |    waiting_query    |  waiting_mode   | waiting_pid | other_locktype | other_table |      other_query      |     other_mode      | other_pid | other_granted 
-------------------+---------------+---------------------+-----------------+-------------+----------------+-------------+-----------------------+---------------------+-----------+---------------
- relation         | truc          | SELECT * FROM truc; | AccessShareLock |       28629 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | AccessExclusiveLock |     25632 | t
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On voit que le &lt;code&gt;SELECT&lt;/code&gt; attend la transaction qui a lancé le
-&lt;code&gt;DROP TABLE&lt;/code&gt;. Même si le &lt;code&gt;DROP TABLE&lt;/code&gt; est terminé, son effet ne sera
-connu des transactions concurrentes seulement ou moment du commit ou
-rollback, parce qu&amp;rsquo;on utilise le niveau d&amp;rsquo;isolation des transaction
-« read committed » (par défaut). Il n&amp;rsquo;y a pas de « &lt;code&gt;UNLOCK&lt;/code&gt; » sur les
-tables dans PostgreSQL, il faut attendre la fin de la transaction pour
-que les verrous soient libérés, du moins lorsqu&amp;rsquo;on n&amp;rsquo;utilise pas de
-savepoints.&lt;/p&gt;
-&lt;p&gt;Maintenant, on valide le &lt;code&gt;DROP TABLE&lt;/code&gt;, avec l&amp;rsquo;ordre &lt;code&gt;COMMIT&lt;/code&gt;. Le
-&lt;code&gt;SELECT&lt;/code&gt; termine en erreur, on voit alors le message dans les logs :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ERROR:  could not open relation with OID 17366 at character 15
-STATEMENT:  SELECT * FROM truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Lorsque le &lt;code&gt;SELECT&lt;/code&gt; n&amp;rsquo;est plus bloqué par le verrou, il ne peut accéder
-pas à la table car elle n&amp;rsquo;existe plus. Le message n&amp;rsquo;est pas très
-explicite parce que la requête est en cours d&amp;rsquo;exécution : le moteur a
-déjà terminé le travail de parsing et de planification, il ne travaille
-qu&amp;rsquo;avec les OID qu&amp;rsquo;il a récupéré du catalogue système à ce moment là.&lt;/p&gt;
-&lt;p&gt;Dans ce cas précis, obtenir ce message n&amp;rsquo;est un problème de corruption
-de la base ou du catalogue système.&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-</description>
+      <description>On peut parfois trouver cet étrange message d&amp;rsquo;erreur dans les traces de PostgreSQL (N étant un nombre) ou lors de l&amp;rsquo;exécution d&amp;rsquo;une requête :
+ERROR: could not open relation with OID N  Si on recherche ce message dans les mailing-lists du projet, on peut facilement conclure que la base de données est corrompue, qu&amp;rsquo;il y a des problèmes matériels et que la sécurité des données est en péril. Et bien, ce n&amp;rsquo;est pas forcément le cas : obtenir ce message peut être tout à fait normal.</description>
     </item>
     
     <item>
       <title>Retrouver un trigger à partir du nom de la fonction associée</title>
       <link>https://www.orgrim.net/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/</link>
       <pubDate>Thu, 07 Apr 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/</guid>
       <description>&lt;p&gt;Ici encore, tout est dans le catalogue système de PostgreSQL, il suffit
-de regarder dans la table &lt;code&gt;pg_trigger&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Avec les jointures qui vont bien, on peut obtenir les informations
-intéressantes :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nspname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;schema&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;relname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;table&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tgname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;trigger&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;proname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;function&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_trigger&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_class&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tgrelid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_namespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;relnamespace&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_proc&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tgfoid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;En ajoutant une clause WHERE, on peut facilement retrouver la table
-associée au trigger :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nspname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;schema&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;relname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;table&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tgname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;trigger&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;proname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;function&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_trigger&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_class&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tgrelid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_namespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;relnamespace&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_proc&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tgfoid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;proname&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;mafonction&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+de regarder dans la table &lt;code&gt;pg_trigger&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pg_class.reltuples n&#39;est qu&#39;une approximation du nombre de lignes</title>
       <link>https://www.orgrim.net/post/2011-03-14-pg_classreltuples-nest-quune-approximation-du-nombre-de-lignes/</link>
       <pubDate>Mon, 14 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-14-pg_classreltuples-nest-quune-approximation-du-nombre-de-lignes/</guid>
       <description>&lt;p&gt;Dans le catalogue de PostgreSQL, qui donne plein d&amp;rsquo;information sur le
@@ -950,55 +165,14 @@ informations sur les tables, les séquences, les index, tout ce qui
 contient des colonnes, appelé relation. L&amp;rsquo;un des champs disponibles est
 &lt;code&gt;reltuples&lt;/code&gt;, il contient le nombre approximatif de lignes dans une
 relation. C&amp;rsquo;est &lt;em&gt;approximatif&lt;/em&gt;, ainsi ce n&amp;rsquo;est pas un donnée sure&amp;hellip; La
-preuve par l&amp;rsquo;exemple.&lt;/p&gt;
-&lt;p&gt;On crée un table avec une colonne de type entier :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;db=# CREATE TABLE truc (i int);
-CREATE TABLE
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On retrouve ensuite notre table ainsi que la valeur de &lt;code&gt;reltuples&lt;/code&gt; dans
-le catalogue système :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;db=# SELECT relname, reltuples FROM pg_class WHERE relname = &#39;truc&#39;;
- relname | reltuples 
----------+-----------
- truc    |         0
-(1 row)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;La table est vide, et &lt;code&gt;reltuples&lt;/code&gt; est à zéro. On insère ensuite quelques
-lignes dans cette table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;db=# INSERT INTO dalibo.truc VALUES (1),(2),(3),(4);
-INSERT 0 4
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On regarde la valeur de &lt;code&gt;reltuples&lt;/code&gt; pour la table après cette
-insertion :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;db=# SELECT relname, reltuples FROM pg_class WHERE relname = &#39;truc&#39;;
- relname | reltuples 
----------+-----------
- truc    |         0
-(1 row)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;code&gt;reltuples&lt;/code&gt; n&amp;rsquo;est pas à jour, il vaut toujours zéro alors que la table
-contient 4 lignes !&lt;/p&gt;
-&lt;p&gt;Comme indiqué dans la documentation, &lt;code&gt;reltuples&lt;/code&gt; est mis à jour lors
-d&amp;rsquo;un &lt;code&gt;ANALYSE&lt;/code&gt; ou d&amp;rsquo;autres opérations de type DDL :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;db=# ANALYZE truc;
-ANALYZE
-db=# SELECT relname,reltuples FROM pg_class WHERE relname = &#39;truc&#39;;
- relname | reltuples 
----------+-----------
- truc    |         4
-(1 row)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et voilà, le passage du &lt;code&gt;ANALYSE&lt;/code&gt; a permis de mettre à jour la valeur de
-&lt;code&gt;reltuples&lt;/code&gt; pour la table.&lt;/p&gt;
-&lt;p&gt;Conclusion, si on désire supprimer une table parce qu&amp;rsquo;elle est vide, le
-moyen sûr est de compter le nombre de lignes dans la table et non pas se
-baser sur la valeur de &lt;code&gt;reltuples&lt;/code&gt;.&lt;/p&gt;</description>
+preuve par l&amp;rsquo;exemple.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Voir tous les champs d&#39;une table</title>
       <link>https://www.orgrim.net/post/2011-02-25-voir-tous-les-champs-dune-table/</link>
       <pubDate>Fri, 25 Feb 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-02-25-voir-tous-les-champs-dune-table/</guid>
       <description>&lt;p&gt;Avec PostgreSQL, on peut utiliser la requête suivante pour obtenir la
@@ -1006,115 +180,21 @@ taille de chacune des bases de données d&amp;rsquo;un cluster :&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;datname&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
   &lt;span class=&#34;n&#34;&gt;pg_size_pretty&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pg_database_size&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;AS&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;taille&lt;/span&gt;
 &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_database&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Qui donne par exemple :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;         base          | taille  
------------------------+---------
- template0             | 5273 kB
- postgres              | 5385 kB
- redmine               | 9057 kB
- roundcube             | 9153 kB
- template1             | 5369 kB
- dotclear              | 6833 kB
- dspam                 | 204 MB
- exim                  | 5649 kB
- (8 rows)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Mais comment est-ce possible ? on a appliqué la fonction
-&lt;code&gt;pg_database_size()&lt;/code&gt; sur une colonne appelée &lt;code&gt;oid&lt;/code&gt;, alors que la
-définition de &lt;code&gt;pg_database&lt;/code&gt; est la suivante :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;postgres=# \\d pg_database
-    Table &amp;quot;pg_catalog.pg_database&amp;quot;
-    Column     |   Type    | Modifiers 
----------------+-----------+-----------
- datname       | name      | not null
- datdba        | oid       | not null
- encoding      | integer   | not null
- datcollate    | name      | not null
- datctype      | name      | not null
- datistemplate | boolean   | not null
- datallowconn  | boolean   | not null
- datconnlimit  | integer   | not null
- datlastsysoid | oid       | not null
- datfrozenxid  | xid       | not null
- dattablespace | oid       | not null
- datacl        | aclitem[] | 
-Indexes:
-    &amp;quot;pg_database_datname_index&amp;quot; UNIQUE, btree (datname), tablespace &amp;quot;pg_global&amp;quot;
-    &amp;quot;pg_database_oid_index&amp;quot; UNIQUE, btree (oid), tablespace &amp;quot;pg_global&amp;quot;
-Tablespace: &amp;quot;pg_global&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Il n&amp;rsquo;y a pas de colonne &lt;code&gt;oid&lt;/code&gt; dans cette table ! Et pourtant&amp;hellip; Cette
-colonne est tout simplement cachée, mais elle existe bel et bien. Pour
-vérifier, on recherche donc dans le catalogue système la liste des
-champs de la table :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;attname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;typname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;attnum&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_attribute&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_class&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;attrelid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;JOIN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pg_type&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ON&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;oid&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;atttypid&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;WHERE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;relname&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;pg_database&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Qui donne :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;    attname    | typname  | attnum 
----------------+----------+--------
- tableoid      | oid      |     -7
- cmax          | cid      |     -6
- xmax          | xid      |     -5
- cmin          | cid      |     -4
- xmin          | xid      |     -3
- oid           | oid      |     -2
- ctid          | tid      |     -1
- datname       | name     |      1
- datdba        | oid      |      2
- encoding      | int4     |      3
- datcollate    | name     |      4
- datctype      | name     |      5
- datistemplate | bool     |      6
- datallowconn  | bool     |      7
- datconnlimit  | int4     |      8
- datlastsysoid | oid      |      9
- datfrozenxid  | xid      |     10
- dattablespace | oid      |     11
- datacl        | _aclitem |     12
-(19 rows)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;La colonne &lt;code&gt;attnum&lt;/code&gt; de &lt;code&gt;pg_attribute&lt;/code&gt; indique la position de la colonne,
-on remarque ainsi qu&amp;rsquo;il y a sept colonnes avec une position négative.
-Ces colonnes ne sont pas montrés par la commande &lt;code&gt;\\d&lt;/code&gt; de psql, ce sont
-les colonnes système de la table (plus d&amp;rsquo;information sur ce qu&amp;rsquo;elles
-représentent dans la &lt;a href=&#34;http://docs.postgresql.fr/9.0/ddl-system-columns.html&#34;&gt;doc&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;En plus, on a encore utilisé cette colonne &lt;code&gt;oid&lt;/code&gt; pour la retrouver dans
-la table&amp;hellip; Maintenant, on peut être rassuré sur le catalogue système,
-ce n&amp;rsquo;est qu&amp;rsquo;un ensemble de tables, auxquelles on accède en SQL
-standard&amp;hellip;&lt;/p&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
     </item>
     
     <item>
       <title>Recréer une séquence</title>
       <link>https://www.orgrim.net/post/2011-02-22-recreer-une-sequence/</link>
       <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-02-22-recreer-une-sequence/</guid>
       <description>&lt;p&gt;On peut faire ça dans 2 cas :&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;On a fait n&amp;rsquo;importe quoi, et la séquence a disparu :-(&lt;/li&gt;
 &lt;li&gt;On veut transformer une colonne en « SERIAL »&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ROLE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;owner_de_la_table&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;SELECT&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--  ?column?
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;-- ----------
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;--       155
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;-- (1 row)
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;-- On prend donc « max(id)+1 » comme valeur de départ de la séquence
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;CREATE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEQUENCE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable_id_seq&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;START&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;155&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OWNED&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;BY&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;COMMIT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Pour lier la séquence à la table (et ainsi l&amp;rsquo;utiliser lors d&amp;rsquo;INSERT par
-exemple) :&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span class=&#34;k&#34;&gt;BEGIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;TABLE&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;latable&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALTER&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;COLUMN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;id&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;SET&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;DEFAULT&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NEXTVAL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;latable_id_seq&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;regclass&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-&lt;span class=&#34;k&#34;&gt;COMMIT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+&lt;/ul&gt;</description>
     </item>
     
   </channel>

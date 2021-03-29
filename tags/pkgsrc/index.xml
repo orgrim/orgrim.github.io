@@ -3,18 +3,16 @@
   <channel>
     <title>pkgsrc on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/pkgsrc/</link>
-    <description>code. grind. sleep. (pkgsrc)</description>
+    <description>Recent content in pkgsrc on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Fri, 23 Aug 2013 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/pkgsrc/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Fri, 23 Aug 2013 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/pkgsrc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>modular-xorg, radeon et pas de KMS</title>
       <link>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</link>
       <pubDate>Fri, 23 Aug 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/</guid>
       <description>&lt;p&gt;Il y avait un moment que je n&amp;rsquo;avais pas touché à NetBSD et donc mis à
@@ -22,388 +20,97 @@ jour mon lappy avec du pkg frais. Entre temps, la version de X.org
 modular, donc issue de pkgsrc, est revenue en 2012, avec son lot de
 drivers mis à jour. Le drivers xf86-video-ati, est passé en version
 7.1.0, sauf qu&amp;rsquo;il fonctionne uniquement en KMS (Kernel Mode Setting),
-chose qu&amp;rsquo;on n&amp;rsquo;a pas encore dans notre kernel.&lt;/p&gt;
-&lt;p&gt;Il faut donc la dernière version de la branche 6 du driver, qui contient
-encore le support UMS, disponible dans le paquet &lt;code&gt;x11/xf86-video-ati6&lt;/code&gt;,
-qui porte le même nom de package, bizarrement. Tout ça est suivi dans le
-&lt;a href=&#34;http://gnats.netbsd.org/cgi-bin/query-pr-single.pl?number=47935&#34;&gt;PR 47935&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Pour que le serveur X trouve le device avec ce driver, j&amp;rsquo;ai du virer la
-ligne &lt;code&gt;BusID&lt;/code&gt; dans la section Device du &lt;code&gt;xorg.conf&lt;/code&gt;.&lt;/p&gt;</description>
+chose qu&amp;rsquo;on n&amp;rsquo;a pas encore dans notre kernel.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Un bulk build par jour dans un screen</title>
       <link>https://www.orgrim.net/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/</link>
       <pubDate>Fri, 10 May 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2013-05-10-un-bulk-build-par-jour-dans-un-screen/</guid>
       <description>&lt;p&gt;Mes packages NetBSD sont préparés par pbulk, qui tourne en continu grâce
-au script &lt;a href=&#34;https://github.com/orgrim/nb-utils/blob/master/pkgsrc/pbulk-builder&#34;&gt;pbulk-builder&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;J&amp;rsquo;avais prévu avec l&amp;rsquo;option &lt;code&gt;-1&lt;/code&gt; de lui éviter d&amp;rsquo;entrer dans une boucle
-infinie, et j&amp;rsquo;ai pas eu tort. En effet, la majorité des tours ne fait
-que mettre à jour l&amp;rsquo;arbre &lt;a href=&#34;http://pkgsrc.org&#34;&gt;pkgsrc&lt;/a&gt;, résoudre les dépendances, sans
-rien compiler de nouveau. La première solution que j&amp;rsquo;ai trouvé a été de
-créer une règle sieve pour ne pas recevoir des dizaines de mails de
-rapport de bulk inutiles, en les plaçant dans un répertoire séparé&amp;hellip;&lt;/p&gt;
-&lt;p&gt;N&amp;rsquo;ayant jamais pris le temps d&amp;rsquo;utiliser cette fameuse option one-shot,
-j&amp;rsquo;ai décidé de mettre le lancement du bulk dans la crontab, sauf que
-c&amp;rsquo;est long et qu&amp;rsquo;il vaut mieux suivre ça avec screen. C&amp;rsquo;est possible
-grâce aux options &lt;code&gt;-d&lt;/code&gt; et &lt;code&gt;-m&lt;/code&gt; (avec &lt;code&gt;-S&lt;/code&gt; pour mettre un titre) :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;0 23 * * * /usr/pkg/bin/screen -dmS bulk -c /root/.screenrc /usr/pkg/bin/bash ~orgrim/nb-utils/pkgsrc/pbulk-builder -c -1 /data/pbulk
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On peut alors attacher le screen quand le bulk tourne.&lt;/p&gt;
-&lt;p&gt;PS: merci au fans de tmux de passer sur le chan #netbsdfr sur Freenode
-pour me dire comment faire pareil avec tmux :)&lt;/p&gt;</description>
+au script &lt;a href=&#34;https://github.com/orgrim/nb-utils/blob/master/pkgsrc/pbulk-builder&#34;&gt;pbulk-builder&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pbulk-builder et pkgtools/mksandbox</title>
       <link>https://www.orgrim.net/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/</link>
       <pubDate>Sat, 26 Jan 2013 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2013-01-26-pbulk-builder-et-pkgtoolsmksandbox/</guid>
       <description>&lt;p&gt;Après la réinstall d&amp;rsquo;une de mes machines de build en 6.0.1, j&amp;rsquo;ai eu la
 bonne surprise de voir que le script de build &lt;code&gt;pbulk-builder&lt;/code&gt;
 (&lt;a href=&#34;https://github.com/orgrim/nb-utils&#34;&gt;https://github.com/orgrim/nb-utils&lt;/a&gt;) ne trouvait plus &lt;code&gt;mksandbox&lt;/code&gt;
 dans l&amp;rsquo;arbre de pkgsrc. Il est désormais dans son paquet :
-&lt;code&gt;pkgtools/mksandbox&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Le script est à jour. le script de montage de la sandbox se prend un
-&lt;code&gt;sed&lt;/code&gt; dans la foulée pour éviter qu&amp;rsquo;il force le montage de l&amp;rsquo;arbre
-pkgsrc dans &lt;code&gt;/tree/pkgsrc&lt;/code&gt;&amp;hellip;&lt;/p&gt;</description>
+&lt;code&gt;pkgtools/mksandbox&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Passer de X.org natif à modular</title>
       <link>https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/</link>
       <pubDate>Mon, 19 Sep 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-09-19-passer-de-xorg-natif-a-modular/</guid>
       <description>&lt;p&gt;X.org est fourni dans le basesys et dans pkgsrc, on appelle le premier
 « native » et le second « modular » selon la valeur de la variable
 &lt;code&gt;X11_TYPE&lt;/code&gt; que l&amp;rsquo;on positionne dans son &lt;code&gt;/etc/mk.conf&lt;/code&gt; pour signifier à
-pkgsrc sur lequel linker.&lt;/p&gt;
-&lt;p&gt;Il s&amp;rsquo;agit des mêmes versions à peu de choses prêt, et X.org native n&amp;rsquo;est
-pas vieux ou non maintenu comme la rumeur voudrait le faire croire. Il
-est juste en retard parce qu&amp;rsquo;il suit le cycle de release du basesys
-alors que modular suit celui de pkgsrc et est tiré vers l&amp;rsquo;avant par les
-packages qui en dépendent. Cela peut poser problème lorsqu&amp;rsquo;on suit la
-cible mouvante qu&amp;rsquo;est pkgsrc-current.&lt;/p&gt;
-&lt;p&gt;La première chose à faire pour passer de native à modular est d&amp;rsquo;éditer
-&lt;code&gt;/etc/mk.conf&lt;/code&gt; pour changer &lt;code&gt;X11_TYPE&lt;/code&gt;, on en profite pour ne plus
-compiler le native :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;MKX11=no 
-X11_TYPE=modular
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, il faut modifier la liste de packages à compiler pour y ajouter
-soit tout modular en installant &lt;code&gt;meta-pkgs/modular-xorg&lt;/code&gt;, soit en
-n&amp;rsquo;installant que le nécessaire, ça fait plus cool, dans
-&lt;code&gt;/usr/pkgsrc/pkgchk.conf&lt;/code&gt; (si vous avez suivi les docs ici ou dans le
-wiki) :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;meta-pkgs/modular-xorg-apps
-meta-pkgs/modular-xorg-libs
-meta-pkgs/modular-xorg-fonts
-x11/xf86-input-keyboard
-x11/xf86-input-mouse
-x11/xf86-input-void
-x11/xf86-video-nv
-x11/xf86-video-vesa
-x11/xf86-video-vga
-x11/xf86-video-wsfb
-x11/modular-xorg-server
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite on donne ça à manger à &lt;code&gt;pkg_comp&lt;/code&gt; ou à son bulk. L&amp;rsquo;important ici
-est de tout recompiler pour bien transférer les dépendances de native
-vers modular : en gros on pète la sandbox, que ça soit de &lt;code&gt;mk/bulk&lt;/code&gt; ou
-&lt;code&gt;pkg_comp&lt;/code&gt; et on recommence. Etant passé en mode bulk partiel comme
-indiqué dans un précédent &lt;a href=&#34;https://www.orgrim.net/post/2011/08/19/Bulk-build-partiel-de-pkgsrc&#34;&gt;post&lt;/a&gt;, voici comment faire :&lt;/p&gt;
-&lt;p&gt;​1. On vérifie avec &lt;code&gt;mount&lt;/code&gt; que la standbox n&amp;rsquo;est pas montée ni qu&amp;rsquo;un
-build tourne (dans ce cas faut le killer), sinon :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# /usr/sandbox/sandbox umount
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​2. On vérifie que le contenu des mk.conf du système et de la sandbox
-sont en phase, c&amp;rsquo;est le seul fichier de la sandbox à sauver&lt;/p&gt;
-&lt;p&gt;​3. On recrée la sandbox :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# rm -rf /usr/sandbox
-# cd /usr/pkgsrc/mk/bulk
-# sh mksandbox --without-x /usr/sandbox
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​4. On nettoie les packages déjà compilés, pour forcer leur
-recompilation, et les fichiers cachés du bulk build :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/packages/
-# mv CVS .CVS
-# rm -rf *
-# mv .CVS CVS
-# cd /usr/pkgsrc
-# rm .broken.html .bulk_build_id .bulk_db .bulklock .depends .dependstree .index  .order .start .supports
-# pkgclean
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​5. On lance le bulk build et on attend, il faut prévoir entre 150 et
-200 packages supplémentaires à compiler.&lt;/p&gt;
-&lt;p&gt;Les étapes suivantes sont simples, on sauvegarde tout ce qu&amp;rsquo;il faut dans
-&lt;code&gt;/usr/pkg&lt;/code&gt;, puis on supprime tous les packages installés :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr
-# mv pkg pkg.old
-# cd /var/db
-# mkdir old_pkgdb
-# mv pkg pkg.refcount old_pkgdb
-# rm -rf pkgin
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;A partir d&amp;rsquo;ici, on n&amp;rsquo;a plus de programmes issus de pkgsrc, en gros pas
-de sudo, vim et autres&amp;hellip;&lt;/p&gt;
-&lt;p&gt;Puis, il faut supprimer les fichiers des sets de X.org, on se base pour
-cela sur le contenu de &lt;code&gt;/etc/mtree/set.x*&lt;/code&gt;. On en arrive donc à un stade
-où on est dans la même situation qu&amp;rsquo;après une installation du système
-sans les sets de X.org natif.&lt;/p&gt;
-&lt;p&gt;Enfin, on réinstalle tout les packages avec &lt;a href=&#34;http://www.pkgin.net&#34;&gt;pkgin&lt;/a&gt;, qui dans sa
-version 0.5.0 (du CVS) peut importer une liste de packages au format de
-&lt;code&gt;pkg_chk&lt;/code&gt;, qui se trouve être le même utilisé par le bulk-build, comme de
-par hasard :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_add http://pkgsrc.orgrim.net/NetBSD/5.1/amd64/All/pkg_install-20110805.tgz
-# mkdir -p /usr/pkg/etc
-# cp -r /usr/pkg.old/etc/pkgin /usr/pkg/etc
-# ./pkgin up
-# ./pkgin im pkgchk.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; si le &lt;code&gt;pkg_add&lt;/code&gt; de pkg_install ne passe pas, essayer avec
-&lt;code&gt;-f&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;et hop, reste plus qu&amp;rsquo;à reconfigurer les chemins dans
-&lt;code&gt;/etc/X11/xorg.conf&lt;/code&gt; et c&amp;rsquo;est bon.&lt;/p&gt;</description>
+pkgsrc sur lequel linker.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Bulk build partiel de pkgsrc</title>
       <link>https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/</link>
       <pubDate>Fri, 19 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/</guid>
-      <description>&lt;p&gt;En suivant l&#39;&lt;a href=&#34;http://www.guigui2.net/index.php?post/2011/07/30/sudo-sh-/usr/pkgsrc/mk/bulk/do-sandbox-build-s&#34;&gt;excellent tip de Mr GuiGui2&lt;/a&gt;, j&amp;rsquo;ai pu monter ma petite
-archi de bulk build personnelle pour fournir du package tout frais à
-&lt;a href=&#34;http://pkgin.net&#34;&gt;pkgin&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;J&amp;rsquo;ai donc ajouté le bloc magique suivant à mon &lt;code&gt;/etc/mk.conf&lt;/code&gt;, qui
-permet de gérer la présence de commentaires dans &lt;code&gt;pkgchk.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# bulk build config
-DEPENDS_TARGET= bulk-install
-BATCH=          yes
-
-BULK_PREREQ+=   pkgtools/lintpkgsrc
-.if defined(SPECIFIC_PKGS)
-PKGLIST!=               awk &#39;$$1 !~ /^\\#/ {print $$1}&#39; ${PKGCHK_CONF}
-.       for _pkg_ in ${PKGLIST}
-HOST_SPECIFIC_PKGS+=    ${_pkg_}
-.       endfor
-.endif
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour aller plus loin, j&amp;rsquo;ai automatisé le process au maximum pour lancer
-des bulk build réguliers par cron, grâce au script [bulk-builder][]. Ce
-script remplace &lt;code&gt;do-sandbox-build&lt;/code&gt; et &lt;code&gt;do-sandbox-upload&lt;/code&gt;, il est
-également capable de gérer des chemins alternatifs, mettre à jour
-&lt;code&gt;pkgsrc&lt;/code&gt; avant de lancer le bulk.&lt;/p&gt;
-&lt;p&gt;La procédure pour mettre ça en place est donc :&lt;/p&gt;
-&lt;p&gt;​1. Ajouter le bloc montré plus haut à &lt;code&gt;/etc/mk.conf&lt;/code&gt; et y définir
-&lt;code&gt;PKGCHK_CONF&lt;/code&gt;, il s&amp;rsquo;agit du chemin vers une liste de packages au format
-\&amp;ldquo;catetgorie/package\&amp;rdquo;, un par ligne, qu&amp;rsquo;on peut automatiquement créer
-avec &lt;code&gt;pkg_chk -g&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;​2. Créer la sandbox :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/mk/bulk
-# sh mksandbox --without-x /usr/sandbox
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​3. Créer et configurer &lt;code&gt;/usr/pkgsrc/mk/bulk/build.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# cd /usr/pkgsrc/mk/bulk
-# cp build.conf-example build.conf
-# vi build.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​4. Lancer le bulk build :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# sh bulk-builder -u -R
-&lt;/code&gt;&lt;/pre&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;-u&lt;/code&gt; demande de &lt;code&gt;cvs up&lt;/code&gt; le répertoire &lt;code&gt;/usr/pkgsrc&lt;/code&gt; avant de
-commencer&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;-R&lt;/code&gt; demande de ne pas uploader le résultat (les packages)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Enfin, il suffit d&amp;rsquo;utiliser la ligne suivante pour utiliser les packages
-avec &lt;code&gt;pkgin&lt;/code&gt;, dans &lt;code&gt;/usr/pkg/etc/pkgin/repositories.conf&lt;/code&gt; :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;file:///usr/pkgsrc/packages/All
-&lt;/code&gt;&lt;/pre&gt;
-&lt;!-- raw HTML omitted --&gt;
-</description>
+      <description>En suivant l&#39;excellent tip de Mr GuiGui2, j&amp;rsquo;ai pu monter ma petite archi de bulk build personnelle pour fournir du package tout frais à pkgin.
+J&amp;rsquo;ai donc ajouté le bloc magique suivant à mon /etc/mk.conf, qui permet de gérer la présence de commentaires dans pkgchk.conf :
+# bulk build config DEPENDS_TARGET= bulk-install BATCH= yes BULK_PREREQ+= pkgtools/lintpkgsrc .if defined(SPECIFIC_PKGS) PKGLIST!= awk &#39;$$1 !~ /^\\#/ {print $$1}&#39; ${PKGCHK_CONF} . for _pkg_ in ${PKGLIST} HOST_SPECIFIC_PKGS+= ${_pkg_} .</description>
     </item>
     
     <item>
       <title>Montrer les dépendances avec make dans pkgsrc</title>
       <link>https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/</link>
       <pubDate>Thu, 18 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/</guid>
-      <description>&lt;p&gt;Généralement, on peut savoir quelles sont les dépendances d&amp;rsquo;un package
-en utilisant &lt;code&gt;make show-depends&lt;/code&gt;, mais cela ne montre que les
-dépendances pour l&amp;rsquo;installation, les dépendances pour la compilation ne
-sont pas montrées.&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-&lt;pre&gt;&lt;code&gt;$ cd /usr/pkgsrc/databases/postgresql90-server/
-$ make show-depends
-postgresql90-client&amp;gt;=9.0.4:../../databases/postgresql90-client
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour connaître les dépendances selon leur type (installation ou
-compilation), on peut utiliser la cible &lt;code&gt;show-depends-pkgpaths&lt;/code&gt; alliée à
-la variable &lt;code&gt;DEPENDS_TYPE&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Pour avoir seulement les dépendances de compilation :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=build show-depends-pkgpaths
-devel/bison
-devel/gmake
-pkgtools/digest
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour avoir seulement celles d&amp;rsquo;installation :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=install show-depends-pkgpaths
-databases/postgresql90-client
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Et enfin pour montrer les deux types, qui est aussi le comportement par
-défaut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ make DEPENDS_TYPE=all show-depends-pkgpaths
-databases/postgresql90-client
-devel/bison
-devel/gmake
-pkgtools/digest
-
-$ make show-depends-pkgpaths
-databases/postgresql90-client
-devel/bison
-devel/gmake
-pkgtools/digest
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour plus d&amp;rsquo;information, le Makefile qui contrôle cette cible est
-&lt;code&gt;mk/bsd.utils.mk&lt;/code&gt;.&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-</description>
+      <description>Généralement, on peut savoir quelles sont les dépendances d&amp;rsquo;un package en utilisant make show-depends, mais cela ne montre que les dépendances pour l&amp;rsquo;installation, les dépendances pour la compilation ne sont pas montrées.
+$ cd /usr/pkgsrc/databases/postgresql90-server/ $ make show-depends postgresql90-client&amp;gt;=9.0.4:../../databases/postgresql90-client  Pour connaître les dépendances selon leur type (installation ou compilation), on peut utiliser la cible show-depends-pkgpaths alliée à la variable DEPENDS_TYPE.
+Pour avoir seulement les dépendances de compilation :
+$ make DEPENDS_TYPE=build show-depends-pkgpaths devel/bison devel/gmake pkgtools/digest  Pour avoir seulement celles d&amp;rsquo;installation :</description>
     </item>
     
     <item>
       <title>Le client de la BuildFarm de PostgreSQL dans pkgsrc-wip</title>
       <link>https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/</link>
       <pubDate>Sat, 06 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-08-06-le-client-de-la-buildfarm-de-postgresql-dans-pkgsrc-wip/</guid>
       <description>&lt;p&gt;Comme j&amp;rsquo;annonçais précédemment, je contribue deux machines NetBSD à la
 BuildFarm de PostgreSQL. La compilation ne se fait automagiquement
 qu&amp;rsquo;après la configuration du client (écrit en Perl). Il n&amp;rsquo;est d&amp;rsquo;ailleurs
 pas forcément très convi à installer, c&amp;rsquo;est pourquoi je l&amp;rsquo;ai packagé
-pour pkgsrc : &lt;a href=&#34;http://pkgsrc.se/wip/pgbuildfarm&#34;&gt;http://pkgsrc.se/wip/pgbuildfarm&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;En espérant qu&amp;rsquo;il soit ajouté à l&amp;rsquo;arbre officiel&amp;hellip;&lt;/p&gt;
-&lt;p&gt;Voici la configuration pour lancer des builds sur NetBSD, dans
-&lt;code&gt;/usr/pkg/etc/pgbuildfarm/build-farm.conf&lt;/code&gt;, en commençant par le chemin
-du miroir du dépôt Git :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# Modifier dans %conf
-scmrepo =&amp;gt; &#39;/usr/pgbuildfarm/pgsql-base.git&#39;,
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le client est destiné à être lancé par cron, connu pour son
-environnement light, c&amp;rsquo;est pourquoi les paramètres d&amp;rsquo;environnement
-doivent être adaptés :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Le make GNU s&amp;rsquo;appelle gmake chez nous&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Pas mal de programmes proviennent de pkgsrc, il faut donc que le
-client ait &lt;code&gt;/usr/pkg/bin&lt;/code&gt; dans son PATH, et puisse trouver les
-bibliothèques issues des packages.&lt;/p&gt;
-&lt;p&gt;make =&amp;gt; &amp;lsquo;gmake&amp;rsquo;,
-aux_path =&amp;gt; &amp;ldquo;/usr/pkg/bin&amp;rdquo;,&lt;/p&gt;
-&lt;p&gt;build_env =&amp;gt;
-{
-PATH =&amp;gt; &amp;ldquo;/usr/pkg/bin:$ENV{PATH}&amp;rdquo;,
-LD_LIBRARY_PATH =&amp;gt; &amp;ldquo;/usr/pkg/lib&amp;rdquo;,
-},&lt;/p&gt;
-&lt;p&gt;config_env =&amp;gt;
-{
-CC =&amp;gt; &amp;lsquo;gcc&amp;rsquo;,
-PATH =&amp;gt; &amp;ldquo;/usr/pkg/bin:$ENV{PATH}&amp;rdquo;,
-LD_LIBRARY_PATH =&amp;gt; &amp;ldquo;/usr/pkg/lib&amp;rdquo;,
-},&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Enfin le plus important, les options du &lt;code&gt;configure&lt;/code&gt;, la plupart
-nécessitent des packages supplémentaires comme &lt;code&gt;python&lt;/code&gt; ou la &lt;code&gt;libxml&lt;/code&gt;.
-Ce qui est primordial ici est d&amp;rsquo;utiliser le « template » NetBSD :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;config_opts =&amp;gt;
-[qw(
-    --enable-cassert
-    --enable-debug
-    --enable-nls
-    --enable-integer-datetimes
-    --with-perl
-    --with-python
-    --with-tcl
-    --with-krb5
-    --with-includes=/usr/include/krb5:/usr/pkg/include
-    --with-libraries=/usr/pkg/lib
-    --with-openssl
-    --with-template=netbsd
-    --enable-thread-safety
-)],
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Pour toutes ces options, les packages suivants ont été installés :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;devel/bison&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;devel/flex&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;lang/python26&lt;/code&gt; (et &lt;code&gt;pkgtools/pkg_alternatives&lt;/code&gt; pour avoir le lien
-python)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;lang/perl5&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;lang/tcl&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;textproc/libxml2&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;textproc/libxslt&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;devel/readline&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;P.S. : Il n&amp;rsquo;y a que les particularités de NetBSD décrites ici, en
-complément du &lt;a href=&#34;http://wiki.postgresql.org/wiki/PostgreSQL_Buildfarm_Howto&#34;&gt;wiki de PostgreSQL&lt;/a&gt;.&lt;/p&gt;</description>
+pour pkgsrc : &lt;a href=&#34;http://pkgsrc.se/wip/pgbuildfarm&#34;&gt;http://pkgsrc.se/wip/pgbuildfarm&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pkgsrc, pkg_comp et ccache</title>
       <link>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</link>
       <pubDate>Fri, 04 Mar 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-03-04-pkgsrc-pkg_comp-et-ccache/</guid>
-      <description>&lt;p&gt;Pour utiliser ccache dans un chroot &lt;code&gt;pkg_comp&lt;/code&gt;, on commence par installer
-ccache :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# pkg_comp build devel/ccache
-# pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;En utilisant la cible &lt;code&gt;package-install&lt;/code&gt; dans le chroot, ccache s&amp;rsquo;y
-trouve installé. On l&amp;rsquo;installe aussi sur le système pour surveiller les
-statistiques plus tard.&lt;/p&gt;
-&lt;p&gt;Ensuite, on édite le &lt;code&gt;etc/mk.conf&lt;/code&gt; du chroot, par exemple
-&lt;code&gt;/local/pkg_comp/default/etc/mk.conf&lt;/code&gt;, pour y définir les variables
-suivantes :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# ...
-# fin de la conf speciale pkg_comp
-
-CCACHE_DIR=${WRKOBJDIR}/.ccache
-PKGSRC_COMPILER = ccache gcc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On créé ensuite le répertoire du cache, si le chemin du chroot est
-&lt;code&gt;/local/pkg_comp/default&lt;/code&gt;, avec la variable &lt;code&gt;WRKOBJDIR&lt;/code&gt; laissée par
-défaut :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# mkdir /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ensuite, il suffit de compiler ses packages comme d&amp;rsquo;habitude.&lt;/p&gt;
-&lt;p&gt;Enfin, on peut suivre les statistiques du cache avec la commande
-suivante :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;# CCACHE_DIR=/local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache ccache -s
-cache directory                     /local/pkg_comp/default/pkg_comp/obj/pkgsrc/.ccache
-cache hit                            133
-cache miss                          3053
-called for link                      383
-compile failed                        43
-preprocessor error                    34
-autoconf compile/link                388
-unsupported compiler option          216
-no input file                         55
-files in cache                      6201
-cache size                          58.7 Mbytes
-max cache size                    1024.0 Mbytes
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;P.S. : Une doc pour mettre en place un chroot &lt;code&gt;pkg_comp&lt;/code&gt; est disponible
-&lt;a href=&#34;http://wiki.orgrim.net/netbsd/pkgsrc/pkg_comp&#34;&gt;sur le wiki&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>Pour utiliser ccache dans un chroot pkg_comp, on commence par installer ccache :
+# pkg_comp build devel/ccache # pkg_add /usr/pkgsrc/packages/All/ccache-3.1.4.tgz  En utilisant la cible package-install dans le chroot, ccache s&amp;rsquo;y trouve installé. On l&amp;rsquo;installe aussi sur le système pour surveiller les statistiques plus tard.
+Ensuite, on édite le etc/mk.conf du chroot, par exemple /local/pkg_comp/default/etc/mk.conf, pour y définir les variables suivantes :
+# ... # fin de la conf speciale pkg_comp CCACHE_DIR=${WRKOBJDIR}/.</description>
     </item>
     
   </channel>

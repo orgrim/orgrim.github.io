@@ -3,123 +3,20 @@
   <channel>
     <title>lock on code. grind. sleep.</title>
     <link>https://www.orgrim.net/tags/lock/</link>
-    <description>code. grind. sleep. (lock)</description>
+    <description>Recent content in lock on code. grind. sleep.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
-    <lastBuildDate>Thu, 04 Aug 2011 00:00:00 +0000</lastBuildDate>
-    
-    <atom:link href="https://www.orgrim.net/tags/lock/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <managingEditor>Nicolas Thauvin</managingEditor>
+    <lastBuildDate>Thu, 04 Aug 2011 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/tags/lock/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Could not open relation with oid N</title>
       <link>https://www.orgrim.net/post/2011-08-04-could-not-open-relation-with-oid-n/</link>
       <pubDate>Thu, 04 Aug 2011 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2011-08-04-could-not-open-relation-with-oid-n/</guid>
-      <description>&lt;p&gt;On peut parfois trouver cet étrange message d&amp;rsquo;erreur dans les traces de
-PostgreSQL (N étant un nombre) ou lors de l&amp;rsquo;exécution d&amp;rsquo;une requête :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ERROR:  could not open relation with OID N
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Si on recherche ce message dans les mailing-lists du projet, on peut
-facilement conclure que la base de données est corrompue, qu&amp;rsquo;il y a des
-problèmes matériels et que la sécurité des données est en péril. Et
-bien, ce n&amp;rsquo;est pas forcément le cas : obtenir ce message peut être tout
-à fait normal.&lt;/p&gt;
-&lt;p&gt;Pour démontrer cela, on a besoin d&amp;rsquo;une table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ createdb test
-$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# CREATE TABLE truc AS SELECT generate_series(0, 5) AS i;
-SELECT 6
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On lance une session qui bloquerait un &lt;code&gt;DROP&lt;/code&gt; de cette table, pour cela
-on pose un verrou exclusif, le mode « ExclusiveLock » ne laisse passer
-que les lectures (c&amp;rsquo;est important pour la suite) :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# BEGIN;
-BEGIN
-test=# LOCK TABLE truc IN EXCLUSIVE MODE;
-LOCK TABLE
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On laisse cette transaction « ouverte », avec le verrou posé et on lance
-une session pour supprimer la table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# BEGIN;
-BEGIN
-test=# DROP TABLE truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;L&amp;rsquo;ordre SQL &lt;code&gt;DROP TABLE&lt;/code&gt; ne rend pas la main, cette deuxième session
-attend le verrou « AccessExclusiveLock », qui est le plus restrictif,
-sur la table pour pouvoir la supprimer. La page
-&lt;a href=&#34;http://wiki.postgresql.org/wiki/Lock_dependency_information&#34;&gt;http://wiki.postgresql.org/wiki/Lock_dependency_information&lt;/a&gt; fournie une requête montrant
-les dépendances entre requêtes du point de vue du verrouillage. Dans ce
-cas, elle donne le résultat suivant :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |  waiting_query   |    waiting_mode     | waiting_pid | other_locktype | other_table |      other_query      |  other_mode   | other_pid | other_granted 
-------------------+---------------+------------------+---------------------+-------------+----------------+-------------+-----------------------+---------------+-----------+---------------
- relation         | truc          | DROP TABLE truc; | AccessExclusiveLock |       25632 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock |     24217 | t
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On lance une troisième session, avec un &lt;code&gt;SELECT&lt;/code&gt; sur notre table :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ psql test
-psql (9.0.4)
-Type &amp;quot;help&amp;quot; for help.
-
-test=# SELECT * FROM truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;L&amp;rsquo;ordre &lt;code&gt;SELECT&lt;/code&gt; ne rend pas la main, cette troisième session se met à
-attendre le &lt;code&gt;DROP TABLE&lt;/code&gt; et la première session. C&amp;rsquo;est d&amp;rsquo;ailleurs le
-&lt;code&gt;DROP TABLE&lt;/code&gt; qui bloque réellement le &lt;code&gt;SELECT&lt;/code&gt;, car la première session
-à verrouillé la table en lecture seule :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |    waiting_query    |    waiting_mode     | waiting_pid | other_locktype | other_table |      other_query      |     other_mode      | other_pid | other_granted 
-------------------+---------------+---------------------+---------------------+-------------+----------------+-------------+-----------------------+---------------------+-----------+---------------
- relation         | truc          | SELECT * FROM truc; | AccessShareLock     |       28629 | relation       | truc        | DROP TABLE truc;      | AccessExclusiveLock |     25632 | f
- relation         | truc          | DROP TABLE truc;    | AccessExclusiveLock |       25632 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock       |     24217 | t
- relation         | truc          | SELECT * FROM truc; | AccessShareLock     |       28629 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | ExclusiveLock       |     24217 | t
- relation         | truc          | DROP TABLE truc;    | AccessExclusiveLock |       25632 | relation       | truc        | SELECT * FROM truc;   | AccessShareLock     |     28629 | f
-(4 rows)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On libère la première session :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;test=# ROLLBACK;
-ROLLBACK
-test=#
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Le &lt;code&gt;DROP TABLE&lt;/code&gt; passe, et le &lt;code&gt;SELECT&lt;/code&gt; continue d&amp;rsquo;attendre :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; waiting_locktype | waiting_table |    waiting_query    |  waiting_mode   | waiting_pid | other_locktype | other_table |      other_query      |     other_mode      | other_pid | other_granted 
-------------------+---------------+---------------------+-----------------+-------------+----------------+-------------+-----------------------+---------------------+-----------+---------------
- relation         | truc          | SELECT * FROM truc; | AccessShareLock |       28629 | relation       | truc        | &amp;lt;IDLE&amp;gt; in transaction | AccessExclusiveLock |     25632 | t
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On voit que le &lt;code&gt;SELECT&lt;/code&gt; attend la transaction qui a lancé le
-&lt;code&gt;DROP TABLE&lt;/code&gt;. Même si le &lt;code&gt;DROP TABLE&lt;/code&gt; est terminé, son effet ne sera
-connu des transactions concurrentes seulement ou moment du commit ou
-rollback, parce qu&amp;rsquo;on utilise le niveau d&amp;rsquo;isolation des transaction
-« read committed » (par défaut). Il n&amp;rsquo;y a pas de « &lt;code&gt;UNLOCK&lt;/code&gt; » sur les
-tables dans PostgreSQL, il faut attendre la fin de la transaction pour
-que les verrous soient libérés, du moins lorsqu&amp;rsquo;on n&amp;rsquo;utilise pas de
-savepoints.&lt;/p&gt;
-&lt;p&gt;Maintenant, on valide le &lt;code&gt;DROP TABLE&lt;/code&gt;, avec l&amp;rsquo;ordre &lt;code&gt;COMMIT&lt;/code&gt;. Le
-&lt;code&gt;SELECT&lt;/code&gt; termine en erreur, on voit alors le message dans les logs :&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;ERROR:  could not open relation with OID 17366 at character 15
-STATEMENT:  SELECT * FROM truc;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Lorsque le &lt;code&gt;SELECT&lt;/code&gt; n&amp;rsquo;est plus bloqué par le verrou, il ne peut accéder
-pas à la table car elle n&amp;rsquo;existe plus. Le message n&amp;rsquo;est pas très
-explicite parce que la requête est en cours d&amp;rsquo;exécution : le moteur a
-déjà terminé le travail de parsing et de planification, il ne travaille
-qu&amp;rsquo;avec les OID qu&amp;rsquo;il a récupéré du catalogue système à ce moment là.&lt;/p&gt;
-&lt;p&gt;Dans ce cas précis, obtenir ce message n&amp;rsquo;est un problème de corruption
-de la base ou du catalogue système.&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-</description>
+      <description>On peut parfois trouver cet étrange message d&amp;rsquo;erreur dans les traces de PostgreSQL (N étant un nombre) ou lors de l&amp;rsquo;exécution d&amp;rsquo;une requête :
+ERROR: could not open relation with OID N  Si on recherche ce message dans les mailing-lists du projet, on peut facilement conclure que la base de données est corrompue, qu&amp;rsquo;il y a des problèmes matériels et que la sécurité des données est en péril. Et bien, ce n&amp;rsquo;est pas forcément le cas : obtenir ce message peut être tout à fait normal.</description>
     </item>
     
   </channel>
