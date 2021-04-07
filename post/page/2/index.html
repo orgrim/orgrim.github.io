@@ -23,8 +23,8 @@
 <meta name="msapplication-TileColor" content="#2e2e33">
 <meta name="generator" content="Hugo 0.81.0" />
 <link rel="alternate" type="application/rss&#43;xml" href="https://www.orgrim.net/post/index.xml">
-<link rel="alternate" hreflang="en" href="https://www.orgrim.net/en/post/" />
 <link rel="alternate" hreflang="fr" href="https://www.orgrim.net/post/" />
+<link rel="alternate" hreflang="en" href="https://www.orgrim.net/en/post/" />
 
 
 <meta property="og:title" content="Posts" />
@@ -174,6 +174,22 @@
 
   <header class="entry-header">
     <h2>
+      modular-xorg, radeon et pas de KMS
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Il y avait un moment que je n’avais pas touché à NetBSD et donc mis à jour mon lappy avec du pkg frais. Entre temps, la version de X.org modular, donc issue de pkgsrc, est revenue en 2012, avec son lot de drivers mis à jour. Le drivers xf86-video-ati, est passé en version 7.1.0, sauf qu’il fonctionne uniquement en KMS (Kernel Mode Setting), chose qu’on n’a pas encore dans notre kernel.
+...</p>
+  </section>
+  <footer class="entry-footer">2013-08-23&nbsp;·&nbsp;1 min
+</footer>
+  <a class="entry-link" aria-label="post link to modular-xorg, radeon et pas de KMS" href="https://www.orgrim.net/post/2013-08-23-modular-xorg-radeon-et-pas-de-kms/"></a>
+</article>
+
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
       Un bulk build par jour dans un screen
     </h2>
   </header>
@@ -316,24 +332,6 @@ J’ai donc ajouté le bloc magique suivant à mon /etc/mk.conf, qui permet de g
   <footer class="entry-footer">2011-08-19&nbsp;·&nbsp;2 min
 </footer>
   <a class="entry-link" aria-label="post link to Bulk build partiel de pkgsrc" href="https://www.orgrim.net/post/2011-08-19-bulk-build-partiel-de-pkgsrc/"></a>
-</article>
-
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      Montrer les dépendances avec make dans pkgsrc
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Généralement, on peut savoir quelles sont les dépendances d’un package en utilisant make show-depends, mais cela ne montre que les dépendances pour l’installation, les dépendances pour la compilation ne sont pas montrées.
-$ cd /usr/pkgsrc/databases/postgresql90-server/ $ make show-depends postgresql90-client&gt;=9.0.4:../../databases/postgresql90-client  Pour connaître les dépendances selon leur type (installation ou compilation), on peut utiliser la cible show-depends-pkgpaths alliée à la variable DEPENDS_TYPE.
-Pour avoir seulement les dépendances de compilation :
-$ make DEPENDS_TYPE=build show-depends-pkgpaths devel/bison devel/gmake pkgtools/digest  Pour avoir seulement celles d’installation :...</p>
-  </section>
-  <footer class="entry-footer">2011-08-18&nbsp;·&nbsp;1 min
-</footer>
-  <a class="entry-link" aria-label="post link to Montrer les dépendances avec make dans pkgsrc" href="https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

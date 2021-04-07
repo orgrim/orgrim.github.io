@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.orgrim.net/categories/</loc>
-    <lastmod>2021-02-11T10:00:00+01:00</lastmod>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -16,7 +16,7 @@
                 />
   </url><url>
     <loc>https://www.orgrim.net/</loc>
-    <lastmod>2021-02-11T10:00:00+01:00</lastmod>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -27,6 +27,70 @@
                 hreflang="fr"
                 href="https://www.orgrim.net/"
                 />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/go/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/go/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/go/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/install/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/install/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/install/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/post/2021-04-06-installer-cfssl/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/tags/linux/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/post/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/post/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/post/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/tls/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/categories/unix/</loc>
+    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/categories/postgresql/</loc>
     <lastmod>2021-02-11T10:00:00+01:00</lastmod>
@@ -57,34 +121,8 @@
     <loc>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</loc>
     <lastmod>2021-02-11T10:00:00+01:00</lastmod>
   </url><url>
-    <loc>https://www.orgrim.net/post/</loc>
-    <lastmod>2021-02-11T10:00:00+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/post/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/post/"
-                />
-  </url><url>
     <loc>https://www.orgrim.net/tags/selinux/</loc>
     <lastmod>2021-02-11T10:00:00+01:00</lastmod>
-  </url><url>
-    <loc>https://www.orgrim.net/tags/</loc>
-    <lastmod>2021-02-11T10:00:00+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/"
-                />
   </url><url>
     <loc>https://www.orgrim.net/categories/code/</loc>
     <lastmod>2021-01-20T21:58:54+01:00</lastmod>
@@ -99,32 +137,6 @@
                 href="https://www.orgrim.net/categories/code/"
                 />
   </url><url>
-    <loc>https://www.orgrim.net/tags/go/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/go/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/go/"
-                />
-  </url><url>
-    <loc>https://www.orgrim.net/tags/install/</loc>
-    <lastmod>2021-01-20T21:58:54+01:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/install/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/install/"
-                />
-  </url><url>
     <loc>https://www.orgrim.net/post/2021-01-20-installer-go/</loc>
     <lastmod>2021-01-20T21:58:54+01:00</lastmod>
   </url><url>
@@ -135,9 +147,6 @@
     <lastmod>2020-07-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</loc>
-    <lastmod>2020-07-28T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.orgrim.net/categories/unix/</loc>
     <lastmod>2020-07-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/tags/unix/</loc>

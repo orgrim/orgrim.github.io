@@ -7,7 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
     <managingEditor>Nicolas Thauvin</managingEditor>
-    <lastBuildDate>Tue, 28 Jul 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.orgrim.net/categories/unix/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 06 Apr 2021 22:30:00 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/categories/unix/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Installer CFSSL</title>
+      <link>https://www.orgrim.net/post/2021-04-06-installer-cfssl/</link>
+      <pubDate>Tue, 06 Apr 2021 22:30:00 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/post/2021-04-06-installer-cfssl/</guid>
+      <description>&lt;p&gt;CFSSL est l&amp;rsquo;outil de gestion de certificats TLS de CloudFlare, son principal
+avantage est de pouvoir créer des certificats en utilisant une configuration au
+format JSON bien plus facile à appréhender qu&amp;rsquo;OpenSSL.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Memento Cloud Init</title>
       <link>https://www.orgrim.net/post/2020-07-28-memento-cloud-init/</link>

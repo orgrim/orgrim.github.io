@@ -23,8 +23,8 @@
 <meta name="msapplication-TileColor" content="#2e2e33">
 <meta name="generator" content="Hugo 0.81.0" />
 <link rel="alternate" type="application/rss&#43;xml" href="https://www.orgrim.net/index.xml">
-<link rel="alternate" hreflang="en" href="https://www.orgrim.net/en/" />
 <link rel="alternate" hreflang="fr" href="https://www.orgrim.net/" />
+<link rel="alternate" hreflang="en" href="https://www.orgrim.net/en/" />
 
 
 <meta property="og:title" content="code. grind. sleep." />
@@ -161,6 +161,24 @@
 
 
 
+
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
+      Montrer les dépendances avec make dans pkgsrc
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Généralement, on peut savoir quelles sont les dépendances d’un package en utilisant make show-depends, mais cela ne montre que les dépendances pour l’installation, les dépendances pour la compilation ne sont pas montrées.
+$ cd /usr/pkgsrc/databases/postgresql90-server/ $ make show-depends postgresql90-client&gt;=9.0.4:../../databases/postgresql90-client  Pour connaître les dépendances selon leur type (installation ou compilation), on peut utiliser la cible show-depends-pkgpaths alliée à la variable DEPENDS_TYPE.
+Pour avoir seulement les dépendances de compilation :
+$ make DEPENDS_TYPE=build show-depends-pkgpaths devel/bison devel/gmake pkgtools/digest  Pour avoir seulement celles d’installation :...</p>
+  </section>
+  <footer class="entry-footer">2011-08-18&nbsp;·&nbsp;1 min
+</footer>
+  <a class="entry-link" aria-label="post link to Montrer les dépendances avec make dans pkgsrc" href="https://www.orgrim.net/post/2011-08-18-montrer-les-dependances-avec-make-dans-pkgsrc/"></a>
+</article>
 
 <article class="post-entry"> 
 
@@ -306,22 +324,6 @@ Pour le coup, c’est utile quand on veut voir un fichier de configuration sans 
   <footer class="entry-footer">2011-03-14&nbsp;·&nbsp;2 min
 </footer>
   <a class="entry-link" aria-label="post link to pg_class.reltuples n&#39;est qu&#39;une approximation du nombre de lignes" href="https://www.orgrim.net/post/2011-03-14-pg_classreltuples-nest-quune-approximation-du-nombre-de-lignes/"></a>
-</article>
-
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      pkgin adventures - bien générer son pkg_summary
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Comme indiqué dans d’autres posts, j’abuse des chroots pkg_comp pour tenir mes paquets à jour. Je suis récemment passé à l’utilisation de pkgin pour la gestion de mes paquets une fois préparés dans le chroot.
-...</p>
-  </section>
-  <footer class="entry-footer">2011-03-12&nbsp;·&nbsp;1 min
-</footer>
-  <a class="entry-link" aria-label="post link to pkgin adventures - bien générer son pkg_summary" href="https://www.orgrim.net/post/2011-03-12-pkgin-adventures-bien-generer-son-pkg_summary/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
