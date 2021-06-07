@@ -130,6 +130,16 @@
   </url><url>
     <loc>https://www.orgrim.net/en/tags/patroni/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/patroni/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/patroni/"
+                />
   </url><url>
     <loc>https://www.orgrim.net/en/categories/postgresql/</loc>
     <lastmod>2020-12-04T21:23:32+01:00</lastmod>
