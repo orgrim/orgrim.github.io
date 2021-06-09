@@ -157,11 +157,28 @@
 
   <header class="entry-header">
     <h2>
+      Load Balancing pour Patroni avec Keepalived
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Les applications doivent déterminer quelle est l’instance disponible en écriture et quelle est la ou les instances en lecture seule.
+Pour fournir un point d’accès unique, sous la forme d’une adresse IP virtuelle, il faut ajouter un service ou mécanisme supplémentaire. Keepalived fournit ce service, il est également capable d’équilibrer les connexions entre plusieurs instances.
+Keepalived est un logiciel de haute-disponibilité et d’équilibrage de charge reposant sur le noyau Linux....</p>
+  </section>
+  <footer class="entry-footer">2021-06-09&nbsp;·&nbsp;18 min
+</footer>
+  <a class="entry-link" aria-label="post link to Load Balancing pour Patroni avec Keepalived" href="https://www.orgrim.net/post/2021-06-07-keepalived-load-balancing-patroni/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+
+  <header class="entry-header">
+    <h2>
       IP flottante pour Patroni avec Keepalived
     </h2>
   </header>
   <section class="entry-content">
-    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d’accès pour les applications. Elles doivent pourtant déterminer quelle serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
+    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d’accès pour les applications. Elles doivent pourtant déterminer quel serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
 Il faut donc ajouter un service supplémentaire à l’architecture pour gérer la placement de cette adresse IP, généralement appelée, IP virtuelle, VIP, ou IP flottante : Keepalived permet de le faire....</p>
   </section>
   <footer class="entry-footer">2021-06-07&nbsp;·&nbsp;7 min
@@ -298,23 +315,6 @@ Ce qui est moins connu et utilisé, c’est la possibilité de configurer ces pa
   <footer class="entry-footer">2012-01-25&nbsp;·&nbsp;3 min
 </footer>
   <a class="entry-link" aria-label="post link to Got GUC?" href="https://www.orgrim.net/post/2012-01-25-got-guc/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Voilà donc une question intéressante, comment se comporte PostgreSQL face à un système de fichier plein ? Un peu d’expérimentation est nécessaire pour se rassurer…
-On crée deux systèmes de fichiers de faible taille pour les tests. Le premier stockera PGDATA, ainsi qu’une base de données nommée db_data. Le second sera le tablesapce ts1, dans lequel oncréera une base de données db_ts1.
-L’objectif est de montrer que seules les transactions modifiant des objets stockés sur des systèmes de fichier plein sont affectées, c’est pourquoi on a besoin de plusieurs tablespaces....</p>
-  </section>
-  <footer class="entry-footer">2011-10-14&nbsp;·&nbsp;4 min
-</footer>
-  <a class="entry-link" aria-label="post link to Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger" href="https://www.orgrim.net/post/2011-10-14-quand-postgresql-na-plus-despace-disque-a-manger/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

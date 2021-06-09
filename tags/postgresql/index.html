@@ -157,11 +157,28 @@
 
   <header class="entry-header">
     <h2>
+      Load Balancing pour Patroni avec Keepalived
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Les applications doivent déterminer quelle est l’instance disponible en écriture et quelle est la ou les instances en lecture seule.
+Pour fournir un point d’accès unique, sous la forme d’une adresse IP virtuelle, il faut ajouter un service ou mécanisme supplémentaire. Keepalived fournit ce service, il est également capable d’équilibrer les connexions entre plusieurs instances.
+Keepalived est un logiciel de haute-disponibilité et d’équilibrage de charge reposant sur le noyau Linux....</p>
+  </section>
+  <footer class="entry-footer">2021-06-09&nbsp;·&nbsp;18 min
+</footer>
+  <a class="entry-link" aria-label="post link to Load Balancing pour Patroni avec Keepalived" href="https://www.orgrim.net/post/2021-06-07-keepalived-load-balancing-patroni/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+
+  <header class="entry-header">
+    <h2>
       IP flottante pour Patroni avec Keepalived
     </h2>
   </header>
   <section class="entry-content">
-    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d’accès pour les applications. Elles doivent pourtant déterminer quelle serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
+    <p>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d’accès pour les applications. Elles doivent pourtant déterminer quel serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
 Il faut donc ajouter un service supplémentaire à l’architecture pour gérer la placement de cette adresse IP, généralement appelée, IP virtuelle, VIP, ou IP flottante : Keepalived permet de le faire....</p>
   </section>
   <footer class="entry-footer">2021-06-07&nbsp;·&nbsp;7 min
@@ -299,22 +316,6 @@ ERROR: could not open relation with OID N  Si on recherche ce message dans les m
   <footer class="entry-footer">2011-04-07&nbsp;·&nbsp;1 min
 </footer>
   <a class="entry-link" aria-label="post link to Retrouver un trigger à partir du nom de la fonction associée" href="https://www.orgrim.net/post/2011-04-07-retrouver-un-trigger-a-partir-du-nom-de-la-fonction-associee/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      pg_class.reltuples n&#39;est qu&#39;une approximation du nombre de lignes
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Dans le catalogue de PostgreSQL, qui donne plein d’information sur le cluster et la base de données, la table pg_class regroupe les informations sur les tables, les séquences, les index, tout ce qui contient des colonnes, appelé relation. L’un des champs disponibles est reltuples, il contient le nombre approximatif de lignes dans une relation. C’est approximatif, ainsi ce n’est pas un donnée sure… La preuve par l’exemple.
-...</p>
-  </section>
-  <footer class="entry-footer">2011-03-14&nbsp;·&nbsp;2 min
-</footer>
-  <a class="entry-link" aria-label="post link to pg_class.reltuples n&#39;est qu&#39;une approximation du nombre de lignes" href="https://www.orgrim.net/post/2011-03-14-pg_classreltuples-nest-quune-approximation-du-nombre-de-lignes/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

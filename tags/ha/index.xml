@@ -7,7 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
     <managingEditor>Nicolas Thauvin</managingEditor>
-    <lastBuildDate>Mon, 07 Jun 2021 11:35:02 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/ha/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 09 Jun 2021 14:21:23 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/ha/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Load Balancing pour Patroni avec Keepalived</title>
+      <link>https://www.orgrim.net/post/2021-06-07-keepalived-load-balancing-patroni/</link>
+      <pubDate>Wed, 09 Jun 2021 14:21:23 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/post/2021-06-07-keepalived-load-balancing-patroni/</guid>
+      <description>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Les applications doivent déterminer quelle est l&amp;rsquo;instance disponible en écriture et quelle est la ou les instances en lecture seule.
+Pour fournir un point d&amp;rsquo;accès unique, sous la forme d&amp;rsquo;une adresse IP virtuelle, il faut ajouter un service ou mécanisme supplémentaire. Keepalived fournit ce service, il est également capable d&amp;rsquo;équilibrer les connexions entre plusieurs instances.
+Keepalived est un logiciel de haute-disponibilité et d&amp;rsquo;équilibrage de charge reposant sur le noyau Linux.</description>
+    </item>
+    
     <item>
       <title>IP flottante pour Patroni avec Keepalived</title>
       <link>https://www.orgrim.net/post/2021-06-07-keepalived-ip-flottante-patroni/</link>
@@ -15,7 +27,7 @@
       <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/post/2021-06-07-keepalived-ip-flottante-patroni/</guid>
-      <description>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d&amp;rsquo;accès pour les applications. Elles doivent pourtant déterminer quelle serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
+      <description>Patroni ne gère que le service PostgreSQL en pilotant la réplication. Il ne fournit volontairement aucun moyen d&amp;rsquo;accès pour les applications. Elles doivent pourtant déterminer quel serveur PostgreSQL est accessible en écriture, pour cela une solution est de placer une adresse IP supplémentaire sur ce serveur en écriture qui est déplacée automatique en cas de bascule.
 Il faut donc ajouter un service supplémentaire à l&amp;rsquo;architecture pour gérer la placement de cette adresse IP, généralement appelée, IP virtuelle, VIP, ou IP flottante : Keepalived permet de le faire.</description>
     </item>
     
