@@ -53,5 +53,18 @@ old, so I installed the official binaries this way.&lt;/p&gt;</description>
 Since I am doing more Python at work these days, I quickly made a patch. Before jumping on git push, I thought it would be nice to test if is really solves the issue. I needed a Patroni cluster, some configuration is provided and commands in the README, which is great but the instruction are not targetted toward development.</description>
     </item>
     
+    <item>
+      <title></title>
+      <link>https://www.orgrim.net/en/post/2022-04-05-setup-kubernetes-on-local-vms/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/en/post/2022-04-05-setup-kubernetes-on-local-vms/</guid>
+      <description>;; This buffer is for text that is not saved, and for Lisp evaluation. ;; To create a file, visit it with C-x C-f and enter text in its buffer.
+Install Ceph using the Ansible roles provided by ceph-ansible.
+Integrate Kubernetes with Ceph to let it create persistent volume on the Ceph cluster
+Once the Ceph cluster is up and running, we will use the RBD to provide block devices to the Kubernetes cluster.</description>
+    </item>
+    
   </channel>
 </rss>

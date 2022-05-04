@@ -7,7 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
     <managingEditor>Nicolas Thauvin</managingEditor>
-    <lastBuildDate>Wed, 09 Jun 2021 14:21:23 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/categories/postgresql/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 May 2022 09:00:00 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/categories/postgresql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SET SESSION AUTHORIZATION vs SET ROLE</title>
+      <link>https://www.orgrim.net/post/set-session-authorization-vs-set-role/</link>
+      <pubDate>Wed, 04 May 2022 09:00:00 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/post/set-session-authorization-vs-set-role/</guid>
+      <description>&lt;p&gt;Sur PostgreSQL, pour obtenir les permissions et attributs d&amp;rsquo;un autre rôle, on
+peut utiliser &lt;code&gt;SET SESSION AUTHORIZATION&lt;/code&gt; ou &lt;code&gt;SET ROLE&lt;/code&gt;. Si on est autorisé à le
+faire, le résultat semble être le même : on se fait passer pour le rôle, mais il
+y a quelques subtilités.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Load Balancing pour Patroni avec Keepalived</title>
       <link>https://www.orgrim.net/post/2021-06-07-keepalived-load-balancing-patroni/</link>

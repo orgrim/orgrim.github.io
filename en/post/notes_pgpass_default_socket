@@ -1,0 +1,21 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with C-x C-f and enter text in its buffer.
+
+[#0] 0x7ffff7f6cb9c → passwordFromFile(pgpassfile=<optimized out>, username=<optimized out>, dbname=<optimized out>, port=<optimized out>, hostname=<optimized out>)
+[#1] 0x7ffff7f6cb9c → connectOptions2(conn=0x55555561f800)
+[#2] 0x7ffff7f6da9b → PQconnectStartParams(keywords=0x55555561f760, values=0x55555561f7b0, expand_dbname=<optimized out>)
+[#3] 0x7ffff7f6db2e → PQconnectdbParams(keywords=<optimized out>, values=<optimized out>, expand_dbname=<optimized out>)
+[#4] 0x555555569837 → main(argc=<optimized out>, argv=0x7fffffffe298)
+
+
+cd /home/pgsql/git
+git checkout REL_14_1
+cd src
+tools/make_etags
+cd ..
+gdb /usr/lib/postgresql/13/bin/psql
+b main
+run
+b passwordFromFile
+c
+then step until you see it changing from /var/run/postgresql to localhost, meaning it searches for localhost in .pgpass

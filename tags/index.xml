@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
     <managingEditor>Nicolas Thauvin</managingEditor>
-    <lastBuildDate>Wed, 09 Jun 2021 14:21:23 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 May 2022 09:00:00 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>postgresql</title>
+      <link>https://www.orgrim.net/tags/postgresql/</link>
+      <pubDate>Wed, 04 May 2022 09:00:00 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/postgresql/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>ha</title>
       <link>https://www.orgrim.net/tags/ha/</link>
@@ -35,16 +45,6 @@
       <author>Nicolas Thauvin</author>
       
       <guid>https://www.orgrim.net/tags/patroni/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>postgresql</title>
-      <link>https://www.orgrim.net/tags/postgresql/</link>
-      <pubDate>Wed, 09 Jun 2021 14:21:23 +0200</pubDate>
-      <author>Nicolas Thauvin</author>
-      
-      <guid>https://www.orgrim.net/tags/postgresql/</guid>
       <description></description>
     </item>
     
