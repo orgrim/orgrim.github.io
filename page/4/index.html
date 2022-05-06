@@ -166,6 +166,22 @@
 
   <header class="entry-header">
     <h2>
+      Combiner des PDF en un seul
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Pour combiner des pdf en un seul, on peut essayer pdfjoin fournit par le projet pdfjam. En attendant que les 250 Mo de dépendances (Latex principalement) s’installent, on peut utiliser ghostscript :
+gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=../combined_doc.pdf *.pdf  Merci à perlmonks.org.</p>
+  </section>
+  <footer class="entry-footer">2011-06-21&nbsp;·&nbsp;1 min
+</footer>
+  <a class="entry-link" aria-label="post link to Combiner des PDF en un seul" href="https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/"></a>
+</article>
+
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
       Retrouver un trigger à partir du nom de la fonction associée
     </h2>
   </header>
@@ -308,22 +324,6 @@ Ensuite, on édite le etc/mk.conf du chroot, par exemple /local/pkg_comp/default
   <footer class="entry-footer">2011-02-26&nbsp;·&nbsp;2 min
 </footer>
   <a class="entry-link" aria-label="post link to Accès SSH externe sur une gateway NetBSD" href="https://www.orgrim.net/post/2011-02-26-acces-ssh-externe-sur-une-gateway-netbsd/"></a>
-</article>
-
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      Voir tous les champs d&#39;une table
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Avec PostgreSQL, on peut utiliser la requête suivante pour obtenir la taille de chacune des bases de données d’un cluster :
-SELECTdatnameASbase,pg_size_pretty(pg_database_size(oid))AStailleFROMpg_database;...</p>
-  </section>
-  <footer class="entry-footer">2011-02-25&nbsp;·&nbsp;2 min
-</footer>
-  <a class="entry-link" aria-label="post link to Voir tous les champs d&#39;une table" href="https://www.orgrim.net/post/2011-02-25-voir-tous-les-champs-dune-table/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

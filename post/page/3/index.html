@@ -174,6 +174,23 @@
 
   <header class="entry-header">
     <h2>
+      X11 forwarding request failed on channel 0
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>Quand j’essaye de me logguer sur ma box NetBSD fraichement passé en X.org modular, j’ai ça :
+orgrim@serfouette ~ $ ssh rateau X11 forwarding request failed on channel 0 Last login: Fri Oct 21 12:20:24 2011 from serfouette.home.orgrim.net  WTF? ça tombe en marche SSH normalement.
+Et bien le souci vient de l’échange des magic cookies pour l’authentification entre serveurs X à travers SSH, c’est utilisé par le X11 forwarding et on a besoin de plusieurs choses pour ça :...</p>
+  </section>
+  <footer class="entry-footer">2011-10-21&nbsp;·&nbsp;2 min
+</footer>
+  <a class="entry-link" aria-label="post link to X11 forwarding request failed on channel 0" href="https://www.orgrim.net/post/2011-10-21-x11-forwarding-request-failed-on-channel-0/"></a>
+</article>
+
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
       Quand PostgreSQL n&#39;a plus d&#39;espace disque à manger
     </h2>
   </header>
@@ -317,22 +334,6 @@ exec FD&gt; &gt;(COMMAND)   FD est le numéro du file descriptor, 1 pour stdout,
   <footer class="entry-footer">2011-06-29&nbsp;·&nbsp;1 min
 </footer>
   <a class="entry-link" aria-label="post link to Rediriger stdout/stderr depuis un script avec du pipe" href="https://www.orgrim.net/post/2011-06-29-rediriger-stdoutstderr-depuis-un-script-avec-du-pipe/"></a>
-</article>
-
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      Combiner des PDF en un seul
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Pour combiner des pdf en un seul, on peut essayer pdfjoin fournit par le projet pdfjam. En attendant que les 250 Mo de dépendances (Latex principalement) s’installent, on peut utiliser ghostscript :
-gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=../combined_doc.pdf *.pdf  Merci à perlmonks.org.</p>
-  </section>
-  <footer class="entry-footer">2011-06-21&nbsp;·&nbsp;1 min
-</footer>
-  <a class="entry-link" aria-label="post link to Combiner des PDF en un seul" href="https://www.orgrim.net/post/2011-06-21-combiner-des-pdf-en-un-seul/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

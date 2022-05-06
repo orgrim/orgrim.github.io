@@ -7,7 +7,37 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>fr</language>
     <managingEditor>Nicolas Thauvin</managingEditor>
-    <lastBuildDate>Wed, 04 May 2022 09:00:00 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 06 May 2022 16:26:01 +0200</lastBuildDate><atom:link href="https://www.orgrim.net/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>fonts</title>
+      <link>https://www.orgrim.net/tags/fonts/</link>
+      <pubDate>Fri, 06 May 2022 16:26:01 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/fonts/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>shell</title>
+      <link>https://www.orgrim.net/tags/shell/</link>
+      <pubDate>Fri, 06 May 2022 16:26:01 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/shell/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tuning</title>
+      <link>https://www.orgrim.net/tags/tuning/</link>
+      <pubDate>Fri, 06 May 2022 16:26:01 +0200</pubDate>
+      <author>Nicolas Thauvin</author>
+      
+      <guid>https://www.orgrim.net/tags/tuning/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>postgresql</title>
       <link>https://www.orgrim.net/tags/postgresql/</link>

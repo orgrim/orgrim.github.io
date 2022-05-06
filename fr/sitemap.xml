@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.orgrim.net/categories/</loc>
-    <lastmod>2022-05-04T09:00:00+02:00</lastmod>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -16,7 +16,7 @@
                 />
   </url><url>
     <loc>https://www.orgrim.net/</loc>
-    <lastmod>2022-05-04T09:00:00+02:00</lastmod>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -27,6 +27,50 @@
                 hreflang="fr"
                 href="https://www.orgrim.net/"
                 />
+  </url><url>
+    <loc>https://www.orgrim.net/categories/debian/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/tags/fonts/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/post/pimp-my-shell/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/post/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/post/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/post/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/shell/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/tags/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://www.orgrim.net/en/tags/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://www.orgrim.net/tags/"
+                />
+  </url><url>
+    <loc>https://www.orgrim.net/tags/tuning/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
+  </url><url>
+    <loc>https://www.orgrim.net/categories/unix/</loc>
+    <lastmod>2022-05-06T16:26:01+02:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/categories/postgresql/</loc>
     <lastmod>2022-05-04T09:00:00+02:00</lastmod>
@@ -54,34 +98,8 @@
                 href="https://www.orgrim.net/tags/postgresql/"
                 />
   </url><url>
-    <loc>https://www.orgrim.net/post/</loc>
-    <lastmod>2022-05-04T09:00:00+02:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/post/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/post/"
-                />
-  </url><url>
     <loc>https://www.orgrim.net/post/set-session-authorization-vs-set-role/</loc>
     <lastmod>2022-05-04T09:00:00+02:00</lastmod>
-  </url><url>
-    <loc>https://www.orgrim.net/tags/</loc>
-    <lastmod>2022-05-04T09:00:00+02:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://www.orgrim.net/en/tags/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://www.orgrim.net/tags/"
-                />
   </url><url>
     <loc>https://www.orgrim.net/tags/ha/</loc>
     <lastmod>2021-06-09T14:21:23+02:00</lastmod>
@@ -141,9 +159,6 @@
     <lastmod>2021-04-06T22:30:00+02:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/tags/tls/</loc>
-    <lastmod>2021-04-06T22:30:00+02:00</lastmod>
-  </url><url>
-    <loc>https://www.orgrim.net/categories/unix/</loc>
     <lastmod>2021-04-06T22:30:00+02:00</lastmod>
   </url><url>
     <loc>https://www.orgrim.net/post/2021-02-11-postgresql-et-selinux/</loc>
